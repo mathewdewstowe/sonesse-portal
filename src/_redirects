@@ -1,0 +1,12 @@
+# Cloudflare Pages redirects
+# Old WordPress ?p=ID URLs
+/index.html?p=24 /demo/ 301
+/index.html?p=303 /use-cases/ 301
+/index.html?p=466 /marketplace/ 301
+/index.html?p=573 /on-premise/ 301
+
+# Old mirrored @p= paths
+/page/24/* /demo/ 301
+/page/303/* /use-cases/ 301
+/page/466/* /marketplace/ 301
+/page/573/* /on-premise/ 301
