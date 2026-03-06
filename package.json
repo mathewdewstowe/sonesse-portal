@@ -6,10 +6,9 @@
     "build": "npx eleventy",
     "start": "npx eleventy --serve --port 8788",
     "dev": "npx eleventy --serve --port 8788",
-    "deploy": "npx eleventy && npx wrangler pages deploy public --project-name=sonesse-website"
+    "deploy": "npx eleventy"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.2",
-    "wrangler": "^3.99.0"
+    "@11ty/eleventy": "^3.1.2"
   }
 }
