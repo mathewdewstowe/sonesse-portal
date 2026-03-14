@@ -18,6 +18,14 @@
 		@media only screen and (min-width: 1340px) { #header-outer header#top .container { max-width: 1260px !important; } }
 		#header-outer nav > ul > li > a { font-size: 16px !important; }
 		#header-space { height: 99px !important; max-height: 99px !important; }
+
+		/* Column margin 80px — matches homepage two-column gap */
+		.vc_row-fluid[data-column-margin="80px"] > .span_12,
+		.vc_row-fluid[data-column-margin="80px"] > .row_col_wrap_12 { margin-left: -40px !important; margin-right: -40px !important; }
+		.vc_row-fluid[data-column-margin="80px"] .wpb_column:not(.child_column) { padding-left: 40px !important; padding-right: 40px !important; }
+		@media only screen and (max-width: 999px) {
+			.vc_row-fluid[data-column-margin="80px"] .wpb_column:not([class*="vc_col-xs-"]):not(.child_column):not(:last-child) { margin-bottom: 80px; }
+		}
 	</style><meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
 
 	<title>{{ title }}</title>
