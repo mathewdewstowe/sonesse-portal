@@ -2,16 +2,39 @@
 <html lang="en-US" class="no-js">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" /><meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+	<style>
+		/* Normalize container widths across all pages */
+		.container, .main-content > .row, .container-wrap .container { max-width: 1100px !important; margin-left: auto !important; margin-right: auto !important; }
+		body[data-ext-responsive="true"] .container, body[data-ext-responsive="true"] .main-content > .row, body[data-ext-responsive="true"] .container-wrap .container { max-width: calc(100% - 80px) !important; }
+		@media only screen and (min-width: 1340px) { body[data-ext-responsive="true"] .container, body[data-ext-responsive="true"] .main-content > .row, body[data-ext-responsive="true"] .container-wrap .container { max-width: 1260px !important; } }
 
-	<!-- This site is optimized with the Yoast SEO plugin v27.1.1 - https://yoast.com/product/yoast-seo-wordpress/ -->
+		/* Normalize header across all pages - lock to consistent values */
+		#header-outer { height: 99px !important; min-height: 99px !important; max-height: 99px !important; }
+		#header-outer[data-header-resize="1"]:not(.scrolled-down) #logo img { height: 43px !important; }
+		#header-outer #logo img { height: 43px !important; max-height: 43px !important; width: auto !important; }
+		#header-outer #logo { margin-top: 28px !important; display: block !important; }
+		#header-outer header#top .container { max-width: calc(100% - 80px) !important; }
+		@media only screen and (min-width: 1340px) { #header-outer header#top .container { max-width: 1260px !important; } }
+		#header-outer nav > ul > li > a { font-size: 16px !important; }
+		#header-space { height: 99px !important; max-height: 99px !important; }
+
+		/* Column margin 80px — matches homepage two-column gap */
+		.vc_row-fluid[data-column-margin="80px"] > .span_12,
+		.vc_row-fluid[data-column-margin="80px"] > .row_col_wrap_12 { margin-left: -40px !important; margin-right: -40px !important; }
+		.vc_row-fluid[data-column-margin="80px"] .wpb_column:not(.child_column) { padding-left: 40px !important; padding-right: 40px !important; }
+		@media only screen and (max-width: 999px) {
+			.vc_row-fluid[data-column-margin="80px"] .wpb_column:not([class*="vc_col-xs-"]):not(.child_column):not(:last-child) { margin-bottom: 80px; }
+		}
+	</style><meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
 	<title>{{ title }}</title>
 	<link rel="canonical" href="{{ canonical }}" />
 	<meta property="og:locale" content="en_US" />
 	<meta property="og:type" content="{{ ogType | default('article') }}" />
 	<meta property="og:title" content="{{ title }}" />
 	<meta property="og:url" content="{{ ogUrl | default(canonical) }}" />
-	<meta property="og:site_name" content="Umified" />
+	<meta property="og:site_name" content="Sonesse" />
 	<meta property="article:modified_time" content="{{ modifiedTime }}" />
 	<meta name="twitter:card" content="summary_large_image" />
 	{% if twitterLabel1 %}
@@ -19,7 +42,6 @@
 	<meta name="twitter:data1" content="{{ twitterData1 }}" />
 	{% endif %}
 	<script type="application/ld+json" class="yoast-schema-graph">{{ jsonLd | safe }}</script>
-	<!-- / Yoast SEO plugin. -->
 
 {% include "partials/head-common.njk" %}
 

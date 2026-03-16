@@ -1,10 +1,33 @@
-<script type="text/html" id="wpb-modifications"> window.wpbCustomElement = 1; </script><script type="text/javascript" src="/wp-includes/js/dist/hooks.min.js@ver=dd5603f07f9220ed27f1" id="wp-hooks-js"></script>
-<script type="text/javascript" src="/wp-includes/js/dist/i18n.min.js@ver=c26c3dc7bed366793375" id="wp-i18n-js"></script>
-<script type="text/javascript" id="wp-i18n-js-after">
-/* <![CDATA[ */
-wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
-//# sourceURL=wp-i18n-js-after
-/* ]]> */
+<!-- Formspree form handler -->
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('form.wpcf7-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var submitBtn = form.querySelector('input[type="submit"]');
+      var originalValue = submitBtn.value;
+      submitBtn.value = 'Sending...';
+      submitBtn.disabled = true;
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function(response) {
+        if (response.ok) {
+          form.innerHTML = '<div style="padding:20px;text-align:center;color:#7C5CFC;font-size:18px;font-weight:600;">Thank you! We\'ll be in touch soon.</div>';
+        } else {
+          submitBtn.value = originalValue;
+          submitBtn.disabled = false;
+          alert('There was a problem submitting the form. Please try again.');
+        }
+      }).catch(function() {
+        submitBtn.value = originalValue;
+        submitBtn.disabled = false;
+        alert('There was a problem submitting the form. Please try again.');
+      });
+    });
+  });
+});
 </script>
 <script type="text/javascript" src="/js/form-handler.js" id="form-handler-js"></script>
 <script type="text/javascript" src="/wp-content/themes/salient/js/build/third-party/jquery.easing.min.js@ver=1.3" id="jquery-easing-js"></script>
@@ -18,34 +41,126 @@ wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
 <script type="text/javascript" src="/wp-content/themes/salient/js/build/third-party/anime.min.js@ver=4.5.1" id="anime-js"></script>
 <script type="text/javascript" src="/wp-content/themes/salient/js/build/third-party/superfish.js@ver=1.5.8" id="superfish-js"></script>
 <script type="text/javascript" id="nectar-frontend-js-extra">
-/* <![CDATA[ */
-var nectarLove = {"ajaxurl":"http://umified.com/wp-admin/admin-ajax.php","postID":"{{ postID }}","rooturl":"http://umified.com","disqusComments":"false","loveNonce":"ede1e440b5","mapApiKey":""};
+var nectarLove = {"ajaxurl":"","postID":"{{ postID }}","rooturl":"https://sonesse.ai","disqusComments":"false","loveNonce":"","mapApiKey":""};
 var nectarOptions = {"delay_js":"false","smooth_scroll":"false","quick_search":"false","react_compat":"disabled","header_entrance":"false","body_border_func":"default","body_border_mobile":"0","dropdown_hover_intent":"default","simplify_ocm_mobile":"0","mobile_header_format":"default","ocm_btn_position":"default","left_header_dropdown_func":"default","ajax_add_to_cart":"0","ocm_remove_ext_menu_items":"remove_images","woo_product_filter_toggle":"0","woo_sidebar_toggles":"true","woo_sticky_sidebar":"0","woo_minimal_product_hover":"default","woo_minimal_product_effect":"default","woo_related_upsell_carousel":"false","woo_product_variable_select":"default","woo_using_cart_addons":"false","view_transitions_effect":""};
 var nectar_front_i18n = {"menu":"Menu","next":"Next","previous":"Previous","close":"Close"};
-//# sourceURL=nectar-frontend-js-extra
-/* ]]> */
 </script>
 <script type="text/javascript" src="/wp-content/themes/salient/js/build/init.js@ver=17.0.0" id="nectar-frontend-js"></script>
 <script type="text/javascript" src="/wp-content/plugins/salient-core/js/third-party/touchswipe.min.js@ver=1.0" id="touchswipe-js"></script>
 <script type="text/javascript" src="/wp-content/plugins/js_composer_salient/assets/js/dist/js_composer_front.min.js@ver=7.8.1" id="wpb_composer_front_js-js"></script>
 <script type="text/javascript" src="/wp-includes/js/jquery/ui/core.min.js@ver=1.13.3" id="jquery-ui-core-js"></script>
+<!-- Popup maker config -->
 <script type="text/javascript" id="popup-maker-site-js-extra">
-/* <![CDATA[ */
-var pum_vars = {"version":"1.21.5","pm_dir_url":"http://umified.com/wp-content/plugins/popup-maker/","ajaxurl":"http://umified.com/wp-admin/admin-ajax.php","restapi":"http://umified.com/wp-json/pum/v1","rest_nonce":null,"default_theme":"477","debug_mode":"","disable_tracking":"","home_url":"/","message_position":"top","core_sub_forms_enabled":"1","popups":[],"cookie_domain":"","analytics_enabled":"1","analytics_route":"analytics","analytics_api":"http://umified.com/wp-json/pum/v1"};
-var pum_sub_vars = {"ajaxurl":"http://umified.com/wp-admin/admin-ajax.php","message_position":"top"};
+var pum_vars = {"version":"1.21.5","pm_dir_url":"/wp-content/plugins/popup-maker/","ajaxurl":"","restapi":"","rest_nonce":null,"default_theme":"477","debug_mode":"","disable_tracking":"1","home_url":"/","message_position":"top","core_sub_forms_enabled":"1","popups":[],"cookie_domain":"","analytics_enabled":"0","analytics_route":"","analytics_api":""};
+var pum_sub_vars = {"ajaxurl":"","message_position":"top"};
 var pum_popups = {"pum-486":{"triggers":[{"type":"click_open","settings":{"cookie_name":"","extra_selectors":".tab-popup-btn"}}],"cookies":[],"disable_on_mobile":false,"disable_on_tablet":false,"atc_promotion":null,"explain":null,"type_section":null,"theme_id":"478","size":"small","responsive_min_width":"0%","responsive_max_width":"640px","custom_width":"640px","custom_height_auto":false,"custom_height":"380px","scrollable_content":false,"animation_type":"fade","animation_speed":"350","animation_origin":"center top","open_sound":"none","custom_sound":"","location":"center","position_top":"100","position_bottom":"0","position_left":"0","position_right":"0","position_from_trigger":false,"position_fixed":false,"overlay_disabled":false,"stackable":false,"disable_reposition":false,"zindex":"1999999999","close_button_delay":"0","fi_promotion":null,"close_on_form_submission":false,"close_on_form_submission_delay":"0","close_on_overlay_click":false,"close_on_esc_press":false,"close_on_f4_press":false,"disable_form_reopen":false,"disable_accessibility":false,"theme_slug":"lightbox","id":486,"slug":"market-place-form"}};
-//# sourceURL=popup-maker-site-js-extra
-/* ]]> */
 </script>
 <script type="text/javascript" src="/wp-content/uploads/pum/pum-site-scripts.js@defer&amp;generated=1756117492&amp;ver=1.21.5" id="popup-maker-site-js"></script>
-<script id="wp-emoji-settings" type="application/json">
-{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"http://umified.com/wp-includes/js/wp-emoji-release.min.js?ver=6.9.1"}}
+<!-- Force consistent layout across all pages - runs AFTER Salient JS -->
+<script type="text/javascript">
+(function() {
+  function getContainerWidth() {
+    var winW = window.innerWidth;
+    return winW >= 1340 ? '1260px' : 'calc(100% - 80px)';
+  }
+  function enforceLayout() {
+    var w = getContainerWidth();
+    // Force header height
+    var header = document.getElementById('header-outer');
+    if (header) {
+      header.style.setProperty('height', '99px', 'important');
+      header.style.setProperty('min-height', '99px', 'important');
+      header.style.setProperty('max-height', '99px', 'important');
+    }
+    // Force header-space
+    var headerSpace = document.getElementById('header-space');
+    if (headerSpace) {
+      headerSpace.style.setProperty('height', '99px', 'important');
+      headerSpace.style.setProperty('max-height', '99px', 'important');
+    }
+    // Force logo size and vertical centering (margin-top = (99-43)/2 = 28px)
+    var logo = document.querySelector('#logo img');
+    if (logo) {
+      logo.style.setProperty('height', '43px', 'important');
+      logo.style.setProperty('max-height', '43px', 'important');
+      logo.style.setProperty('width', 'auto', 'important');
+    }
+    var logoLink = document.getElementById('logo');
+    if (logoLink) {
+      logoLink.style.setProperty('margin-top', '28px', 'important');
+      logoLink.style.setProperty('display', 'block', 'important');
+    }
+    // Force header container width — both width and max-width
+    var headerContainer = document.querySelector('#header-outer header#top > .container');
+    if (headerContainer) {
+      headerContainer.style.setProperty('max-width', w, 'important');
+      headerContainer.style.setProperty('width', w, 'important');
+      headerContainer.style.setProperty('margin-left', 'auto', 'important');
+      headerContainer.style.setProperty('margin-right', 'auto', 'important');
+    }
+    // Force content container widths
+    var containers = document.querySelectorAll('.container-wrap .container');
+    containers.forEach(function(c) {
+      c.style.setProperty('max-width', w, 'important');
+      c.style.setProperty('margin-left', 'auto', 'important');
+      c.style.setProperty('margin-right', 'auto', 'important');
+    });
+    // Force row_col_wrap_12 inside full-width-section
+    var rowWraps = document.querySelectorAll('.full-width-section > .row_col_wrap_12');
+    rowWraps.forEach(function(rw) {
+      rw.style.setProperty('max-width', w, 'important');
+      rw.style.setProperty('margin-left', 'auto', 'important');
+      rw.style.setProperty('margin-right', 'auto', 'important');
+    });
+    // Force nav font size
+    var navLinks = document.querySelectorAll('nav .sf-menu > li > a');
+    navLinks.forEach(function(a) {
+      a.style.setProperty('font-size', '16px', 'important');
+    });
+  }
+  // Run immediately (before DOMContentLoaded)
+  enforceLayout();
+  // Run after DOM ready — Salient JS also runs on DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', function() {
+    enforceLayout();
+    setTimeout(enforceLayout, 50);
+    setTimeout(enforceLayout, 200);
+    setTimeout(enforceLayout, 500);
+    setTimeout(enforceLayout, 1000);
+  });
+  // Run on full load
+  window.addEventListener('load', function() {
+    enforceLayout();
+    setTimeout(enforceLayout, 300);
+  });
+  // Run on resize
+  window.addEventListener('resize', enforceLayout);
+  // MutationObserver: re-enforce immediately if Salient JS mutates header styles
+  if (window.MutationObserver) {
+    var _obs = new MutationObserver(function(mutations) {
+      var needsEnforce = false;
+      mutations.forEach(function(m) {
+        if (m.attributeName === 'style' || m.attributeName === 'class') needsEnforce = true;
+      });
+      if (needsEnforce) {
+        _obs.disconnect();
+        enforceLayout();
+        _reattachObs();
+      }
+    });
+    function _reattachObs() {
+      var _h = document.getElementById('header-outer');
+      var _hs = document.getElementById('header-space');
+      var _l = document.getElementById('logo');
+      var _li = document.querySelector('#logo img');
+      if (_h) _obs.observe(_h, { attributes: true, attributeFilter: ['style','class'] });
+      if (_hs) _obs.observe(_hs, { attributes: true, attributeFilter: ['style','class'] });
+      if (_l) _obs.observe(_l, { attributes: true, attributeFilter: ['style','class'] });
+      if (_li) _obs.observe(_li, { attributes: true, attributeFilter: ['style','class'] });
+    }
+    function _startObs() { _reattachObs(); }
+    document.addEventListener('DOMContentLoaded', _startObs);
+    window.addEventListener('load', _startObs);
+  }
+})();
 </script>
-<script type="module">
-/* <![CDATA[ */
-/*! This file is auto-generated */
-const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
-//# sourceURL=http://umified.com/wp-includes/js/wp-emoji-loader.min.js
-/* ]]> */
-</script>
-<script></script>
