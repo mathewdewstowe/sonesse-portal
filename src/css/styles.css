@@ -1129,6 +1129,16 @@ p:last-child { margin-bottom: 0; }
 .mt-20 { margin-top: 20px; }
 
 /* --- Responsive --- */
+@media (max-width: 999px) {
+  /* Left-align images on mobile */
+  img { margin-left: 0; margin-right: auto; }
+  .feature-block__image { justify-content: flex-start; }
+  .feature-block__image img { margin-left: 0; }
+  .grid img { margin-left: 0; }
+  .use-cases-tabs img { margin-left: 0; }
+  .text-center img { margin-left: auto; margin-right: auto; }
+}
+
 @media (max-width: 690px) {
   .banner-section { padding: 60px 0 50px; }
   .banner-section__title { font-size: 36px; line-height: 44px; }
