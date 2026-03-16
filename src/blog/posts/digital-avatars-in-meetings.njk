@@ -1,0 +1,79 @@
+---
+layout: blog-post.njk
+title: "Digital Avatars in Video Meetings: A Developer's Guide"
+excerpt: "Learn how to integrate photorealistic digital avatars into Zoom, Teams and Google Meet using the Sonesse API. Low-latency, expressive avatars for training, presentations, and customer interactions."
+date: 2026-01-28
+category: "Tutorials"
+author: "Sonesse Team"
+readTime: 7
+featuredImage: "/assets/2024/12/Group-290.png"
+tags: ["api", "digital-avatar", "tutorial"]
+permalink: "/blog/digital-avatars-in-meetings/"
+---
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Digital avatars are rapidly becoming a standard feature in enterprise video conferencing. From training simulations to customer-facing interactions, photorealistic avatars enable new categories of meeting experiences that weren't possible before.</p>
+
+<p>Sonesse's Digital Avatar API makes it straightforward to integrate avatars into any video meeting platform. In this guide, we'll cover the key concepts and walk through a basic integration.</p>
+
+<h2 id="use-cases">Use Cases for Digital Avatars</h2>
+
+<p>Before diving into the technical details, let's look at how companies are using digital avatars in meetings today:</p>
+
+<ul>
+	<li><strong>Training and onboarding</strong> — create consistent, repeatable training sessions with AI trainers</li>
+	<li><strong>Customer support</strong> — provide 24/7 video-based customer interactions</li>
+	<li><strong>Sales demos</strong> — deliver personalised product demonstrations at scale</li>
+	<li><strong>Accessibility</strong> — provide sign language interpretation through avatar-based interpreters</li>
+</ul>
+
+<h2 id="getting-started">Getting Started with the Avatar API</h2>
+
+<p>The Avatar API extends Sonesse's standard bot API. You create an avatar-enabled bot, configure the avatar's appearance and behaviour, and deploy it to a meeting just like any other Sonesse bot.</p>
+
+<pre><code>import sonesse
+
+client = sonesse.Client(api_key="your_api_key")
+
+# Create a digital avatar bot
+bot = client.bots.create(
+    meeting_url="https://zoom.us/j/123456789",
+    bot_name="Training Assistant",
+    avatar={
+        "model": "professional-female-01",
+        "voice": "en-US-aria",
+        "behaviour": "conversational",
+        "script": None  # Set to None for real-time conversation
+    }
+)</code></pre>
+
+<h2 id="real-time-interaction">Real-Time Interaction</h2>
+
+<p>Digital avatars can respond to meeting participants in real-time. Sonesse handles the speech-to-text, text-to-speech, and avatar animation pipeline automatically. You just need to provide the conversational logic:</p>
+
+<pre><code># Handle avatar conversations via webhook
+@app.post("/webhooks/avatar")
+async def handle_avatar_event(request: Request):
+    event = await request.json()
+
+    if event["type"] == "avatar.speech_detected":
+        # Someone spoke to the avatar
+        user_speech = event["data"]["text"]
+
+        # Generate response (using your LLM of choice)
+        response = await generate_response(user_speech)
+
+        # Send response back to the avatar
+        client.bots.avatar_speak(
+            bot_id=event["data"]["bot_id"],
+            text=response
+        )</code></pre>
+
+<h2 id="latency">Latency Considerations</h2>
+
+<p>For natural-feeling conversations, end-to-end latency needs to be under 500ms. Sonesse's avatar pipeline is optimised for low latency, but your response generation logic needs to be fast too. We recommend streaming LLM responses and using caching where possible.</p>
+
+<h2 id="whats-next">What's Next</h2>
+
+<p>Digital avatars are just getting started. We're working on custom avatar creation, emotion detection, and multi-avatar scenes. <a href="/demo/">Book a demo</a> to see what's possible today.</p>

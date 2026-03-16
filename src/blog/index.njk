@@ -1,0 +1,98 @@
+---
+layout: base.njk
+title: "Blog - Sonesse"
+canonical: "/blog/"
+ogType: "website"
+ogUrl: "/blog/"
+bodyClass: "blog-index"
+permalink: "/blog/index.html"
+---
+
+<!-- Blog Hero -->
+<section class="section blog-index-hero" style="padding-top: 65px; padding-bottom: 30px;">
+	<div class="section__inner text-center">
+		<span class="badge">Blog</span>
+		<h1>Tutorials, news and <span class="gradient-text">developer resources</span></h1>
+		<p style="max-width: 620px; margin: 0 auto; color: var(--color-text-light);">Learn how to build AI-powered meeting experiences with Sonesse. Tutorials, product updates, and engineering insights.</p>
+	</div>
+</section>
+
+<!-- Category Filter -->
+<section class="blog-filter">
+	<div class="section__inner">
+		<div class="blog-filter__nav" id="blog-filter">
+			<button class="blog-filter__btn is-active" data-filter="all">All Posts</button>
+			<button class="blog-filter__btn" data-filter="tutorials">Tutorials</button>
+			<button class="blog-filter__btn" data-filter="product">Product Updates</button>
+			<button class="blog-filter__btn" data-filter="engineering">Engineering</button>
+			<button class="blog-filter__btn" data-filter="news">News</button>
+		</div>
+	</div>
+</section>
+
+<!-- Blog Posts Grid -->
+<section class="section" style="padding-top: 20px;">
+	<div class="section__inner">
+		<div class="blog-grid" id="blog-grid">
+
+			{%- for post in collections.blogPosts | reverse %}
+			<a href="{{ post.url }}" class="blog-card" data-category="{{ post.data.category | lower }}">
+				{% if post.data.featuredImage %}
+				<div class="blog-card__image">
+					<img src="{{ post.data.featuredImage }}" alt="{{ post.data.title }}" loading="lazy" />
+				</div>
+				{% endif %}
+				<div class="blog-card__body">
+					<div class="blog-card__meta">
+						<span class="blog-card__category">{{ post.data.category }}</span>
+						<time class="blog-card__date">{{ post.date | date("MMM d, yyyy") }}</time>
+					</div>
+					<h3 class="blog-card__title">{{ post.data.title }}</h3>
+					<p class="blog-card__excerpt">{{ post.data.excerpt }}</p>
+					<span class="blog-card__read-more">Read more &rarr;</span>
+				</div>
+			</a>
+			{%- endfor %}
+
+		</div>
+	</div>
+</section>
+
+<!-- Bottom CTA -->
+<section class="blog-cta">
+	<div class="blog-cta__inner">
+		<h2>Ready to build with Sonesse?</h2>
+		<p>Start integrating AI agents into meetings with our Universal API.</p>
+		<a class="btn btn--primary" href="/demo/">
+			<span>Book a Demo</span>
+			<span class="btn__arrow">&rarr;</span>
+		</a>
+	</div>
+</section>
+
+<script>
+// Blog category filter
+(function() {
+	document.addEventListener('DOMContentLoaded', function() {
+		var buttons = document.querySelectorAll('.blog-filter__btn');
+		var cards = document.querySelectorAll('.blog-card');
+
+		buttons.forEach(function(btn) {
+			btn.addEventListener('click', function() {
+				var filter = btn.getAttribute('data-filter');
+
+				buttons.forEach(function(b) { b.classList.remove('is-active'); });
+				btn.classList.add('is-active');
+
+				cards.forEach(function(card) {
+					if (filter === 'all' || card.getAttribute('data-category') === filter) {
+						card.style.display = '';
+					} else {
+						card.style.display = 'none';
+					}
+				});
+			});
+		});
+	});
+})();
+</script>

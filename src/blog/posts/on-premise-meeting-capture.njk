@@ -1,0 +1,39 @@
+---
+layout: blog-post.njk
+title: "Why Regulated Industries Need On-Premise Meeting Capture"
+excerpt: "For healthcare, finance, and government organisations, cloud-based meeting recording isn't always an option. Here's how Sonesse's on-premise deployment solves data sovereignty challenges."
+date: 2026-02-10
+category: "Engineering"
+author: "Sonesse Team"
+readTime: 5
+featuredImage: "/assets/2026/02/img_1.png"
+tags: ["on-premise", "security", "compliance"]
+permalink: "/blog/on-premise-meeting-capture/"
+---
+
+<h2 id="the-challenge">The Challenge</h2>
+
+<p>Regulated industries face a fundamental tension: they need the productivity benefits of AI-powered meeting tools, but their compliance requirements often prohibit sending sensitive data to external cloud services.</p>
+
+<p>Healthcare organisations must comply with HIPAA. Financial institutions operate under SOX and FINRA regulations. Government agencies have strict data sovereignty requirements. For all of these sectors, the question isn't whether they want AI meeting tools — it's whether they can use them within their regulatory framework.</p>
+
+<h2 id="sonesse-on-premise">Sonesse On-Premise</h2>
+
+<p>Sonesse's on-premise deployment model solves this by running the entire meeting capture and AI processing pipeline within your own infrastructure. No meeting data ever leaves your network.</p>
+
+<ul>
+	<li><strong>Full data sovereignty</strong> — all audio, video, and transcripts stay within your infrastructure</li>
+	<li><strong>Same API</strong> — the on-premise deployment exposes the same Universal API as our cloud offering</li>
+	<li><strong>Air-gapped support</strong> — deploy in environments with no internet connectivity</li>
+	<li><strong>Compliance-ready</strong> — built-in audit logging, encryption at rest, and access controls</li>
+</ul>
+
+<h2 id="architecture">Architecture Overview</h2>
+
+<p>The on-premise deployment consists of three main components: the Bot Orchestrator (manages meeting bot lifecycle), the Media Pipeline (handles audio/video capture and transcription), and the API Gateway (provides the same REST and WebSocket APIs as the cloud version).</p>
+
+<p>All components run as containers and can be deployed on Kubernetes, Docker Compose, or bare metal. The system scales horizontally to support hundreds of concurrent meeting bots.</p>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>If your organisation needs on-premise meeting capture, <a href="/demo/">book a demo</a> with our team. We'll walk you through the deployment options and help you evaluate Sonesse for your specific compliance requirements.</p>

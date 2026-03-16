@@ -1,91 +1,17 @@
+<header class="site-header">
+	<div class="site-header__inner">
+		<a href="/" class="site-header__logo">
+			<img src="/assets/2024/12/sonesse-header-logo.svg" alt="Sonesse" width="220" height="43" />
+		</a>
 
-	<script type="text/javascript">
-	 (function(window, document) {
+		<nav class="site-header__nav" aria-label="Main Menu">
+			<a href="/on-premise/">On-Premise</a>
+			<a href="/use-cases/">Use Cases</a>
+			<a href="/demo/">Sign Up</a>
+		</nav>
 
-		 if(navigator.userAgent.match(/(Android|iPod|iPhone|iPad|BlackBerry|IEMobile|Opera Mini)/)) {
-			 document.body.className += " using-mobile-browser mobile ";
-		 }
-		 if(navigator.userAgent.match(/Mac/) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2) {
-			document.body.className += " using-ios-device ";
-		}
-
-		 if( !("ontouchstart" in window) ) {
-
-			 var body = document.querySelector("body");
-			 var winW = window.innerWidth;
-			 var bodyW = body.clientWidth;
-
-			 if (winW > bodyW + 4) {
-				 body.setAttribute("style", "--scroll-bar-w: " + (winW - bodyW - 4) + "px");
-			 } else {
-				 body.setAttribute("style", "--scroll-bar-w: 0px");
-			 }
-		 }
-
-	 })(window, document);
-   </script><a href="/#ajax-content-wrap" class="nectar-skip-to-content">Skip to main content</a><div class="ocm-effect-wrap"><div class="ocm-effect-wrap-inner">
-	<div id="header-space" style="height: 99px;" data-header-mobile-fixed='1'></div>
-
-		<div id="header-outer" style="height: 99px; min-height: 99px;" data-has-menu="true" data-has-buttons="no" data-header-button_style="default" data-using-pr-menu="false" data-mobile-fixed="1" data-ptnm="false" data-lhe="default" data-user-set-bg="#05000a" data-format="default" data-permanent-transparent="false" data-megamenu-rt="0" data-remove-fixed="0" data-header-resize="1" data-cart="false" data-transparency-option="0" data-box-shadow="large" data-shrink-num="6" data-using-secondary="0" data-using-logo="1" data-logo-height="43" data-m-logo-height="24" data-padding="28" data-full-width="false" data-condense="false" >
-
-<div id="search-outer" class="nectar">
-	<div id="search">
-		<div class="container">
-			 <div id="search-box">
-				 <div class="inner-wrap">
-					 <div class="col span_12">
-						  <form role="search" action="/" method="GET">
-														 <input type="text" name="s"  value="" aria-label="Search" placeholder="Search" />
-
-						<span>Hit enter to search or ESC to close</span>
-												</form>
-					</div><!--/span_12-->
-				</div><!--/inner-wrap-->
-			 </div><!--/search-box-->
-			 <div id="close"><a href="#"><span class="screen-reader-text">Close Search</span>
-				<span class="close-wrap"> <span class="close-line close-line1"></span> <span class="close-line close-line2"></span> </span>				 </a></div>
-		 </div><!--/container-->
-	</div><!--/search-->
-</div><!--/search-outer-->
-
-<header id="top">
-	<div class="container">
-		<div class="row">
-			<div class="col span_3">
-								<a id="logo" href="/" data-supplied-ml-starting-dark="true" data-supplied-ml-starting="true" data-supplied-ml="false" >
-					<img class="stnd skip-lazy default-logo" width="220" height="43" style="height: 43px; max-height: 43px;" alt="Sonesse" src="/wp-content/uploads/2024/12/sonesse-header-logo.svg" />				</a>
-							</div><!--/span_3-->
-
-			<div class="col span_9 col_last">
-									<div class="nectar-mobile-only mobile-header"><div class="inner"></div></div>
-													<div class="slide-out-widget-area-toggle mobile-icon fullscreen-split" data-custom-color="false" data-icon-animation="simple-transform">
-						<div> <a href="/#slide-out-widget-area" role="button" aria-label="Navigation Menu" aria-expanded="false" class="closed">
-							<span class="screen-reader-text">Menu</span><span aria-hidden="true"> <i class="lines-button x2"> <i class="lines"></i> </i> </span>						</a></div>
-					</div>
-
-									<nav aria-label="Main Menu">
-													<ul class="sf-menu">
-								<li id="menu-item-671" class="menu-item menu-item-type-post_type menu-item-object-page nectar-regular-menu-item menu-item-671"><a href="/on-premise/"><span class="menu-title-text">On-Premise</span></a></li>
-<li id="menu-item-346" class="menu-item menu-item-type-post_type menu-item-object-page nectar-regular-menu-item menu-item-346"><a href="/use-cases/"><span class="menu-title-text">Use Cases</span></a></li>
-<li id="menu-item-31" class="menu-item menu-item-type-post_type menu-item-object-page nectar-regular-menu-item menu-item-31"><a href="/demo/"><span class="menu-title-text">Sign Up</span></a></li>
-							</ul>
-													<ul class="buttons sf-menu" data-user-set-ocm="off">
-
-								<li class="nectar-header-text-content-wrap"><div class="nectar-header-text-content"><div>&nbsp;
-
-
-
-
-</div></div></li>
-							</ul>
-
-					</nav>
-
-
-				</div><!--/span_9-->
-
-
-			</div><!--/row-->
-					</div><!--/container-->
-	</header>
+		<button class="menu-toggle" aria-label="Menu" aria-expanded="false">
+			<span class="menu-toggle__lines"></span>
+		</button>
 	</div>
+</header>

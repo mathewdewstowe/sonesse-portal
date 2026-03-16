@@ -1,0 +1,141 @@
+---
+layout: blog-post.njk
+title: "Building an AI Note Taker with the Sonesse API"
+excerpt: "Learn how to build a white-label AI note taker that joins Zoom, Teams and Google Meet calls, transcribes conversations in real-time, and generates structured meeting summaries."
+date: 2026-03-10
+category: "Tutorials"
+author: "Sonesse Team"
+readTime: 8
+featuredImage: "/assets/2025/01/svgexport-11.png"
+tags: ["api", "note-taker", "tutorial"]
+permalink: "/blog/building-ai-note-taker-with-sonesse/"
+---
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Meeting note-taking is one of the most requested features in modern productivity tools. With Sonesse's Universal API, you can build a fully white-labelled AI note taker that integrates seamlessly into Zoom, Microsoft Teams, and Google Meet — all through a single API.</p>
+
+<p>In this tutorial, we'll walk through the complete process of building an AI-powered note taker that joins meetings, captures transcripts, and uses large language models to generate structured summaries with action items.</p>
+
+<h2 id="the-stack">The Stack</h2>
+
+<p>Here's what we'll be using:</p>
+
+<ul>
+	<li><strong>Sonesse API</strong> — to send bots to meetings and capture real-time transcription</li>
+	<li><strong>Python 3.10+</strong> — for our backend service</li>
+	<li><strong>OpenAI GPT-4</strong> — for generating meeting summaries and action items</li>
+	<li><strong>FastAPI</strong> — for our webhook handler</li>
+</ul>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>First, sign up for a Sonesse API key at <a href="/demo/">sonesse.ai/demo</a>. You'll need your API key and a webhook URL to receive meeting events.</p>
+
+<h3 id="install-dependencies">Install Dependencies</h3>
+
+<pre><code>pip install sonesse-sdk openai fastapi uvicorn</code></pre>
+
+<h2 id="sending-a-bot">Sending a Bot to a Meeting</h2>
+
+<p>With Sonesse, sending a bot to any video meeting is a single API call. The bot joins as a participant and immediately starts capturing audio, video, and transcript data.</p>
+
+<pre><code>import sonesse
+
+client = sonesse.Client(api_key="your_api_key")
+
+# Send a bot to a Zoom meeting
+bot = client.bots.create(
+    meeting_url="https://zoom.us/j/123456789",
+    bot_name="My AI Note Taker",
+    transcription={"provider": "sonesse"},
+    recording={"mode": "audio_only"}
+)
+
+print(f"Bot ID: {bot.id}")
+print(f"Status: {bot.status}")</code></pre>
+
+<p>The same code works for Teams and Google Meet — just pass a different meeting URL. Sonesse automatically detects the platform and handles the integration.</p>
+
+<h2 id="receiving-transcripts">Receiving Real-Time Transcripts</h2>
+
+<p>Set up a webhook endpoint to receive transcript events as they happen during the meeting:</p>
+
+<pre><code>from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.post("/webhooks/sonesse")
+async def handle_webhook(request: Request):
+    event = await request.json()
+
+    if event["type"] == "transcript.word":
+        speaker = event["data"]["speaker"]
+        text = event["data"]["text"]
+        print(f"{speaker}: {text}")
+
+    elif event["type"] == "bot.meeting_ended":
+        bot_id = event["data"]["bot_id"]
+        # Trigger summary generation
+        await generate_summary(bot_id)
+
+    return {"status": "ok"}</code></pre>
+
+<h2 id="generating-summaries">Generating AI Summaries</h2>
+
+<p>Once the meeting ends, retrieve the full transcript and send it to GPT-4 for summarisation:</p>
+
+<pre><code>import openai
+
+async def generate_summary(bot_id):
+    # Get complete transcript
+    transcript = client.bots.get_transcript(bot_id)
+
+    # Format for the LLM
+    conversation = "\n".join([
+        f"{entry.speaker}: {entry.text}"
+        for entry in transcript.entries
+    ])
+
+    # Generate summary with GPT-4
+    response = openai.chat.completions.create(
+        model="gpt-4",
+        messages=[{
+            "role": "system",
+            "content": "Summarise this meeting transcript. Include: "
+                       "1) Key discussion points, "
+                       "2) Decisions made, "
+                       "3) Action items with owners."
+        }, {
+            "role": "user",
+            "content": conversation
+        }]
+    )
+
+    summary = response.choices[0].message.content
+    return summary</code></pre>
+
+<h2 id="deploying">Deploying to Production</h2>
+
+<p>For production use, you'll want to add error handling, retry logic, and a database to store transcripts and summaries. Sonesse provides webhooks for all bot lifecycle events, making it easy to track the state of each meeting bot.</p>
+
+<p>Key considerations for production:</p>
+
+<ul>
+	<li>Store transcripts in a database for later retrieval</li>
+	<li>Implement webhook signature verification for security</li>
+	<li>Add rate limiting for your summary generation endpoint</li>
+	<li>Use async processing for long meetings with large transcripts</li>
+</ul>
+
+<h2 id="whats-next">What's Next</h2>
+
+<p>This tutorial covered the basics of building an AI note taker with Sonesse. In upcoming posts, we'll explore:</p>
+
+<ul>
+	<li>Adding real-time coaching during live calls</li>
+	<li>Building custom integrations with CRMs like Salesforce and HubSpot</li>
+	<li>Implementing speaker identification and sentiment analysis</li>
+</ul>
+
+<p>Ready to get started? <a href="/demo/">Book a demo</a> and get your API key today.</p>

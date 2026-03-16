@@ -1,11 +1,32 @@
 module.exports = function(eleventyConfig) {
-  // Passthrough copy - preserve all existing static assets
-  eleventyConfig.addPassthroughCopy({ "src/wp-content": "wp-content" });
-  eleventyConfig.addPassthroughCopy({ "src/wp-includes": "wp-includes" });
+  // Passthrough copy - static assets
+  eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
+  eleventyConfig.addPassthroughCopy({ "src/css": "css" });
+  eleventyConfig.addPassthroughCopy({ "src/js": "js" });
   eleventyConfig.addPassthroughCopy({ "src/_headers": "_headers" });
   eleventyConfig.addPassthroughCopy({ "src/_redirects": "_redirects" });
-  eleventyConfig.addPassthroughCopy({ "src/js": "js" });
   eleventyConfig.addPassthroughCopy({ "src/_routes.json": "_routes.json" });
+
+  // Blog posts collection
+  eleventyConfig.addCollection("blogPosts", function(collectionApi) {
+    return collectionApi.getFilteredByGlob("src/blog/posts/*.njk").sort(function(a, b) {
+      return a.date - b.date;
+    });
+  });
+
+  // Date filter
+  eleventyConfig.addFilter("date", function(dateObj, format) {
+    var d = new Date(dateObj);
+    var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    var shortMonths = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    if (format === "MMMM d, yyyy") {
+      return months[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+    }
+    if (format === "MMM d, yyyy") {
+      return shortMonths[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear();
+    }
+    return d.toLocaleDateString();
+  });
 
   return {
     dir: {
