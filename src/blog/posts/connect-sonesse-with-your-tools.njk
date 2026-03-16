@@ -1,0 +1,60 @@
+---
+layout: blog-post.njk
+title: "Connect Sonesse with Your Favourite Tools: CRMs, Helpdesks, and Beyond"
+excerpt: "Sonesse's universal API connects your AI meeting agents to the tools your team already uses — Salesforce, HubSpot, Zendesk, Slack, and more. Real-time data flows from meetings directly into your workflows."
+date: 2026-02-25
+category: "Product"
+author: "Sonesse Team"
+readTime: 5
+featuredImage: "/assets/2025/08/Group-282.png"
+tags: ["integrations", "crm", "product"]
+permalink: "/blog/connect-sonesse-with-your-tools/"
+---
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Meetings don't exist in isolation. The insights captured during a sales call need to flow into your CRM. Action items from a support call need to become tickets. Decisions made in a planning meeting need to update your project management tool.</p>
+
+<p>Sonesse's universal API makes these connections seamless, turning every meeting into an automated trigger for your existing workflows.</p>
+
+<h2 id="the-vision">Beyond Recording</h2>
+
+<p>Imagine a future where video meetings feel as natural and engaging as being in the same room. A future where AI enhances every interaction, providing real-time translations, dynamic insights, and immersive environments that foster true collaboration.</p>
+
+<p>With Sonesse's universal API, you begin creating these transformative meeting experiences, setting teams on the path to a new era of communication. Meetings stop being information silos and start being workflow triggers.</p>
+
+<h2 id="integrations">How It Works</h2>
+
+<p>Sonesse provides webhook events and API endpoints that connect meeting data to your existing tools in real time:</p>
+
+<ul>
+	<li><strong>CRM Updates</strong> — automatically log meeting notes, action items, and sentiment scores to Salesforce, HubSpot, or Pipedrive contact records</li>
+	<li><strong>Helpdesk Tickets</strong> — create and update Zendesk or Freshdesk tickets based on support call outcomes</li>
+	<li><strong>Messaging</strong> — post meeting summaries, key decisions, and follow-ups to Slack or Teams channels</li>
+	<li><strong>Project Management</strong> — create tasks in Jira, Asana, or Linear from meeting action items</li>
+	<li><strong>Data Warehouses</strong> — stream meeting analytics to Snowflake, BigQuery, or Redshift for business intelligence</li>
+</ul>
+
+<h2 id="real-time-data">Real-Time Data Flow</h2>
+
+<p>Sonesse doesn't batch data after meetings end. As your agent captures transcripts, detects decisions, and identifies action items during the call, that data flows immediately to connected systems via webhooks. A sales rep finishes a call and their CRM is already updated. A support agent resolves an issue and the ticket is already closed.</p>
+
+<pre><code># Example: Auto-update Salesforce after a meeting
+@app.post("/webhooks/sonesse")
+async def handle_meeting_event(request: Request):
+    event = await request.json()
+
+    if event["type"] == "bot.meeting_ended":
+        summary = event["data"]["summary"]
+        action_items = event["data"]["action_items"]
+
+        # Update CRM with meeting outcomes
+        salesforce.update_opportunity(
+            opportunity_id=event["data"]["metadata"]["sf_opportunity_id"],
+            notes=summary,
+            next_steps=action_items
+        )</code></pre>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>Connect your AI today with Sonesse and start turning meetings into automated workflows. <a href="/demo/">Book a demo</a> to see the integrations in action.</p>
