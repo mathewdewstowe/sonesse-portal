@@ -42,8 +42,8 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
   --font-heading: 'Inter Tight', sans-serif;
 
   /* Spacing */
-  --container-width: 1100px;
-  --container-wide: 1260px;
+  --container-width: 1200px;
+  --container-wide: 1400px;
   --container-padding: 40px;
   --header-height: 99px;
   --logo-height: 43px;
@@ -57,7 +57,7 @@ h1, h2, h3, h4, h5, h6 { line-height: 1.2; }
 /* --- Typography --- */
 body {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 17px;
   color: var(--color-text);
   background: var(--color-white);
 }
@@ -68,10 +68,10 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-dark);
 }
 
-h1 { font-size: 36px; line-height: 46px; }
-h2 { font-size: 36px; line-height: 46px; }
-h3 { font-size: 24px; }
-h6 { font-size: 14px; font-weight: 400; }
+h1 { font-size: 48px; line-height: 58px; }
+h2 { font-size: 44px; line-height: 54px; }
+h3 { font-size: 28px; line-height: 36px; }
+h6 { font-size: 15px; font-weight: 400; }
 
 p { margin-bottom: 1em; }
 p:last-child { margin-bottom: 0; }
@@ -88,7 +88,7 @@ p:last-child { margin-bottom: 0; }
 }
 
 .section {
-  padding: 70px 0;
+  padding: 90px 0;
 }
 
 .section--full {
@@ -159,9 +159,9 @@ p:last-child { margin-bottom: 0; }
 
 .site-header__nav a {
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 17px;
   color: var(--color-white);
-  padding: 10px 18px;
+  padding: 10px 20px;
   transition: opacity 0.2s;
 }
 
@@ -362,12 +362,13 @@ p:last-child { margin-bottom: 0; }
 /* --- Badge/Tag --- */
 .badge {
   display: inline-block;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   color: var(--color-text);
   border: 1px solid var(--color-primary-lighter);
   border-radius: 35px;
   padding: 8px 15px;
+  margin-bottom: 20px;
 }
 
 .badge--purple {
@@ -498,20 +499,52 @@ p:last-child { margin-bottom: 0; }
 
 /* Pill style tabs (use-cases) */
 .tabs__nav--pills .tabs__btn {
-  padding: 8px 20px;
+  padding: 10px 24px;
   font-size: 16px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.7);
+  border-color: rgba(255,255,255,0.25);
+  background: transparent;
+  transition: all 0.25s ease;
+}
+
+.tabs__nav--pills .tabs__btn:hover {
   color: var(--color-white);
-  border-color: rgba(255,255,255,0.3);
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.06);
 }
 
 .tabs__nav--pills .tabs__btn.is-active {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.12);
   border-color: var(--color-primary-lighter);
   color: var(--color-white);
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .tabs__panel { display: none; }
 .tabs__panel.is-active { display: block; }
+
+/* Tab panel content spacing */
+.use-cases-tabs .tabs__panel {
+  padding: 20px 0 0;
+}
+
+.use-cases-tabs .grid--2-center {
+  gap: 60px;
+  align-items: start;
+}
+
+.use-cases-tabs h2 {
+  font-size: 40px;
+  line-height: 48px;
+  margin-bottom: 20px;
+}
+
+.use-cases-tabs p {
+  font-size: 17px;
+  line-height: 1.7;
+}
 
 @media (max-width: 690px) {
   .tabs__nav { margin-bottom: 20px; }
@@ -598,7 +631,7 @@ p:last-child { margin-bottom: 0; }
   background: none;
   border: none;
   font-family: var(--font-heading);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--color-dark);
   cursor: pointer;
@@ -650,25 +683,25 @@ p:last-child { margin-bottom: 0; }
 
 /* --- Sections: Banner --- */
 .banner-section {
-  padding: 80px 0 90px;
+  padding: 100px 0 110px;
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
   text-align: center;
 }
 
-.banner-section .badge { margin-bottom: 10px; }
+.banner-section .badge { margin-bottom: 25px; }
 
 .banner-section__title {
-  font-size: 36px;
-  line-height: 46px;
+  font-size: 56px;
+  line-height: 68px;
   font-weight: 600;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .banner-section__subtitle {
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 22px;
+  line-height: 32px;
   color: var(--color-text);
   max-width: 100%;
   margin: 0 auto 20px;
@@ -711,7 +744,7 @@ p:last-child { margin-bottom: 0; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 80px;
-  align-items: center;
+  align-items: start;
   padding: 80px 0 0;
 }
 
@@ -771,7 +804,7 @@ p:last-child { margin-bottom: 0; }
   text-align: center;
 }
 
-.benefits-section .badge { margin-bottom: 15px; }
+.benefits-section .badge { margin-bottom: 25px; }
 
 .benefits-section h2 {
   color: var(--color-white);
@@ -803,13 +836,13 @@ p:last-child { margin-bottom: 0; }
 
 .benefit-card h3 {
   color: var(--color-white);
-  font-size: 20px;
+  font-size: 22px;
   margin-bottom: 10px;
 }
 
 .benefit-card p {
   color: var(--color-text-muted);
-  font-size: 15px;
+  font-size: 16px;
 }
 
 @media (max-width: 999px) {
@@ -845,6 +878,57 @@ p:last-child { margin-bottom: 0; }
 .dark-tabs-section h2 { color: var(--color-white); }
 
 .dark-tabs-section p { color: var(--color-text-muted); }
+
+/* Use Cases tabs section */
+.use-cases-tabs {
+  margin: 0 20px;
+  padding: 60px 40px 70px;
+}
+
+.use-cases-tabs .section__inner {
+  max-width: 1100px;
+}
+
+/* Video thumbnail styling */
+.video-thumb {
+  position: relative;
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.video-thumb img {
+  width: 100%;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.video-thumb:hover img {
+  transform: scale(1.03);
+}
+
+.video-thumb__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.video-thumb:hover .video-thumb__play {
+  background: rgba(139, 92, 246, 0.6);
+  transform: translate(-50%, -50%) scale(1.1);
+}
 
 /* --- Marketplace: Agent Cards --- */
 .agent-cards {
@@ -1047,10 +1131,11 @@ p:last-child { margin-bottom: 0; }
 /* --- Responsive --- */
 @media (max-width: 690px) {
   .banner-section { padding: 60px 0 50px; }
-  .banner-section__title { font-size: 40px; line-height: 50px; }
-  .banner-section__subtitle { font-size: 19px; }
+  .banner-section__title { font-size: 36px; line-height: 44px; }
+  .banner-section__subtitle { font-size: 18px; line-height: 26px; }
   .section { padding: 40px 0; }
-  h1 { font-size: 28px; line-height: 36px; }
-  h2 { font-size: 28px; line-height: 36px; }
+  h1 { font-size: 32px; line-height: 40px; }
+  h2 { font-size: 30px; line-height: 38px; }
+  h3 { font-size: 22px; line-height: 30px; }
   .site-header__inner { max-width: calc(100% - 40px); }
 }
