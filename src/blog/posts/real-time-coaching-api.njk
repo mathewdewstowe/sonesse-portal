@@ -1,0 +1,78 @@
+---
+layout: blog-post.njk
+title: "How to Build Real-Time Sales Coaching with the Sonesse API"
+excerpt: "Build a real-time coaching tool that analyses live conversations and provides instant tips, objection-handling strategies, and actionable guidance during sales calls."
+date: 2026-03-05
+category: "Tutorials"
+author: "Sonesse Team"
+readTime: 6
+featuredImage: "/assets/2025/01/svgexport-1.png"
+tags: ["api", "coaching", "real-time"]
+permalink: "/blog/real-time-coaching-api/"
+---
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Real-time coaching is transforming how sales teams operate. Instead of reviewing calls after the fact, your reps get instant guidance while they're on the call. With Sonesse's streaming transcription API, building this capability into your product is straightforward.</p>
+
+<p>In this tutorial, we'll build a real-time coaching overlay that analyses conversations as they happen and surfaces actionable coaching prompts.</p>
+
+<h2 id="how-it-works">How It Works</h2>
+
+<p>The architecture is simple: Sonesse joins the meeting and streams transcript data via WebSocket. Your application processes each utterance in real-time, runs it through an LLM, and pushes coaching prompts to your frontend.</p>
+
+<ul>
+	<li><strong>Sonesse API</strong> handles meeting integration and real-time transcription</li>
+	<li><strong>WebSocket connection</strong> streams transcript events with sub-second latency</li>
+	<li><strong>Your coaching engine</strong> analyses conversation patterns and generates prompts</li>
+</ul>
+
+<h2 id="streaming-transcripts">Streaming Transcripts</h2>
+
+<p>Sonesse provides a WebSocket endpoint for real-time transcript streaming. Each event contains the speaker, text, and precise timestamps:</p>
+
+<pre><code>import asyncio
+import websockets
+import json
+
+async def stream_transcript(bot_id, api_key):
+    uri = f"wss://api.sonesse.ai/v1/bots/{bot_id}/stream"
+    headers = {"Authorization": f"Bearer {api_key}"}
+
+    async with websockets.connect(uri, extra_headers=headers) as ws:
+        async for message in ws:
+            event = json.loads(message)
+            if event["type"] == "transcript.partial":
+                yield {
+                    "speaker": event["speaker"],
+                    "text": event["text"],
+                    "timestamp": event["timestamp"],
+                    "is_final": event["is_final"]
+                }</code></pre>
+
+<h2 id="coaching-engine">Building the Coaching Engine</h2>
+
+<p>The coaching engine buffers conversation context and triggers analysis when it detects key moments — such as objections, pricing discussions, or competitor mentions:</p>
+
+<pre><code>COACHING_TRIGGERS = [
+    "too expensive", "competitor", "not sure",
+    "budget", "timeline", "decision maker"
+]
+
+async def analyse_for_coaching(transcript_buffer):
+    recent_text = " ".join([t["text"] for t in transcript_buffer[-10:]])
+
+    # Check for trigger phrases
+    triggered = any(t in recent_text.lower() for t in COACHING_TRIGGERS)
+
+    if triggered:
+        coaching_prompt = await generate_coaching_tip(recent_text)
+        return coaching_prompt
+
+    return None</code></pre>
+
+<h2 id="deployment">Deployment Considerations</h2>
+
+<p>When deploying real-time coaching, latency is critical. Keep your LLM calls fast by using streaming responses and caching common coaching patterns. Sonesse's low-latency transcription ensures you're working with the freshest possible data.</p>
+
+<p>Ready to build real-time coaching into your product? <a href="/demo/">Get started with Sonesse</a>.</p>

@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
+	<title>{{ title }} - Sonesse Blog</title>
+	<link rel="canonical" href="/blog/{{ page.fileSlug }}/" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="{{ title }}" />
+	<meta property="og:description" content="{{ excerpt }}" />
+	<meta property="og:url" content="/blog/{{ page.fileSlug }}/" />
+	<meta property="og:site_name" content="Sonesse" />
+	<meta property="article:published_time" content="{{ date }}" />
+	{% if featuredImage %}
+	<meta property="og:image" content="{{ featuredImage }}" />
+	{% endif %}
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="description" content="{{ excerpt }}" />
+
+	{% if jsonLd %}
+	<script type="application/ld+json">{{ jsonLd | safe }}</script>
+	{% endif %}
+
+	<!-- Fonts -->
+	<link rel="dns-prefetch" href="https://fonts.googleapis.com/" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=latin,latin-ext" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter+Tight:400,600,700" />
+
+	<!-- Styles -->
+	<link rel="stylesheet" href="/css/styles.css" />
+
+	<!-- Favicons -->
+	{% include "partials/head-favicons.njk" %}
+</head>
+<body class="blog-single">
+
+<a href="#main-content" class="sr-only">Skip to main content</a>
+
+{% include "partials/header.njk" %}
+
+<div class="header-spacer"></div>
+
+<main id="main-content" role="main">
+
+<!-- Blog Post Hero -->
+<section class="blog-hero">
+	<div class="blog-hero__inner">
+		<a href="/blog/" class="blog-hero__back">&larr; Back to Blog</a>
+		<div class="blog-hero__meta">
+			<span class="badge blog-hero__category">{{ category }}</span>
+			<time class="blog-hero__date" datetime="{{ date }}">{{ date | date("MMMM d, yyyy") }}</time>
+			{% if readTime %}<span class="blog-hero__read-time">{{ readTime }} min read</span>{% endif %}
+		</div>
+		<h1 class="blog-hero__title">{{ title }}</h1>
+		<p class="blog-hero__excerpt">{{ excerpt }}</p>
+		{% if author %}
+		<div class="blog-hero__author">
+			<div class="blog-hero__author-info">
+				<span class="blog-hero__author-name">By {{ author }}</span>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</section>
+
+{% if featuredImage %}
+<div class="blog-featured-image">
+	<div class="blog-featured-image__inner">
+		<img src="{{ featuredImage }}" alt="{{ title }}" />
+	</div>
+</div>
+{% endif %}
+
+<!-- Blog Content Layout -->
+<div class="blog-layout">
+	<!-- Sidebar: Table of Contents + Related -->
+	<aside class="blog-sidebar">
+		<div class="blog-sidebar__sticky">
+			<div class="blog-sidebar__section">
+				<h6 class="blog-sidebar__heading">On this page</h6>
+				<nav class="blog-toc" id="blog-toc">
+					<!-- Populated by JS -->
+				</nav>
+			</div>
+			{% if relatedPosts %}
+			<div class="blog-sidebar__section">
+				<h6 class="blog-sidebar__heading">Related articles</h6>
+				<div class="blog-sidebar__related">
+					{% for post in relatedPosts %}
+					<a href="/blog/{{ post.slug }}/" class="blog-sidebar__related-item">{{ post.title }}</a>
+					{% endfor %}
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</aside>
+
+	<!-- Main Content -->
+	<article class="blog-content">
+		{{ content | safe }}
+	</article>
+</div>
+
+<!-- Bottom CTA -->
+<section class="blog-cta">
+	<div class="blog-cta__inner">
+		<h2>Ready to build with Sonesse?</h2>
+		<p>Start integrating AI agents into meetings with our Universal API.</p>
+		<a class="btn btn--primary" href="/demo/">
+			<span>Book a Demo</span>
+			<span class="btn__arrow">&rarr;</span>
+		</a>
+	</div>
+</section>
+
+</main>
+
+{% include "partials/footer.njk" %}
+
+<!-- Scroll to Top -->
+<button class="scroll-to-top" aria-label="Back to top">&uarr;</button>
+
+<!-- Mobile Menu Overlay -->
+<nav class="mobile-menu" aria-label="Mobile Menu">
+	<a href="/on-premise/">On-Premise</a>
+	<a href="/use-cases/">Use Cases</a>
+	<a href="/blog/">Blog</a>
+	<a href="/demo/">Sign Up</a>
+</nav>
+
+<script src="/js/main.js" defer></script>
+<script>
+// Build Table of Contents from h2/h3 in blog content
+(function() {
+	document.addEventListener('DOMContentLoaded', function() {
+		var article = document.querySelector('.blog-content');
+		var toc = document.getElementById('blog-toc');
+		if (!article || !toc) return;
+
+		var headings = article.querySelectorAll('h2, h3');
+		if (headings.length === 0) return;
+
+		var list = document.createElement('ul');
+		list.className = 'blog-toc__list';
+
+		headings.forEach(function(h, i) {
+			if (!h.id) h.id = 'section-' + i;
+			var li = document.createElement('li');
+			li.className = 'blog-toc__item' + (h.tagName === 'H3' ? ' blog-toc__item--sub' : '');
+			var a = document.createElement('a');
+			a.href = '#' + h.id;
+			a.className = 'blog-toc__link';
+			a.textContent = h.textContent;
+			li.appendChild(a);
+			list.appendChild(li);
+		});
+
+		toc.appendChild(list);
+
+		// Highlight active TOC item on scroll
+		var links = toc.querySelectorAll('.blog-toc__link');
+		window.addEventListener('scroll', function() {
+			var current = '';
+			headings.forEach(function(h) {
+				if (window.scrollY >= h.offsetTop - 120) {
+					current = h.id;
+				}
+			});
+			links.forEach(function(link) {
+				link.classList.toggle('is-active', link.getAttribute('href') === '#' + current);
+			});
+		});
+	});
+})();
+</script>
+</body>
+</html>
