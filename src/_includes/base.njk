@@ -1,32 +1,9 @@
 <!doctype html>
-<html lang="en-US" class="no-js">
+<html lang="en-US">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-	<style>
-		/* Normalize container widths across all pages */
-		.container, .main-content > .row, .container-wrap .container { max-width: 1100px !important; margin-left: auto !important; margin-right: auto !important; }
-		body[data-ext-responsive="true"] .container, body[data-ext-responsive="true"] .main-content > .row, body[data-ext-responsive="true"] .container-wrap .container { max-width: calc(100% - 80px) !important; }
-		@media only screen and (min-width: 1340px) { body[data-ext-responsive="true"] .container, body[data-ext-responsive="true"] .main-content > .row, body[data-ext-responsive="true"] .container-wrap .container { max-width: 1260px !important; } }
-
-		/* Normalize header across all pages - lock to consistent values */
-		#header-outer { height: 99px !important; min-height: 99px !important; max-height: 99px !important; }
-		#header-outer[data-header-resize="1"]:not(.scrolled-down) #logo img { height: 43px !important; }
-		#header-outer #logo img { height: 43px !important; max-height: 43px !important; width: auto !important; }
-		#header-outer #logo { margin-top: 28px !important; display: block !important; }
-		#header-outer header#top .container { max-width: calc(100% - 80px) !important; }
-		@media only screen and (min-width: 1340px) { #header-outer header#top .container { max-width: 1260px !important; } }
-		#header-outer nav > ul > li > a { font-size: 16px !important; }
-		#header-space { height: 99px !important; max-height: 99px !important; }
-
-		/* Column margin 80px — matches homepage two-column gap */
-		.vc_row-fluid[data-column-margin="80px"] > .span_12,
-		.vc_row-fluid[data-column-margin="80px"] > .row_col_wrap_12 { margin-left: -40px !important; margin-right: -40px !important; }
-		.vc_row-fluid[data-column-margin="80px"] .wpb_column:not(.child_column) { padding-left: 40px !important; padding-right: 40px !important; }
-		@media only screen and (max-width: 999px) {
-			.vc_row-fluid[data-column-margin="80px"] .wpb_column:not([class*="vc_col-xs-"]):not(.child_column):not(:last-child) { margin-bottom: 80px; }
-		}
-	</style><meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
 
 	<title>{{ title }}</title>
 	<link rel="canonical" href="{{ canonical }}" />
@@ -41,37 +18,54 @@
 	<meta name="twitter:label1" content="{{ twitterLabel1 }}" />
 	<meta name="twitter:data1" content="{{ twitterData1 }}" />
 	{% endif %}
-	<script type="application/ld+json" class="yoast-schema-graph">{{ jsonLd | safe }}</script>
+	{% if jsonLd %}
+	<script type="application/ld+json">{{ jsonLd | safe }}</script>
+	{% endif %}
 
-{% include "partials/head-common.njk" %}
+	<!-- Fonts -->
+	<link rel="dns-prefetch" href="https://fonts.googleapis.com/" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&subset=latin,latin-ext" />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter+Tight:400,600,700" />
 
-	{{ pageElementCss | safe }}
+	<!-- Styles -->
+	<link rel="stylesheet" href="/css/styles.css" />
 
-	{{ pageInlineStyles | safe }}
+	<!-- Favicons -->
+	{% include "partials/head-favicons.njk" %}
+</head>
+<body class="{{ bodyClass }}">
 
-{% include "partials/head-cookie-config.njk" %}
-{{ vcCustomCss | safe }}
-{% include "partials/head-favicons.njk" %}
-{% include "partials/head-wp-custom-css.njk" %}
-
-{% include "partials/head-deferred-css.njk" %}
-
-</head><body class="{{ bodyClass }}" data-footer-reveal="false" data-footer-reveal-shadow="none" data-header-format="default" data-body-border="off" data-boxed-style="" data-header-breakpoint="1000" data-dropdown-style="minimal" data-cae="easeOutCubic" data-cad="750" data-megamenu-width="contained" data-aie="none" data-ls="fancybox" data-apte="standard" data-hhun="0" data-fancy-form-rcs="default" data-form-style="default" data-form-submit="regular" data-is="minimal" data-button-style="rounded_shadow" data-user-account-button="false" data-flex-cols="true" data-col-gap="default" data-header-inherit-rc="false" data-header-search="false" data-animated-anchors="true" data-ajax-transitions="false" data-full-width-header="false" data-slide-out-widget-area="true" data-slide-out-widget-area-style="fullscreen-split" data-user-set-ocm="off" data-loading-animation="none" data-bg-header="false" data-responsive="1" data-ext-responsive="true" data-ext-padding="40" data-header-resize="1" data-header-color="custom" data-transparent-header="false" data-cart="false" data-remove-m-parallax="" data-remove-m-video-bgs="" data-m-animate="0" data-force-header-trans-color="light" data-smooth-scrolling="0" data-permanent-transparent="false" >
+<a href="#main-content" class="sr-only">Skip to main content</a>
 
 {% include "partials/header.njk" %}
 
-	<div id="ajax-content-wrap">
-<div class="container-wrap">
-	<div class="container main-content" role="main">
-		<div class="row">
+<div class="header-spacer"></div>
 
+<main id="main-content" role="main">
 {{ content | safe }}
-
- </div></div>
+</main>
 
 {% include "partials/footer.njk" %}
-{% include "partials/cookie-consent.njk" %}
 {% include "partials/popup-form.njk" %}
-{% include "partials/scripts-common.njk" %}
+
+<!-- Video Lightbox -->
+<div id="video-lightbox" class="video-lightbox-overlay">
+	<div class="video-lightbox__inner">
+		<button class="video-lightbox__close" aria-label="Close">&times;</button>
+		<video class="video-lightbox__video" controls></video>
+	</div>
+</div>
+
+<!-- Scroll to Top -->
+<button class="scroll-to-top" aria-label="Back to top">&uarr;</button>
+
+<!-- Mobile Menu Overlay -->
+<nav class="mobile-menu" aria-label="Mobile Menu">
+	<a href="/on-premise/">On-Premise</a>
+	<a href="/use-cases/">Use Cases</a>
+	<a href="/demo/">Sign Up</a>
+</nav>
+
+<script src="/js/main.js" defer></script>
 </body>
 </html>
