@@ -168,8 +168,18 @@ const WIZARD_STEPS = [
   { id: "postmeeting", label: "Post-Meeting" },
   { id: "notifications", label: "Notifications" },
   { id: "email", label: "Custom Email" },
+  { id: "preview", label: "Preview" },
   { id: "deploy", label: "Deploy" },
 ];
+
+const USE_CASE_DEFAULTS = {
+  recruitment: "AI Screening Interview",
+  sales: "AI Sales Qualifier",
+  tutoring: "AI Tutoring Session",
+  coaching: "AI Coaching Session",
+  lms: "AI Learning Experience",
+  onboarding: "AI Onboarding Guide",
+};
 
 const AVATAR_VENDORS = [
   { id: "tavus", name: "Tavus", type: "video", desc: "Real-time conversational video avatars with lip sync", color: "#1e40af", logo: "T", previewImg: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" },
@@ -212,6 +222,13 @@ const INTEGRATIONS = {
     { id: "canvas", name: "Canvas", desc: "Learning management system" },
     { id: "cornerstone", name: "Cornerstone", desc: "Enterprise learning" },
     { id: "docebo", name: "Docebo", desc: "AI-powered LMS" },
+  ],
+  onboarding: [
+    { id: "workday", name: "Workday", desc: "HR and onboarding platform" },
+    { id: "bamboohr", name: "BambooHR", desc: "HR software with onboarding" },
+    { id: "rippling", name: "Rippling", desc: "All-in-one HR platform" },
+    { id: "notion", name: "Notion", desc: "Team wiki and onboarding docs" },
+    { id: "slack", name: "Slack", desc: "Workspace communication" },
   ],
 };
 
@@ -345,6 +362,7 @@ function StepUseCase({ data, onChange }) {
     { id: "tutoring", label: "Tutoring", desc: "Personalised learning and practice" },
     { id: "coaching", label: "Coaching", desc: "Structured coaching at scale" },
     { id: "lms", label: "LMS", desc: "Interactive learning experiences" },
+    { id: "onboarding", label: "Onboarding", desc: "Guide new hires or users through setup" },
   ];
 
   return (
@@ -353,7 +371,7 @@ function StepUseCase({ data, onChange }) {
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select the domain for your experience.</p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
         {useCases.map((uc) => (
-          <button key={uc.id} onClick={() => onChange({ ...data, useCase: uc.id })} style={selCard(data.useCase === uc.id, { padding: "16px 20px" })}>
+          <button key={uc.id} onClick={() => onChange({ ...data, useCase: uc.id, name: USE_CASE_DEFAULTS[uc.id] || "" })} style={selCard(data.useCase === uc.id, { padding: "16px 20px" })}>
             <div style={{ fontWeight: 600, fontSize: 14, color: data.useCase === uc.id ? theme.primary : theme.heading, marginBottom: 2 }}>{uc.label}</div>
             <div style={{ fontSize: 12, color: theme.textMuted }}>{uc.desc}</div>
           </button>
@@ -444,14 +462,14 @@ function StepAvatar({ data, onChange }) {
           }}>
             {/* Avatar face preview */}
             {vendor.previewImg ? (
-              <div style={{ width: "100%", height: 160, background: `linear-gradient(135deg, ${vendor.color}15, ${vendor.color}30)`, position: "relative", overflow: "hidden" }}>
-                <img src={vendor.previewImg} alt={`${vendor.name} avatar`} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.9 }} onError={(e) => { e.target.style.display = "none"; }} />
-                <div style={{ position: "absolute", top: 10, right: 10, padding: "3px 10px", borderRadius: 12, background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{vendor.type}</div>
+              <div style={{ width: "100%", height: 110, background: `linear-gradient(135deg, ${vendor.color}15, ${vendor.color}30)`, position: "relative", overflow: "hidden" }}>
+                <img src={vendor.previewImg} alt={`${vendor.name} avatar`} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", opacity: 0.9 }} onError={(e) => { e.target.style.display = "none"; }} />
+                <div style={{ position: "absolute", top: 8, right: 8, padding: "2px 8px", borderRadius: 10, background: "rgba(0,0,0,0.55)", color: "#fff", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{vendor.type}</div>
               </div>
             ) : (
-              <div style={{ width: "100%", height: 120, background: `linear-gradient(135deg, ${vendor.color}15, ${vendor.color}30)`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+              <div style={{ width: "100%", height: 90, background: `linear-gradient(135deg, ${vendor.color}15, ${vendor.color}30)`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                 <div style={{ color: vendor.color, opacity: 0.6 }}>{Icons.mic}</div>
-                <div style={{ position: "absolute", top: 10, right: 10, padding: "3px 10px", borderRadius: 12, background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{vendor.type}</div>
+                <div style={{ position: "absolute", top: 8, right: 8, padding: "2px 8px", borderRadius: 10, background: "rgba(0,0,0,0.55)", color: "#fff", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{vendor.type}</div>
               </div>
             )}
             <div style={{ padding: "16px 20px" }}>
@@ -477,15 +495,24 @@ function StepPersona({ data, onChange }) {
   const [logoPreview, setLogoPreview] = useState(data.logoPreview || null);
 
   const handleLogoUpload = () => {
-    // Simulated upload
     setLogoPreview("uploaded");
     onChange({ ...data, logoPreview: "uploaded", logoName: "company-logo.png" });
   };
 
+  const ucLabel = data.useCase ? data.useCase.charAt(0).toUpperCase() + data.useCase.slice(1) : null;
+  const accentColors = { recruitment: "#6d28d9", sales: "#0891b2", tutoring: "#16a34a", coaching: "#d97706", lms: "#db2777", onboarding: "#4f46e5" };
+  const accent = accentColors[data.useCase] || theme.primary;
+
   return (
     <div>
-      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Define the persona</h2>
-      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Set the identity, goals and guardrails for your avatar.</p>
+      {/* Coloured heading band */}
+      <div style={{ margin: "0 0 28px", padding: "20px 24px", borderRadius: 12, background: `linear-gradient(135deg, ${accent}12, ${accent}06)`, border: `1px solid ${accent}25` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+          {ucLabel && <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: accent, background: `${accent}15`, padding: "2px 10px", borderRadius: 20 }}>{ucLabel}</span>}
+        </div>
+        <h2 style={{ color: theme.heading, margin: "0 0 4px", fontSize: 22, fontWeight: 700 }}>Define the persona</h2>
+        <p style={{ color: theme.textMuted, margin: 0, fontSize: 14 }}>Set the identity, goals and guardrails for your avatar.</p>
+      </div>
 
       {/* Top row: name + logo side by side */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 20, marginBottom: 24, alignItems: "end" }}>
@@ -850,7 +877,109 @@ function StepCustomEmail({ data, onChange }) {
   );
 }
 
-// Step 11: Deploy
+// Step 11: Preview & Launch
+function StepPreview({ data }) {
+  const [launching, setLaunching] = useState(null);
+  const [launched, setLaunched] = useState(false);
+  const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
+
+  const platforms = [
+    { id: "zoom", label: "Zoom", color: "#2D8CFF", desc: "Launch a Zoom meeting", icon: (
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#2D8CFF"/><path d="M8 14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V14z" fill="white"/><path d="M26 17l6-4v14l-6-4V17z" fill="white"/></svg>
+    )},
+    { id: "teams", label: "Microsoft Teams", color: "#5059C9", desc: "Start a Teams meeting", icon: (
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#5059C9"/><text x="50%" y="56%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="18" fontWeight="700">T</text></svg>
+    )},
+    { id: "meet", label: "Google Meet", color: "#00AC47", desc: "Open a Google Meet", icon: (
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#00AC47"/><path d="M10 15h12v10H10z" fill="white"/><path d="M22 18l8-4v12l-8-4V18z" fill="#00832D"/></svg>
+    )},
+  ];
+
+  const handleLaunch = (platform) => {
+    setLaunching(platform.id);
+    setTimeout(() => {
+      setLaunching(null);
+      setLaunched(platform.id);
+    }, 1500);
+  };
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Preview your experience</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Review the session setup and launch a test in your preferred platform.</p>
+
+      {/* Config summary card */}
+      <div style={{ ...styles.card, padding: 0, overflow: "hidden", marginBottom: 28 }}>
+        <div style={{ padding: "14px 20px", background: `linear-gradient(135deg, ${theme.primary}10, ${theme.primary}04)`, borderBottom: `1px solid ${theme.border}`, display: "flex", alignItems: "center", gap: 10 }}>
+          {Icons.sparkle}
+          <span style={{ fontWeight: 700, fontSize: 14, color: theme.heading }}>{data.name || "Untitled Experience"}</span>
+          {data.useCase && <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: theme.primary, background: theme.primaryLight, padding: "2px 10px", borderRadius: 20 }}>{data.useCase}</span>}
+        </div>
+        <div style={{ padding: "16px 20px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 24px" }}>
+          {[
+            { label: "Bot type", value: data.botType === "voice" ? "Voice Bot" : "Video Avatar" },
+            { label: "Vendor", value: vendor ? vendor.name : "Not selected" },
+            { label: "Session type", value: data.participants === "multi" ? "Multi-Participant" : "Single Participant" },
+            { label: "Tone of voice", value: data.tone || "Not set" },
+            { label: "Integration", value: (data.connectedIntegrations || []).length > 0 ? (data.connectedIntegrations || []).join(", ") : "None connected" },
+            { label: "Triggers", value: (data.triggers || []).length > 0 ? `${(data.triggers || []).length} configured` : "None" },
+          ].map((item) => (
+            <div key={item.label} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: theme.textDim, textTransform: "uppercase", letterSpacing: "0.05em" }}>{item.label}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: theme.heading }}>{item.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Avatar preview */}
+      {vendor && vendor.previewImg && (
+        <div style={{ marginBottom: 28, display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 12 }}>
+          <img src={vendor.previewImg} alt={vendor.name} style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover", objectPosition: "top", border: `2px solid ${theme.border}` }} onError={(e) => { e.target.style.display = "none"; }} />
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: 2 }}>{vendor.name} avatar ready</div>
+            <div style={{ fontSize: 12, color: theme.textMuted }}>{vendor.desc}</div>
+          </div>
+          <div style={{ marginLeft: "auto", width: 10, height: 10, borderRadius: "50%", background: theme.success, boxShadow: `0 0 0 3px ${theme.successBg}` }} />
+        </div>
+      )}
+
+      {/* Launch platforms */}
+      <div style={{ marginBottom: 8 }}>
+        <label style={{ ...styles.label, marginBottom: 14 }}>Launch a test session in</label>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          {platforms.map((platform) => (
+            <button key={platform.id} onClick={() => !launched && handleLaunch(platform)} style={{
+              padding: "18px 12px", borderRadius: 12, border: `1.5px solid ${launched === platform.id ? platform.color : theme.border}`,
+              background: launched === platform.id ? `${platform.color}08` : theme.surface,
+              cursor: launched ? "default" : "pointer", textAlign: "center",
+              boxShadow: launched === platform.id ? `0 0 0 1px ${platform.color}` : "none",
+              transition: "all 0.2s",
+            }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}>{platform.icon}</div>
+              <div style={{ fontWeight: 700, fontSize: 13, color: theme.heading, marginBottom: 2 }}>{platform.label}</div>
+              <div style={{ fontSize: 11, color: theme.textMuted }}>{platform.desc}</div>
+              {launching === platform.id && (
+                <div style={{ marginTop: 8, fontSize: 11, color: platform.color, fontWeight: 600 }}>Launching...</div>
+              )}
+              {launched === platform.id && (
+                <div style={{ marginTop: 8, fontSize: 11, color: theme.success, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>{Icons.check} Session opened</div>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {launched && (
+        <div style={{ marginTop: 20, padding: "14px 18px", background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 10, fontSize: 13, color: theme.success, fontWeight: 500 }}>
+          Your avatar session has been launched. Continue to deploy when you're ready to go live.
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Step 12: Deploy
 function StepDeploy({ data }) {
   const [deploying, setDeploying] = useState(false);
   const [deployed, setDeployed] = useState(false);
@@ -933,7 +1062,8 @@ function Wizard({ user, onLogout }) {
       case 7: return true; // post-meeting optional
       case 8: return true; // notifications optional
       case 9: return true; // email optional
-      case 10: return true; // deploy
+      case 10: return true; // preview optional
+      case 11: return true; // deploy
       default: return false;
     }
   };
@@ -974,7 +1104,8 @@ function Wizard({ user, onLogout }) {
           {step === 7 && <StepPostMeeting data={data} onChange={setData} />}
           {step === 8 && <StepNotifications data={data} onChange={setData} />}
           {step === 9 && <StepCustomEmail data={data} onChange={setData} />}
-          {step === 10 && <StepDeploy data={data} />}
+          {step === 10 && <StepPreview data={data} />}
+          {step === 11 && <StepDeploy data={data} />}
 
           {/* Navigation */}
           <div style={styles.wizardNav}>
