@@ -90,24 +90,28 @@
 
 /* Marketplace — Tabs Card (right column) */
 .marketplace-tabs-card {
-  background: linear-gradient(135deg, #090310 0%, #1a0a2e 40%, #391d62 100%);
+  background: linear-gradient(135deg, #040108 0%, #0d0518 40%, #1e0d38 100%);
   border-radius: 20px;
   padding: 40px 35px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
 }
 
 /* Marketplace — Use Case Panel */
 .marketplace-usecase {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 28px;
-  align-items: start;
+  grid-template-columns: 160px 1fr;
+  gap: 32px;
+  align-items: center;
 }
 
 .marketplace-usecase__img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
   display: block;
+  object-fit: cover;
+  object-position: top center;
+  border: 3px solid rgba(179, 138, 238, 0.3);
 }
 
 .marketplace-usecase__body {
