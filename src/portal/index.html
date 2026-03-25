@@ -1,23 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sonesse Portal</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #ffffff; }
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sonesse Portal</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; padding: 0; background: #ffffff; }
+    select { font-family: inherit; }
+    button { font-family: inherit; }
+    input { font-family: inherit; }
+    textarea { font-family: inherit; }
+    table { font-family: inherit; }
+  </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect } = React;
+  <div id="root"></div>
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect } = React;
+
+
 
 // ─── Icons (inline SVG helpers) ───
 const Icons = {
@@ -162,7 +169,9 @@ const WIZARD_STEPS = [
   { id: "bottype", label: "Bot Type" },
   { id: "participants", label: "Participants" },
   { id: "avatar", label: "Avatar" },
+  { id: "avatarsettings", label: "Avatar Settings" },
   { id: "persona", label: "Persona" },
+  { id: "knowledgebase", label: "Knowledge Base" },
   { id: "integration", label: "Integration" },
   { id: "trigger", label: "Trigger Workflow" },
   { id: "postmeeting", label: "Post-Meeting" },
@@ -388,7 +397,7 @@ function StepUseCase({ data, onChange }) {
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>What do you want to build?</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select the domain for your experience.</p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
         {useCases.map((uc) => (
           <button key={uc.id} onClick={() => onChange({ ...data, useCase: uc.id, name: USE_CASE_DEFAULTS[uc.id] || "" })} style={selCard(data.useCase === uc.id, { padding: "16px 20px" })}>
             <div style={{ fontWeight: 600, fontSize: 14, color: data.useCase === uc.id ? theme.primary : theme.heading, marginBottom: 2 }}>{uc.label}</div>
@@ -516,7 +525,108 @@ function StepAvatar({ data, onChange }) {
   );
 }
 
-// Step 5: Persona — improved layout with logo upload
+// Step 5: Avatar Settings — default or advanced model configuration
+function StepAvatarSettings({ data, onChange }) {
+  const [mode, setMode] = useState(data.avatarSettingsMode || "default");
+  const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
+
+  const LLM_MODELS = ["GPT-4o", "GPT-4o mini", "Claude 3.5 Sonnet", "Claude 3 Haiku", "Gemini 1.5 Pro"];
+  const TURN_DETECTION = ["Server VAD", "Semantic VAD", "Disabled"];
+  const PERCEPTION_MODELS = ["Standard", "Enhanced", "Lite"];
+  const VISUAL_TOOLS = ["Enabled", "Disabled"];
+  const AUDIO_TOOLS = ["Enabled", "Disabled"];
+  const TTS_MODELS = ["Tavus Phoenix", "ElevenLabs Turbo v2", "OpenAI TTS-1", "OpenAI TTS-1-HD"];
+
+  const SettingRow = ({ label, desc, fieldKey, options }) => (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "center", padding: "14px 20px", borderBottom: `1px solid ${theme.border}` }}>
+      <div>
+        <div style={{ fontWeight: 600, fontSize: 13, color: theme.heading, marginBottom: 2 }}>{label}</div>
+        <div style={{ fontSize: 11, color: theme.textMuted }}>{desc}</div>
+      </div>
+      <select value={data[fieldKey] || options[0]} onChange={(e) => onChange({ ...data, [fieldKey]: e.target.value })} style={styles.select}>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  );
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Avatar settings</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 24px", fontSize: 14 }}>Configure how your avatar thinks, speaks and perceives the conversation.</p>
+
+      {/* Vendor badge */}
+      {vendor && (
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, padding: "12px 16px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 10 }}>
+          {vendor.previewImg ? (
+            <img src={vendor.previewImg} alt={vendor.name} style={{ width: 40, height: 40, borderRadius: 8, objectFit: "cover", objectPosition: "center 15%", border: `1px solid ${theme.border}` }} />
+          ) : (
+            <div style={{ width: 40, height: 40, borderRadius: 8, background: vendor.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: "#fff", flexShrink: 0 }}>{vendor.logo}</div>
+          )}
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading }}>{vendor.name}</div>
+            <div style={{ fontSize: 12, color: theme.textMuted }}>{vendor.type === "video" ? "Video Avatar" : "Voice Bot"}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Mode selector — radio-style */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+        {[
+          { id: "default", label: "Default", desc: "Optimised settings for your use case — no configuration needed" },
+          { id: "advanced", label: "Advanced", desc: "Fine-tune every model parameter for full control" },
+        ].map((m) => (
+          <button key={m.id} onClick={() => { setMode(m.id); onChange({ ...data, avatarSettingsMode: m.id }); }} style={{
+            ...styles.card, cursor: "pointer", textAlign: "left", padding: "16px 20px",
+            borderColor: mode === m.id ? theme.selectedBorder : theme.border,
+            background: mode === m.id ? theme.selectedBg : theme.surface,
+            boxShadow: mode === m.id ? `0 0 0 1px ${theme.selectedBorder}` : "none",
+            transition: "all 0.15s",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+              <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${mode === m.id ? theme.primary : theme.border}`, background: mode === m.id ? theme.primary : "transparent", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
+                {mode === m.id && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
+              </div>
+              <span style={{ fontWeight: 700, fontSize: 14, color: mode === m.id ? theme.primary : theme.heading }}>{m.label}</span>
+            </div>
+            <div style={{ fontSize: 12, color: theme.textMuted, lineHeight: 1.4, paddingLeft: 28 }}>{m.desc}</div>
+          </button>
+        ))}
+      </div>
+
+      {mode === "default" && (
+        <div style={{ padding: "16px 20px", background: theme.primaryLight, borderRadius: 10, border: `1px solid ${theme.primaryMed}`, fontSize: 13, color: theme.textMuted, lineHeight: 1.5 }}>
+          <span style={{ fontWeight: 700, color: theme.primary }}>Defaults applied. </span>Sonesse will automatically select the best model settings for your use case. Switch to Advanced to customise.
+        </div>
+      )}
+
+      {mode === "advanced" && (
+        <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
+          <div style={{ padding: "12px 20px", background: theme.surface, borderBottom: `1px solid ${theme.border}` }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.04em" }}>Model Configuration</span>
+          </div>
+          <SettingRow label="LLM Model" desc="Language model powering conversation intelligence" fieldKey="llmModel" options={LLM_MODELS} />
+          <SettingRow label="Turn Detection" desc="How the avatar detects when a participant has finished speaking" fieldKey="turnDetection" options={TURN_DETECTION} />
+          <SettingRow label="Perception Model" desc="Visual and contextual understanding of the session environment" fieldKey="perceptionModel" options={PERCEPTION_MODELS} />
+          <SettingRow label="Visual Tools" desc="Allow the avatar to process visual context from the session" fieldKey="visualTools" options={VISUAL_TOOLS} />
+          <SettingRow label="Audio Tools" desc="Allow the avatar to process audio signals beyond speech" fieldKey="audioTools" options={AUDIO_TOOLS} />
+          <div style={{ padding: "14px 20px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "center" }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: theme.heading, marginBottom: 2 }}>TTS (Text-to-Speech)</div>
+                <div style={{ fontSize: 11, color: theme.textMuted }}>Voice synthesis model for avatar speech output</div>
+              </div>
+              <select value={data.ttsModel || TTS_MODELS[0]} onChange={(e) => onChange({ ...data, ttsModel: e.target.value })} style={styles.select}>
+                {TTS_MODELS.map((o) => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Step 6: Persona — improved layout with logo upload
 function StepPersona({ data, onChange }) {
   const tones = ["Professional", "Friendly", "Direct", "Empathetic", "Formal", "Casual"];
   const [logoPreview, setLogoPreview] = useState(data.logoPreview || null);
@@ -602,7 +712,108 @@ function StepPersona({ data, onChange }) {
   );
 }
 
-// Step 6: Integration — dropdown with OAuth / API key options
+// Step 7: Knowledge Base — upload files or add URLs
+function StepKnowledgeBase({ data, onChange }) {
+  const [urlInput, setUrlInput] = useState("");
+  const files = data.kbFiles || [];
+  const urls = data.kbUrls || [];
+
+  const addUrl = () => {
+    if (!urlInput.trim()) return;
+    const updated = [...urls, { id: Date.now(), url: urlInput.trim() }];
+    onChange({ ...data, kbUrls: updated });
+    setUrlInput("");
+  };
+
+  const removeUrl = (id) => onChange({ ...data, kbUrls: urls.filter((u) => u.id !== id) });
+  const removeFile = (id) => onChange({ ...data, kbFiles: files.filter((f) => f.id !== id) });
+
+  const mockFileNames = ["company-handbook.pdf", "product-guide.docx", "interview-rubric.pdf", "faq.txt", "onboarding-checklist.docx"];
+  const handleFileUpload = () => {
+    const name = mockFileNames[files.length % mockFileNames.length];
+    const size = `${Math.floor(Math.random() * 800 + 80)}KB`;
+    onChange({ ...data, kbFiles: [...files, { id: Date.now(), name, size }] });
+  };
+
+  const totalSources = files.length + urls.length;
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Knowledge base</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Upload documents or add URLs so your avatar can draw on specific knowledge during sessions.</p>
+
+      {/* Upload files */}
+      <div style={{ marginBottom: 28 }}>
+        <label style={styles.label}>Upload documents</label>
+        <div onClick={handleFileUpload} style={{ border: `2px dashed ${theme.border}`, borderRadius: 10, padding: "28px 24px", textAlign: "center", cursor: "pointer", background: theme.surface, transition: "border-color 0.15s" }}
+          onMouseEnter={(e) => e.currentTarget.style.borderColor = theme.primary}
+          onMouseLeave={(e) => e.currentTarget.style.borderColor = theme.border}>
+          <div style={{ color: theme.textMuted, marginBottom: 8, display: "flex", justifyContent: "center" }}>{Icons.upload}</div>
+          <div style={{ fontWeight: 600, fontSize: 13, color: theme.heading, marginBottom: 4 }}>Drop files here or click to upload</div>
+          <div style={{ fontSize: 12, color: theme.textMuted }}>PDF, DOCX, TXT, CSV — up to 20MB each</div>
+        </div>
+        {files.length > 0 && (
+          <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
+            {files.map((file) => (
+              <div key={file.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8 }}>
+                <div style={{ color: theme.primary, flexShrink: 0 }}>{Icons.fileText}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 13, color: theme.heading }}>{file.name}</div>
+                  <div style={{ fontSize: 11, color: theme.textMuted }}>{file.size}</div>
+                </div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: theme.success, background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 10, padding: "2px 8px" }}>Indexed</div>
+                <button onClick={() => removeFile(file.id)} style={{ ...styles.btnLink, color: theme.textDim, fontSize: 12 }}>Remove</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add URLs */}
+      <div>
+        <label style={styles.label}>Add URLs</label>
+        <p style={{ fontSize: 12, color: theme.textMuted, margin: "0 0 12px" }}>Add documentation pages, knowledge base articles, or websites for the avatar to reference.</p>
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <input
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addUrl()}
+            placeholder="https://docs.yourcompany.com/..."
+            style={{ ...styles.input, flex: 1 }}
+            onFocus={(e) => e.target.style.borderColor = theme.borderFocus}
+            onBlur={(e) => e.target.style.borderColor = theme.border}
+          />
+          <button onClick={addUrl} style={{ ...styles.btnSecondary, flexShrink: 0 }}>Add URL</button>
+        </div>
+        {urls.length > 0 && (
+          <div style={{ display: "grid", gap: 8 }}>
+            {urls.map((item) => (
+              <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8 }}>
+                <div style={{ color: theme.primary, flexShrink: 0 }}>{Icons.link}</div>
+                <div style={{ flex: 1, fontSize: 13, color: theme.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.url}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: theme.success, background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 10, padding: "2px 8px", flexShrink: 0 }}>Indexed</div>
+                <button onClick={() => removeUrl(item.id)} style={{ ...styles.btnLink, color: theme.textDim, fontSize: 12, flexShrink: 0 }}>Remove</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {totalSources === 0 && (
+        <div style={{ marginTop: 24, padding: "14px 18px", background: theme.surface, borderRadius: 8, border: `1px solid ${theme.border}`, fontSize: 12, color: theme.textDim, textAlign: "center" }}>
+          No knowledge sources added. Your avatar will use general knowledge only. You can skip this step.
+        </div>
+      )}
+      {totalSources > 0 && (
+        <div style={{ marginTop: 20, padding: "12px 16px", background: theme.primaryLight, border: `1px solid ${theme.primaryMed}`, borderRadius: 8, fontSize: 12, color: theme.textMuted }}>
+          <span style={{ fontWeight: 700, color: theme.primary }}>{totalSources} source{totalSources !== 1 ? "s" : ""} added.</span> Your avatar will be able to reference this knowledge during sessions.
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Step 8: Integration — dropdown with OAuth / API key options
 function StepIntegration({ data, onChange }) {
   const uc = data.useCase || "recruitment";
   const integrations = INTEGRATIONS[uc] || INTEGRATIONS.recruitment;
@@ -1109,9 +1320,9 @@ function PortalNav({ user, onLogout, onHome, currentView }) {
 // ═══════════════════════════════════════════
 function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
   const experiences = [
-    { id: 1, name: "Senior Engineer Screening", useCase: "recruitment", status: "live", sessions: 42, vendor: "Anam" },
-    { id: 2, name: "SDR Outreach Bot", useCase: "sdr", status: "live", sessions: 118, vendor: "ElevenLabs" },
-    { id: 3, name: "New Hire Onboarding", useCase: "onboarding", status: "draft", sessions: 0, vendor: "Tavus" },
+    { id: 1, name: "Senior Engineer Screening", useCase: "recruitment", status: "live", sessions: 42, vendor: "Anam", avatarImg: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=80&h=80&fit=crop&crop=faces,center" },
+    { id: 2, name: "SDR Outreach Bot", useCase: "sdr", status: "live", sessions: 118, vendor: "ElevenLabs", avatarImg: null },
+    { id: 3, name: "New Hire Onboarding", useCase: "onboarding", status: "draft", sessions: 0, vendor: "Tavus", avatarImg: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&h=80&fit=crop&crop=faces,center" },
   ];
 
   const ucColors = { recruitment: "#6d28d9", sales: "#0891b2", tutoring: "#16a34a", coaching: "#d97706", lms: "#db2777", onboarding: "#4f46e5", meetingbot: "#0f766e", sdr: "#b45309" };
@@ -1156,8 +1367,14 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
             <div style={{ display: "grid", gap: 12 }}>
               {experiences.map((exp) => (
                 <div key={exp.id} style={{ ...styles.card, padding: "16px 20px", display: "flex", alignItems: "center", gap: 16 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: `${ucColors[exp.useCase] || theme.primary}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <div style={{ width: 14, height: 14, borderRadius: 3, background: ucColors[exp.useCase] || theme.primary }} />
+                  <div style={{ width: 44, height: 44, borderRadius: 10, background: `${ucColors[exp.useCase] || theme.primary}15`, overflow: "hidden", flexShrink: 0, border: `1px solid ${theme.border}` }}>
+                    {exp.avatarImg ? (
+                      <img src={exp.avatarImg} alt={exp.vendor} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} onError={(e) => { e.target.style.display = "none"; }} />
+                    ) : (
+                      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div style={{ width: 20, height: 20, borderRadius: 4, background: ucColors[exp.useCase] || theme.primary, opacity: 0.7 }} />
+                      </div>
+                    )}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: 2 }}>{exp.name}</div>
@@ -1190,14 +1407,14 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
 // SESSIONS TABLE (shared component)
 // ═══════════════════════════════════════════
 const MOCK_SESSIONS = [
-  { id: "s001", experience: "Senior Engineer Screening", participant: "Alex Johnson", email: "alex.johnson@techcorp.com", date: "2026-03-25", time: "10:30", duration: "18m", status: "completed", score: 82, transcript: "#", video: "#" },
-  { id: "s002", experience: "Senior Engineer Screening", participant: "Sarah Chen", email: "s.chen@devstudio.io", date: "2026-03-25", time: "14:00", duration: "22m", status: "completed", score: 91, transcript: "#", video: "#" },
-  { id: "s003", experience: "SDR Outreach Bot", participant: "Marcus Webb", email: "m.webb@growthco.com", date: "2026-03-24", time: "09:15", duration: "11m", status: "completed", score: 74, transcript: "#", video: null },
-  { id: "s004", experience: "Senior Engineer Screening", participant: "Priya Nair", email: "priya.nair@ml-labs.ai", date: "2026-03-24", time: "11:45", duration: "20m", status: "completed", score: 88, transcript: "#", video: "#" },
-  { id: "s005", experience: "SDR Outreach Bot", participant: "Tom Briggs", email: "tbriggs@salesorg.com", date: "2026-03-23", time: "16:00", duration: "8m", status: "no-show", score: null, transcript: null, video: null },
-  { id: "s006", experience: "New Hire Onboarding", participant: "Fatima Al-Rashid", email: "fatima@newco.co", date: "2026-03-23", time: "13:30", duration: "34m", status: "completed", score: 95, transcript: "#", video: "#" },
-  { id: "s007", experience: "Senior Engineer Screening", participant: "James Park", email: "j.park@softwareinc.com", date: "2026-03-22", time: "10:00", duration: "17m", status: "completed", score: 67, transcript: "#", video: "#" },
-  { id: "s008", experience: "SDR Outreach Bot", participant: "Elena Rossi", email: "elena@italyventures.it", date: "2026-03-22", time: "15:30", duration: "14m", status: "completed", score: 79, transcript: "#", video: null },
+  { id: "s001", experience: "Senior Engineer Screening", participant: "Alex Johnson", email: "alex.johnson@techcorp.com", date: "25 Mar 2026", time: "10:30", duration: "18m", status: "completed", score: 82, transcript: "#", video: "#" },
+  { id: "s002", experience: "Senior Engineer Screening", participant: "Sarah Chen", email: "s.chen@devstudio.io", date: "25 Mar 2026", time: "14:00", duration: "22m", status: "completed", score: 91, transcript: "#", video: "#" },
+  { id: "s003", experience: "SDR Outreach Bot", participant: "Marcus Webb", email: "m.webb@growthco.com", date: "24 Mar 2026", time: "09:15", duration: "11m", status: "completed", score: 74, transcript: "#", video: null },
+  { id: "s004", experience: "Senior Engineer Screening", participant: "Priya Nair", email: "priya.nair@ml-labs.ai", date: "24 Mar 2026", time: "11:45", duration: "20m", status: "completed", score: 88, transcript: "#", video: "#" },
+  { id: "s005", experience: "SDR Outreach Bot", participant: "Tom Briggs", email: "tbriggs@salesorg.com", date: "23 Mar 2026", time: "16:00", duration: "8m", status: "no-show", score: null, transcript: null, video: null },
+  { id: "s006", experience: "New Hire Onboarding", participant: "Fatima Al-Rashid", email: "fatima@newco.co", date: "23 Mar 2026", time: "13:30", duration: "34m", status: "completed", score: 95, transcript: "#", video: "#" },
+  { id: "s007", experience: "Senior Engineer Screening", participant: "James Park", email: "j.park@softwareinc.com", date: "22 Mar 2026", time: "10:00", duration: "17m", status: "completed", score: 67, transcript: "#", video: "#" },
+  { id: "s008", experience: "SDR Outreach Bot", participant: "Elena Rossi", email: "elena@italyventures.it", date: "22 Mar 2026", time: "15:30", duration: "14m", status: "completed", score: 79, transcript: "#", video: null },
 ];
 
 function SessionsTable({ preview = false }) {
@@ -1330,7 +1547,9 @@ function Wizard({ user, onLogout, onHome }) {
       case 1: return data.botType;
       case 2: return data.participants;
       case 3: return data.avatar;
-      case 4: return data.name;
+      case 4: return true;  // avatarsettings — optional
+      case 5: return data.name;
+      case 6: return true;  // knowledgebase — optional
       default: return true;
     }
   };
@@ -1363,14 +1582,16 @@ function Wizard({ user, onLogout, onHome }) {
           {step === 1 && <StepBotType data={data} onChange={setData} />}
           {step === 2 && <StepParticipants data={data} onChange={setData} />}
           {step === 3 && <StepAvatar data={data} onChange={setData} />}
-          {step === 4 && <StepPersona data={data} onChange={setData} />}
-          {step === 5 && <StepIntegration data={data} onChange={setData} />}
-          {step === 6 && <StepTriggerWorkflow data={data} onChange={setData} />}
-          {step === 7 && <StepPostMeeting data={data} onChange={setData} />}
-          {step === 8 && <StepNotifications data={data} onChange={setData} />}
-          {step === 9 && <StepCustomEmail data={data} onChange={setData} />}
-          {step === 10 && <StepPreview data={data} />}
-          {step === 11 && <StepDeploy data={data} />}
+          {step === 4 && <StepAvatarSettings data={data} onChange={setData} />}
+          {step === 5 && <StepPersona data={data} onChange={setData} />}
+          {step === 6 && <StepKnowledgeBase data={data} onChange={setData} />}
+          {step === 7 && <StepIntegration data={data} onChange={setData} />}
+          {step === 8 && <StepTriggerWorkflow data={data} onChange={setData} />}
+          {step === 9 && <StepPostMeeting data={data} onChange={setData} />}
+          {step === 10 && <StepNotifications data={data} onChange={setData} />}
+          {step === 11 && <StepCustomEmail data={data} onChange={setData} />}
+          {step === 12 && <StepPreview data={data} />}
+          {step === 13 && <StepDeploy data={data} />}
 
           {/* Navigation */}
           <div style={styles.wizardNav}>
@@ -1414,8 +1635,9 @@ function App() {
   return <LoginPage onLogin={handleLogin} onForgot={() => setView("forgot")} />;
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
-</script>
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
 </body>
 </html>
