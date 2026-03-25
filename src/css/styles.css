@@ -1876,3 +1876,21 @@ p:last-child { margin-bottom: 0; }
     font-size: 13px;
   }
 }
+
+/* ── Home: bottom CTA card ── */
+.home-bottom-cta {
+  padding: 70px 80px;
+}
+
+@media (max-width: 690px) {
+  .home-bottom-cta {
+    padding: 40px 24px;
+    border-radius: 20px;
+  }
+}
+
+/* ── General section padding on mobile ── */
+@media (max-width: 690px) {
+  .section { padding: 50px 0; }
+  .banner-section { padding: 60px 0 70px; }
+}

@@ -17,13 +17,37 @@
     input { font-family: inherit; }
     textarea { font-family: inherit; }
     table { font-family: inherit; }
+
+    /* ── Portal responsive grid helpers ── */
+    @media (max-width: 600px) {
+      /* 4-col grids → 2-col on mobile */
+      .portal-grid-4 {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      /* 3-col grids → 1-col on mobile */
+      .portal-grid-3 {
+        grid-template-columns: 1fr !important;
+      }
+      /* 2-col grids → 1-col on mobile */
+      .portal-grid-2 {
+        grid-template-columns: 1fr !important;
+      }
+      /* Sessions table — horizontal scroll */
+      .portal-table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+      /* Nav — reduce padding on small screens */
+      .portal-nav {
+        padding: 0 12px !important;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel" data-presets="react">
     const { useState, useEffect } = React;
-
 
 
 // ─── Icons (inline SVG helpers) ───
@@ -202,13 +226,20 @@ const AVATAR_VENDORS = [
   { id: "deepgram", name: "Deepgram", type: "voice", desc: "Fast, accurate voice agents for enterprise scale", color: "#16a34a", logo: "D", previewImg: null },
 ];
 
+const STACKONE_ATS_IDS = ["greenhouse", "lever", "workday", "ashby", "smartrecruiters", "bamboohr", "teamtailor", "personio", "workable", "recruitee"];
+
 const INTEGRATIONS = {
   recruitment: [
-    { id: "greenhouse", name: "Greenhouse", desc: "Applicant tracking system" },
-    { id: "lever", name: "Lever", desc: "Talent acquisition suite" },
-    { id: "workday", name: "Workday", desc: "HR and recruiting platform" },
-    { id: "bamboohr", name: "BambooHR", desc: "HR software for SMBs" },
-    { id: "ashby", name: "Ashby", desc: "All-in-one recruiting platform" },
+    { id: "greenhouse", name: "Greenhouse", desc: "Applicant tracking system · via StackOne", stackone: true },
+    { id: "lever", name: "Lever", desc: "Talent acquisition suite · via StackOne", stackone: true },
+    { id: "workday", name: "Workday", desc: "HR and recruiting platform · via StackOne", stackone: true },
+    { id: "ashby", name: "Ashby", desc: "All-in-one recruiting platform · via StackOne", stackone: true },
+    { id: "smartrecruiters", name: "SmartRecruiters", desc: "Enterprise talent acquisition · via StackOne", stackone: true },
+    { id: "bamboohr", name: "BambooHR", desc: "HR software for SMBs · via StackOne", stackone: true },
+    { id: "teamtailor", name: "Teamtailor", desc: "Employer branding & ATS · via StackOne", stackone: true },
+    { id: "personio", name: "Personio", desc: "European HR & recruiting platform · via StackOne", stackone: true },
+    { id: "workable", name: "Workable", desc: "Hiring software for growing teams · via StackOne", stackone: true },
+    { id: "recruitee", name: "Recruitee", desc: "Collaborative hiring software · via StackOne", stackone: true },
   ],
   sales: [
     { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM" },
@@ -264,6 +295,97 @@ const TRIGGER_OPTIONS = [
   { id: "form", label: "Form submission", desc: "Candidate or user submits an application or form" },
   { id: "manual", label: "Manual launch", desc: "User clicks a button to start the session" },
   { id: "schedule", label: "Scheduled time", desc: "Runs at a specific date and time" },
+];
+
+// StackOne ATS-specific triggers (shown when an ATS is connected)
+const STACKONE_ATS_TRIGGERS = [
+  {
+    id: "so_stage_changed",
+    label: "Application stage changed",
+    desc: "Fires when a candidate moves to a configured stage in your ATS",
+    badge: "Webhook · application.stage_changed",
+    endpoint: null,
+  },
+  {
+    id: "so_application_created",
+    label: "New application submitted",
+    desc: "Fires when a candidate applies — auto-invite them to a screening session",
+    badge: "Webhook · application.created",
+    endpoint: null,
+  },
+  {
+    id: "so_interview_created",
+    label: "Interview scheduled",
+    desc: "Fires when an interview is created in the ATS — send a pre-interview prep bot",
+    badge: "Webhook · interview.created",
+    endpoint: null,
+  },
+  {
+    id: "so_manual",
+    label: "Manual launch from ATS record",
+    desc: "Recruiter clicks 'Start Session' directly from the candidate profile",
+    badge: "Manual",
+    endpoint: null,
+  },
+  {
+    id: "so_external_webhook",
+    label: "External webhook",
+    desc: "Send a POST to your Sonesse endpoint from any system or automation",
+    badge: "Webhook · custom",
+    endpoint: null,
+  },
+];
+
+// StackOne ATS post-meeting actions (shown when an ATS is connected)
+const STACKONE_POST_MEETING_ACTIONS = [
+  {
+    id: "so_move_stage",
+    label: "Move to next stage",
+    desc: "Automatically advances the candidate to the next configured ATS stage",
+    method: "PATCH",
+    endpoint: "/unified/ats/applications/{id}",
+    body: '{ "stage_id": "<next_stage>" }',
+  },
+  {
+    id: "so_add_notes",
+    label: "Add interview notes",
+    desc: "Posts the AI-generated session summary as a note on the application record",
+    method: "POST",
+    endpoint: "/unified/ats/applications/{id}/notes",
+    body: '{ "content": "<summary>", "author_id": "<user_id>" }',
+  },
+  {
+    id: "so_attach_transcript",
+    label: "Attach full transcript",
+    desc: "Uploads the session transcript as a file attachment to the candidate record",
+    method: "POST",
+    endpoint: "/unified/ats/applications/{id}/attachments",
+    body: '{ "name": "transcript.pdf", "file_url": "<url>", "type": "other" }',
+  },
+  {
+    id: "so_update_score",
+    label: "Update candidate score",
+    desc: "Writes the AI-generated interview score back to the candidate profile",
+    method: "PATCH",
+    endpoint: "/unified/ats/candidates/{id}",
+    body: '{ "custom_fields": [{ "name": "sonesse_score", "value": "<score>" }] }',
+  },
+  {
+    id: "so_reject",
+    label: "Reject candidate",
+    desc: "Sets the application status to rejected with a configurable reason",
+    method: "PATCH",
+    endpoint: "/unified/ats/applications/{id}",
+    body: '{ "application_status": "rejected", "reject_reason_id": "<reason>" }',
+  },
+  {
+    id: "so_schedule_interview",
+    label: "Schedule next interview",
+    desc: "Creates a follow-up interview in the ATS and sends an invite to the candidate",
+    method: "POST",
+    endpoint: "/unified/ats/scheduled-interviews",
+    body: '{ "application_id": "<id>", "interview_stage_id": "<stage>", "start_at": "<time>" }',
+  },
 ];
 
 // ═══════════════════════════════════════════
@@ -398,7 +520,7 @@ function StepUseCase({ data, onChange }) {
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>What do you want to build?</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select the domain for your experience.</p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+      <div className="portal-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
         {useCases.map((uc) => (
           <button key={uc.id} onClick={() => onChange({ ...data, useCase: uc.id, name: USE_CASE_DEFAULTS[uc.id] || "" })} style={selCard(data.useCase === uc.id, { padding: "16px 20px" })}>
             <div style={{ fontWeight: 600, fontSize: 14, color: data.useCase === uc.id ? theme.primary : theme.heading, marginBottom: 2 }}>{uc.label}</div>
@@ -421,7 +543,7 @@ function StepBotType({ data, onChange }) {
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Choose your bot type</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Would you like a visual avatar or a voice-only agent?</p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="portal-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {options.map((opt) => (
           <button key={opt.id} onClick={() => onChange({ ...data, botType: opt.id })} style={{
             ...styles.card, cursor: "pointer", textAlign: "center", padding: "36px 24px",
@@ -451,7 +573,7 @@ function StepParticipants({ data, onChange }) {
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Session type</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>How many participants will be in each session?</p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="portal-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {options.map((opt) => (
           <button key={opt.id} onClick={() => onChange({ ...data, participants: opt.id })} style={{
             ...styles.card, cursor: "pointer", textAlign: "center", padding: "32px 24px",
@@ -933,25 +1055,44 @@ function StepIntegration({ data, onChange }) {
 
 // Step 7: Trigger Workflow
 function StepTriggerWorkflow({ data, onChange }) {
+  const connectedATS = (data.connectedIntegrations || []).find((id) => STACKONE_ATS_IDS.includes(id));
+  const atsName = connectedATS ? (INTEGRATIONS.recruitment.find((i) => i.id === connectedATS) || {}).name : null;
+  const useStackOne = !!(connectedATS && atsName);
+  const triggerList = useStackOne ? STACKONE_ATS_TRIGGERS : TRIGGER_OPTIONS;
+
   return (
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Trigger workflow</h2>
-      <p style={{ color: theme.textMuted, margin: "0 0 24px", fontSize: 14 }}>What starts an avatar session? Select all that apply.</p>
+      <p style={{ color: theme.textMuted, margin: "0 0 16px", fontSize: 14 }}>What starts an avatar session? Select all that apply.</p>
+
+      {useStackOne && (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: theme.primaryLight, border: `1px solid ${theme.primaryMed}`, borderRadius: 8, marginBottom: 20 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 6, background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 11, color: "#fff", flexShrink: 0 }}>S1</div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: theme.primary }}>StackOne unified ATS webhooks</div>
+            <div style={{ fontSize: 11, color: theme.textMuted }}>Connected to <strong>{atsName}</strong> — triggers use the StackOne unified webhook API across your ATS</div>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: "grid", gap: 10 }}>
-        {TRIGGER_OPTIONS.map((opt) => {
+        {triggerList.map((opt) => {
           const isSelected = (data.triggers || []).includes(opt.id);
           return (
             <button key={opt.id} onClick={() => {
               const triggers = data.triggers || [];
               const updated = isSelected ? triggers.filter((t) => t !== opt.id) : [...triggers, opt.id];
               onChange({ ...data, triggers: updated });
-            }} style={selCard(isSelected, { display: "flex", alignItems: "center", gap: 14, padding: "14px 18px" })}>
-              <div style={{ width: 22, height: 22, borderRadius: 4, border: `2px solid ${isSelected ? theme.primary : theme.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: isSelected ? theme.primary : "transparent", color: "#fff", transition: "all 0.15s" }}>
+            }} style={selCard(isSelected, { display: "flex", alignItems: "flex-start", gap: 14, padding: "14px 18px" })}>
+              <div style={{ width: 22, height: 22, borderRadius: 4, border: `2px solid ${isSelected ? theme.primary : theme.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1, background: isSelected ? theme.primary : "transparent", color: "#fff", transition: "all 0.15s" }}>
                 {isSelected && Icons.check}
               </div>
-              <div>
+              <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 14, color: theme.heading }}>{opt.label}</div>
-                <div style={{ fontSize: 12, color: theme.textMuted }}>{opt.desc}</div>
+                <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>{opt.desc}</div>
+                {opt.badge && (
+                  <div style={{ marginTop: 6, display: "inline-block", fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 4, background: theme.primaryMed, color: theme.primary, fontFamily: "monospace", letterSpacing: "0.02em" }}>{opt.badge}</div>
+                )}
               </div>
             </button>
           );
@@ -963,19 +1104,72 @@ function StepTriggerWorkflow({ data, onChange }) {
 
 // Step 8: Post-Meeting Workflow
 function StepPostMeeting({ data, onChange }) {
+  const connectedATS = (data.connectedIntegrations || []).find((id) => STACKONE_ATS_IDS.includes(id));
+  const atsName = connectedATS ? (INTEGRATIONS.recruitment.find((i) => i.id === connectedATS) || {}).name : null;
+  const useStackOne = !!(connectedATS && atsName);
+
   const destinations = [
     { id: "transcript_dest", label: "Transcript destination", desc: "Where should the full conversation transcript be saved?", options: ["CRM/ATS Record", "Google Drive", "S3 Bucket", "Webhook", "Email"] },
     { id: "summary_dest", label: "Summary destination", desc: "Where should the AI-generated session summary go?", options: ["CRM/ATS Record", "Slack Channel", "Email", "Notion", "Webhook"] },
     { id: "recording_dest", label: "Recording destination", desc: "Where should the audio/video recording be stored?", options: ["S3 Bucket", "Google Drive", "Azure Blob", "Dropbox", "None — don't record"] },
-    { id: "ats_event", label: "ATS/CRM event", desc: "What event should be triggered in your system after the session?", options: ["Move to next stage", "Update candidate score", "Create task for reviewer", "Add note to record", "No action"] },
   ];
 
   return (
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Post-meeting workflow</h2>
-      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Configure what happens after each session completes.</p>
+      <p style={{ color: theme.textMuted, margin: "0 0 20px", fontSize: 14 }}>Configure what happens after each session completes.</p>
 
-      <div style={{ display: "grid", gap: 20 }}>
+      {/* StackOne ATS API Actions */}
+      {useStackOne && (
+        <div style={{ marginBottom: 28 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: theme.primaryLight, border: `1px solid ${theme.primaryMed}`, borderRadius: 8, marginBottom: 16 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 6, background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 11, color: "#fff", flexShrink: 0 }}>S1</div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: theme.primary }}>StackOne ATS actions for {atsName}</div>
+              <div style={{ fontSize: 11, color: theme.textMuted }}>Select which API calls Sonesse makes to your ATS after each session ends</div>
+            </div>
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {STACKONE_POST_MEETING_ACTIONS.map((action) => {
+              const isSelected = (data.atsActions || []).includes(action.id);
+              return (
+                <button key={action.id} onClick={() => {
+                  const current = data.atsActions || [];
+                  const updated = isSelected ? current.filter((a) => a !== action.id) : [...current, action.id];
+                  onChange({ ...data, atsActions: updated });
+                }} style={selCard(isSelected, { display: "flex", alignItems: "flex-start", gap: 14, padding: "14px 18px", textAlign: "left" })}>
+                  <div style={{ width: 22, height: 22, borderRadius: 4, border: `2px solid ${isSelected ? theme.primary : theme.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2, background: isSelected ? theme.primary : "transparent", color: "#fff", transition: "all 0.15s" }}>
+                    {isSelected && Icons.check}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: theme.heading }}>{action.label}</div>
+                    <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>{action.desc}</div>
+                    <div style={{ marginTop: 8, padding: "6px 10px", background: "#f8f9fb", borderRadius: 6, border: "1px solid #e0e1e6", fontFamily: "monospace", fontSize: 10 }}>
+                      <span style={{ fontWeight: 700, color: action.method === "PATCH" ? "#d97706" : "#2563eb" }}>{action.method}</span>
+                      <span style={{ color: theme.textMuted }}>{" "}{action.endpoint}</span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Standard destinations */}
+      <div style={{ display: "grid", gap: 16 }}>
+        {!useStackOne && (
+          <div style={{ ...styles.card, padding: 20 }}>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: 2 }}>ATS/CRM event</div>
+              <div style={{ fontSize: 12, color: theme.textMuted }}>What event should be triggered in your system after the session?</div>
+            </div>
+            <select value={data.ats_event || ""} onChange={(e) => onChange({ ...data, ats_event: e.target.value })} style={styles.select}>
+              <option value="">Select action...</option>
+              {["Move to next stage", "Update candidate score", "Create task for reviewer", "Add note to record", "No action"].map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+          </div>
+        )}
         {destinations.map((dest) => (
           <div key={dest.id} style={{ ...styles.card, padding: 20 }}>
             <div style={{ marginBottom: 12 }}>
@@ -1186,7 +1380,7 @@ function StepPreview({ data }) {
       {/* Launch platforms */}
       <div style={{ marginBottom: 8 }}>
         <label style={{ ...styles.label, marginBottom: 14 }}>Launch a test session in</label>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
           {platforms.map((platform) => (
             <button key={platform.id} onClick={() => !launched && handleLaunch(platform)} style={{
               padding: "18px 12px", borderRadius: 12, border: `1.5px solid ${launched === platform.id ? platform.color : theme.border}`,
@@ -1287,7 +1481,7 @@ function StepDeploy({ data }) {
 // ═══════════════════════════════════════════
 function PortalNav({ user, onLogout, onHome, currentView }) {
   return (
-    <div style={{ borderBottom: `1px solid ${theme.border}`, padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "#ffffff", zIndex: 50, height: 52 }}>
+    <div className="portal-nav" style={{ borderBottom: `1px solid ${theme.border}`, padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "#ffffff", zIndex: 50, height: 52 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
         {/* Logo — clickable, goes home */}
         <button onClick={onHome} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "0 16px 0 0", borderRight: `1px solid ${theme.border}`, marginRight: 16 }}>
@@ -1345,7 +1539,7 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
           </div>
 
           {/* Stats row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+          <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
             {[
               { label: "Total Sessions", value: "160", sub: "All time" },
               { label: "Active Experiences", value: "2", sub: "Currently live" },
@@ -1409,12 +1603,12 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
 const MOCK_SESSIONS = [
   { id: "s001", experience: "Senior Engineer Screening", participant: "Alex Johnson", email: "alex.johnson@techcorp.com", date: "25 Mar 2026", time: "10:30", duration: "18m", status: "completed", score: 82, transcript: "#", video: "#" },
   { id: "s002", experience: "Senior Engineer Screening", participant: "Sarah Chen", email: "s.chen@devstudio.io", date: "25 Mar 2026", time: "14:00", duration: "22m", status: "completed", score: 91, transcript: "#", video: "#" },
-  { id: "s003", experience: "SDR Outreach Bot", participant: "Marcus Webb", email: "m.webb@growthco.com", date: "24 Mar 2026", time: "09:15", duration: "11m", status: "completed", score: 74, transcript: "#", video: null },
+  { id: "s003", experience: "SDR Outreach Bot", participant: "Marcus Webb", email: "m.webb@growthco.com", date: "24 Mar 2026", time: "09:15", duration: "11m", status: "completed", score: 74, transcript: "#", video: "#" },
   { id: "s004", experience: "Senior Engineer Screening", participant: "Priya Nair", email: "priya.nair@ml-labs.ai", date: "24 Mar 2026", time: "11:45", duration: "20m", status: "completed", score: 88, transcript: "#", video: "#" },
-  { id: "s005", experience: "SDR Outreach Bot", participant: "Tom Briggs", email: "tbriggs@salesorg.com", date: "23 Mar 2026", time: "16:00", duration: "8m", status: "no-show", score: null, transcript: null, video: null },
+  { id: "s005", experience: "SDR Outreach Bot", participant: "Tom Briggs", email: "tbriggs@salesorg.com", date: "23 Mar 2026", time: "16:00", duration: "8m", status: "no-show", score: null, transcript: "#", video: "#" },
   { id: "s006", experience: "New Hire Onboarding", participant: "Fatima Al-Rashid", email: "fatima@newco.co", date: "23 Mar 2026", time: "13:30", duration: "34m", status: "completed", score: 95, transcript: "#", video: "#" },
   { id: "s007", experience: "Senior Engineer Screening", participant: "James Park", email: "j.park@softwareinc.com", date: "22 Mar 2026", time: "10:00", duration: "17m", status: "completed", score: 67, transcript: "#", video: "#" },
-  { id: "s008", experience: "SDR Outreach Bot", participant: "Elena Rossi", email: "elena@italyventures.it", date: "22 Mar 2026", time: "15:30", duration: "14m", status: "completed", score: 79, transcript: "#", video: null },
+  { id: "s008", experience: "SDR Outreach Bot", participant: "Elena Rossi", email: "elena@italyventures.it", date: "22 Mar 2026", time: "15:30", duration: "14m", status: "completed", score: 79, transcript: "#", video: "#" },
 ];
 
 function SessionsTable({ preview = false }) {
@@ -1430,12 +1624,12 @@ function SessionsTable({ preview = false }) {
   const scoreColor = (s) => s >= 85 ? theme.success : s >= 70 ? theme.warning : theme.danger;
 
   return (
-    <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+    <div className="portal-table-wrap" style={{ ...styles.card, padding: 0, overflowX: "auto", overflowY: "hidden" }}>
+      <table style={{ width: "100%", minWidth: 600, borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ background: theme.surface, borderBottom: `1px solid ${theme.border}` }}>
-            {["Participant", "Experience", "Date & Time", "Duration", "Score", "Status", "Transcript", "Video"].map((h) => (
-              <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{h}</th>
+            {["Participant", "Experience", "Date & Time", "Duration", "Status", "Transcript", "Video"].map((h) => (
+              <th key={h} style={{ padding: "10px 16px", textAlign: h === "Duration" ? "center" : "left", fontSize: 11, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{h}</th>
             ))}
           </tr>
         </thead>
@@ -1451,12 +1645,7 @@ function SessionsTable({ preview = false }) {
                 <div style={{ color: theme.heading, fontWeight: 500 }}>{row.date}</div>
                 <div style={{ fontSize: 11, color: theme.textMuted }}>{row.time}</div>
               </td>
-              <td style={{ padding: "12px 16px", color: theme.textMuted }}>{row.duration}</td>
-              <td style={{ padding: "12px 16px" }}>
-                {row.score !== null ? (
-                  <span style={{ fontWeight: 700, fontSize: 14, color: scoreColor(row.score) }}>{row.score}</span>
-                ) : <span style={{ color: theme.textDim }}>—</span>}
-              </td>
+              <td style={{ padding: "12px 16px", color: theme.textMuted, textAlign: "center" }}>{row.duration}</td>
               <td style={{ padding: "12px 16px" }}>
                 <span style={statusStyle(row.status)}>{row.status === "completed" ? "Completed" : "No-show"}</span>
               </td>
@@ -1620,7 +1809,7 @@ function Wizard({ user, onLogout, onHome }) {
 // ═══════════════════════════════════════════
 // APP ROOT
 // ═══════════════════════════════════════════
-function App() {
+export default function App() {
   const [view, setView] = useState("login"); // login | forgot | home | sessions | wizard
   const [user, setUser] = useState("");
 
