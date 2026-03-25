@@ -280,6 +280,7 @@ function LoginPage({ onLogin, onForgot }) {
     e.preventDefault();
     setError("");
     if (!email || !password) { setError("Please enter your email and password."); return; }
+    if (email !== "demo" || password !== "demo") { setError("Invalid credentials. Use demo / demo to sign in."); return; }
     setLoading(true);
     setTimeout(() => { setLoading(false); onLogin(email); }, 800);
   };
@@ -318,8 +319,8 @@ function LoginPage({ onLogin, onForgot }) {
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
-          <div style={{ marginTop: 24, textAlign: "center", color: theme.textMuted, fontSize: 13 }}>
-            Don't have an account? <button style={styles.btnLink}>Request access</button>
+          <div style={{ marginTop: 20, textAlign: "center", padding: "10px 14px", background: theme.surface, borderRadius: 8, border: `1px solid ${theme.border}`, fontSize: 12, color: theme.textMuted }}>
+            Demo credentials: <span style={{ fontFamily: "monospace", fontWeight: 700, color: theme.heading }}>demo</span> / <span style={{ fontFamily: "monospace", fontWeight: 700, color: theme.heading }}>demo</span>
           </div>
         </div>
       </div>
