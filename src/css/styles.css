@@ -1695,3 +1695,184 @@ p:last-child { margin-bottom: 0; }
   .blog-cta h2 { font-size: 28px; }
   .blog-filter__nav { justify-content: flex-start; }
 }
+
+
+/* ============================================
+   Marketplace — Two-Column Layout
+   ============================================ */
+.marketplace-layout {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 680px);
+  gap: 60px;
+  align-items: start;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@media (max-width: 999px) {
+  .marketplace-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.marketplace-layout__left {
+  position: sticky;
+  top: 120px;
+}
+
+@media (max-width: 999px) {
+  .marketplace-layout__left {
+    position: static;
+  }
+}
+/* Marketplace — Vertical Steps */
+.steps-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.step-v {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  position: relative;
+}
+
+.step-v::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 52px;
+  bottom: -16px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--color-primary-border), transparent);
+}
+
+.step-v:last-child::before {
+  display: none;
+}
+.step-v__number {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-lighter));
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-v__content h4 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.step-v__content p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-light);
+}
+/* Marketplace — Tabs Card (right column) */
+.marketplace-tabs-card {
+  background: linear-gradient(135deg, #090310 0%, #1a0a2e 40%, #391d62 100%);
+  border-radius: 20px;
+  padding: 40px 35px;
+}
+
+/* Marketplace — Use Case Panel */
+.marketplace-usecase {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.marketplace-usecase__img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+}
+
+.marketplace-usecase__body {
+  text-align: left;
+}
+
+@media (max-width: 690px) {
+  .marketplace-usecase {
+    grid-template-columns: 1fr;
+  }
+  .marketplace-usecase__img {
+    max-width: 180px;
+    margin: 0 auto;
+  }
+}
+
+.marketplace-usecase h3 {
+  color: #ffffff;
+  font-size: clamp(22px, 3vw, 30px);
+  margin-bottom: 8px;
+}
+
+.marketplace-usecase__sub {
+  color: #c9a0ff;
+  font-size: clamp(16px, 2vw, 19px);
+  font-weight: 600;
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.marketplace-usecase__integrations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.marketplace-usecase__integrations span {
+  display: inline-block;
+  padding: 4px 12px;
+  border: 1px solid rgba(179, 138, 238, 0.35);
+  border-radius: 100px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.05);
+}
+.marketplace-usecase p {
+  color: #d7d7d7;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.marketplace-tabs-card .tabs__nav--pills {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.marketplace-tabs-card .tabs__nav--pills .tabs__btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+@media (max-width: 690px) {
+  .marketplace-tabs-card {
+    padding: 25px 20px;
+  }
+  .marketplace-tabs-card .tabs__nav--pills .tabs__btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+}

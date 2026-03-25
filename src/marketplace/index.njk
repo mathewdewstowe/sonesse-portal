@@ -11,138 +11,163 @@ jsonLd: '{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"/m
 bodyClass: "marketplace"
 permalink: "/marketplace/index.html"
 ---
-
-<!-- Intro -->
-<section class="section use-cases-intro" style="padding-top: 65px; padding-bottom: 45px;">
-	<div class="section__inner text-center">
+<!-- Hero -->
+<section class="section use-cases-intro" style="padding-top: 65px; padding-bottom: 25px;">
+	<div class="section__inner text-center" style="max-width: 1100px;">
 		<span class="badge">Marketplace</span>
 		<h1>Deploy intelligent avatars <span class="gradient-text">in minutes, not months.</span></h1>
 		<p style="max-width: 760px; margin-left: auto; margin-right: auto; color: var(--color-text-light);">Build, customise and launch voice or video avatars across any domain — no coding required. Choose your avatar vendor, connect your systems, define your triggers and go live in under 15 minutes. Fully vendor-agnostic. Fully domain-agnostic.</p>
 	</div>
 </section>
 
-<!-- How It Works -->
-<section class="section" style="padding: 0 0 60px;">
+<!-- Two-Column: Steps + Use Cases -->
+<section class="section" style="padding: 20px 0 0;">
 	<div class="section__inner">
-		<div class="steps-flow steps-flow--5">
-			<div class="step-item step-item--big">
-				<div class="step-item__number">1</div>
-				<h4>Select your avatar</h4>
-			</div>
-			<div class="step-item step-item--big">
-				<div class="step-item__number">2</div>
-				<h4>Add a persona</h4>
-			</div>
-			<div class="step-item step-item--big">
-				<div class="step-item__number">3</div>
-				<h4>Integrate</h4>
-			</div>
-			<div class="step-item step-item--big">
-				<div class="step-item__number">4</div>
-				<h4>Configure Workflow</h4>
-			</div>
-			<div class="step-item step-item--big">
-				<div class="step-item__number">5</div>
-				<h4>Deploy</h4>
-			</div>
-		</div>
-		<div class="text-center" style="margin-top: 40px;">
-			<a class="btn btn--primary" href="/demo/">
-				<span>Sign Up</span>
-				<span class="btn__arrow">&rarr;</span>
-			</a>
-		</div>
-	</div>
-</section>
+		<div class="marketplace-layout">
 
-<!-- Tabbed Use Cases -->
-<section class="section use-cases-tabs" style="background: linear-gradient(135deg, #090310 0%, #1a0a2e 40%, #391d62 100%); border-radius: 20px;">
-	<div class="section__inner">
-		<div data-tabs>
-			<div class="tabs__nav tabs__nav--pills tabs__nav--center">
-				<button class="tabs__btn is-active" data-tab="recruitment">Recruitment</button>
-				<button class="tabs__btn" data-tab="sales">Sales</button>
-				<button class="tabs__btn" data-tab="tutoring">Tutoring</button>
-				<button class="tabs__btn" data-tab="coaching">Coaching</button>
-				<button class="tabs__btn" data-tab="lms">LMS</button>
-			</div>
-
-			<!-- Recruitment -->
-			<div class="tabs__panel is-active" data-tab-panel="recruitment">
-				<div class="grid grid--2-center">
-					<div>
-						<h2 style="color: #ffffff;">Recruitment</h2>
-						<h3 style="color: #b38aee; margin-bottom: 16px; font-size: clamp(18px, 2.5vw, 22px);">Avatars that screen, qualify and schedule — automatically.</h3>
-						<p style="color: #d7d7d7;">Deploy a branded interview avatar that engages candidates in real time. Connect your ATS, define screening criteria in plain language, and let the avatar handle first-round conversations at scale. Post-session actions push qualified candidates straight into your pipeline with full transcripts and scoring attached.</p>
+			<!-- LEFT COLUMN: Steps & Explanation -->
+			<div class="marketplace-layout__left">
+				<h2 style="margin-bottom: 30px;">How it works</h2>
+				<div class="steps-vertical">
+					<div class="step-v">
+						<div class="step-v__number">1</div>
+						<div class="step-v__content">
+							<h4>Select your avatar</h4>
+							<p>Choose from leading avatar vendors — voice-only or full video.</p>
+						</div>
+					</div>					<div class="step-v">
+						<div class="step-v__number">2</div>
+						<div class="step-v__content">
+							<h4>Add a persona</h4>
+							<p>Define personality, tone and domain expertise in plain language.</p>
+						</div>
 					</div>
-					<div>
-						<img src="/assets/2025/01/svgexport-11.png" alt="Recruitment Avatar" width="529" height="450" />
+					<div class="step-v">
+						<div class="step-v__number">3</div>
+						<div class="step-v__content">
+							<h4>Integrate</h4>
+							<p>Connect your CRM, ATS, LMS or any system via pre-built connectors.</p>
+						</div>
+					</div>
+					<div class="step-v">
+						<div class="step-v__number">4</div>
+						<div class="step-v__content">
+							<h4>Configure Workflow</h4>
+							<p>Set triggers, post-session actions and data routing rules.</p>
+						</div>
+					</div>
+					<div class="step-v">
+						<div class="step-v__number">5</div>
+						<div class="step-v__content">
+							<h4>Preview</h4>
+							<p>Test your avatar in a sandbox before going live — refine tone, flows and responses.</p>
+						</div>
+					</div>
+					<div class="step-v">
+						<div class="step-v__number">6</div>
+						<div class="step-v__content">
+							<h4>Deploy</h4>
+							<p>Go live on your website, app or meeting platform instantly.</p>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- Sales -->
-			<div class="tabs__panel" data-tab-panel="sales">
-				<div class="grid grid--2-center">
-					<div>
-						<h2 style="color: #ffffff;">Sales</h2>
-						<h3 style="color: #b38aee; margin-bottom: 16px; font-size: clamp(18px, 2.5vw, 22px);">Qualify leads and book meetings while you sleep.</h3>
-						<p style="color: #d7d7d7;">Drop a trained sales avatar into your website, landing page or outbound flow. It qualifies prospects against your ICP, answers product questions from your knowledge base, and books directly into your team's calendar. Every conversation feeds back into your CRM with full context — no manual data entry.</p>
+			<!-- RIGHT COLUMN: Tabbed Use Cases -->
+			<div class="marketplace-layout__right">
+				<div class="marketplace-tabs-card" data-tabs>
+					<div class="tabs__nav tabs__nav--pills" style="justify-content: flex-start; margin-bottom: 30px;">
+						<button class="tabs__btn is-active" data-tab="recruitment">Recruitment</button>
+						<button class="tabs__btn" data-tab="onboarding">Onboarding</button>
+						<button class="tabs__btn" data-tab="sales">Sales</button>
+						<button class="tabs__btn" data-tab="tutoring">Tutoring</button>
+						<button class="tabs__btn" data-tab="coaching">Coaching</button>
+						<button class="tabs__btn" data-tab="assessment">Assessment</button>
 					</div>
-					<div>
-						<img src="/assets/2025/01/svgexport-1.png" alt="Sales Avatar" width="528" height="450" />
+					<!-- Recruitment -->
+					<div class="tabs__panel is-active" data-tab-panel="recruitment">
+						<div class="marketplace-usecase">
+							<img src="/assets/2025/01/svgexport-11.png" alt="Recruitment Avatar" class="marketplace-usecase__img" />
+							<div class="marketplace-usecase__body">
+								<p class="marketplace-usecase__sub">Your team only speaks to candidates who are genuinely qualified.</p>
+								<p>Connect your ATS, define screening criteria in plain language, and let the avatar run first-round interviews at scale — every session scored, transcribed and pushed straight into your pipeline.</p>
+
+
+							</div>
+						</div>
 					</div>
+					<!-- Onboarding -->
+					<div class="tabs__panel" data-tab-panel="onboarding">
+						<div class="marketplace-usecase">
+							<img src="/assets/2026/02/img_1.png" alt="Onboarding Avatar" class="marketplace-usecase__img" />
+							<div class="marketplace-usecase__body">
+								<p class="marketplace-usecase__sub">New hires hit the ground running — no coordinator required.</p>
+								<p>Replace static decks with a two-way avatar that walks new hires through policies, culture and tools, adapts to their role, and logs every response automatically.</p>
+
+
+							</div>
+						</div>
+					</div>
+
+					<!-- Sales -->
+					<div class="tabs__panel" data-tab-panel="sales">
+						<div class="marketplace-usecase">
+							<img src="/assets/2025/01/svgexport-1.png" alt="Sales Avatar" class="marketplace-usecase__img" />
+							<div class="marketplace-usecase__body">
+								<p class="marketplace-usecase__sub">Your reps only talk to prospects who are already qualified.</p>
+								<p>Drop a trained avatar into your website or outbound flow. It qualifies against your ICP, answers product questions and books into your team's calendar — every conversation scored and synced to your CRM.</p>
+
+
+							</div>
+						</div>
+					</div>
+					<!-- Tutoring -->
+					<div class="tabs__panel" data-tab-panel="tutoring">
+						<div class="marketplace-usecase">
+							<img src="/assets/2024/12/Group-300.png" alt="Tutoring Avatar" class="marketplace-usecase__img" />
+							<div class="marketplace-usecase__body">
+								<p class="marketplace-usecase__sub">A tutor that responds to the learner — not a script.</p>
+								<p>The avatar adapts pace and depth in real time based on what the learner says — surfacing gaps, adjusting difficulty and pushing session summaries to your LMS automatically.</p>
+
+
+							</div>
+						</div>
+					</div>
+					<!-- Coaching -->
+					<div class="tabs__panel" data-tab-panel="coaching">
+						<div class="marketplace-usecase">
+							<img src="/assets/2024/12/Group-290.png" alt="Coaching Avatar" class="marketplace-usecase__img" />
+							<div class="marketplace-usecase__body">
+								<p class="marketplace-usecase__sub">Your methodology. Delivered at scale. No room required.</p>
+								<p>Train the avatar on your own frameworks. It runs structured sessions, asks probing questions and generates action items and progress scores automatically — escalating to a human when needed.</p>
+
+
+							</div>
+						</div>
+					</div>
+					<!-- Assessment -->
+					<div class="tabs__panel" data-tab-panel="assessment">
+						<div class="marketplace-usecase">
+							<img src="/assets/2026/02/img_3.png" alt="Assessment Avatar" class="marketplace-usecase__img" />
+							<div class="marketplace-usecase__body">
+								<p class="marketplace-usecase__sub">Test real understanding — not the ability to guess correctly.</p>
+								<p>Avatar-led assessments probe answers with adaptive follow-up questions. Define scoring criteria in plain language and receive structured competency reports for every session automatically.</p>
+
+
+							</div>
+						</div>
+					</div>
+
 				</div>
 			</div>
 
-			<!-- Tutoring -->
-			<div class="tabs__panel" data-tab-panel="tutoring">
-				<div class="grid grid--2-center">
-					<div>
-						<h2 style="color: #ffffff;">Tutoring</h2>
-						<h3 style="color: #b38aee; margin-bottom: 16px; font-size: clamp(18px, 2.5vw, 22px);">Personalised tutors that adapt to every learner in real time.</h3>
-						<p style="color: #d7d7d7;">Create a personalised tutor that explains, questions and guides students through any subject. Connect your LMS to track progress, set session goals through simple prompts, and let the avatar adjust its teaching style based on learner responses. Session summaries and performance data sync back automatically.</p>
-					</div>
-					<div>
-						<img src="/assets/2024/12/Group-300.png" alt="Tutoring Avatar" width="375" height="265" />
-					</div>
-				</div>
-			</div>
-
-			<!-- Coaching -->
-			<div class="tabs__panel" data-tab-panel="coaching">
-				<div class="grid grid--2-center">
-					<div>
-						<h2 style="color: #ffffff;">Coaching</h2>
-						<h3 style="color: #b38aee; margin-bottom: 16px; font-size: clamp(18px, 2.5vw, 22px);">Structured coaching sessions delivered at scale.</h3>
-						<p style="color: #d7d7d7;">Build a coaching avatar trained on your methodology — whether it's leadership development, sales enablement or wellness. Define session frameworks, set follow-up triggers, and connect to your platform of choice. Each session generates structured notes, action items and progress tracking without any manual overhead.</p>
-					</div>
-					<div>
-						<img src="/assets/2024/12/Group-290.png" alt="Coaching Avatar" width="375" height="265" />
-					</div>
-				</div>
-			</div>
-
-			<!-- LMS -->
-			<div class="tabs__panel" data-tab-panel="lms">
-				<div class="grid grid--2-center">
-					<div>
-						<h2 style="color: #ffffff;">LMS</h2>
-						<h3 style="color: #b38aee; margin-bottom: 16px; font-size: clamp(18px, 2.5vw, 22px);">Turn static content into interactive learning experiences.</h3>
-						<p style="color: #d7d7d7;">Transform your existing learning modules into live, conversational sessions. The avatar walks learners through material, checks understanding with adaptive questioning, and logs completion and competency data directly into your LMS. Supports SCORM and xAPI out of the box.</p>
-					</div>
-					<div>
-						<img src="/assets/2025/01/svgexport-11.png" alt="LMS Avatar" width="529" height="450" />
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </section>
 
 <!-- Bottom CTA -->
 <section class="section" style="padding: 70px 0 90px;">
-	<div class="section__inner text-center">
+	<div class="section__inner text-center" style="max-width: 1100px;">
 		<h1 style="margin: 0 auto; white-space: nowrap;">Go live in 15 minutes. No code. No limits.</h1>
 		<p style="max-width: 600px; margin: 20px auto 0; color: var(--color-text-light);">Pick your vendor, connect your systems, deploy your avatar. It's that simple.</p>
 		<a class="btn btn--primary" href="/demo/" style="margin-top: 30px;">
