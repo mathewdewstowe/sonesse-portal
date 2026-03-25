@@ -1330,7 +1330,7 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
 
   return (
     <div style={styles.page}>
-      <PortalNav user={user} onLogout={onLogout} onHome={() => {}} currentView="home" />
+      <PortalNav user={user} onLogout={onLogout} onHome={(subview) => { if (subview === "sessions") onSessions(); }} currentView="home" />
       <div style={styles.wideContainer}>
         <div style={{ padding: "36px 0 60px" }}>
           {/* Header row */}
