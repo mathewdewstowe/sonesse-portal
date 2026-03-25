@@ -1,0 +1,54 @@
+---
+layout: blog-post.njk
+title: "From Zero to Live in Hours: How Sonesse Makes AI Meeting Integration Simple"
+excerpt: "An admin clicks a consent link, approves permissions, and assigns users through their existing identity provider. AI agents start joining meetings as native participants — live in hours, not months."
+date: 2026-03-08
+category: "Engineering"
+author: "Sonesse Team"
+readTime: 5
+featuredImage: "/assets/2024/12/Group-299.png"
+tags: ["integration", "engineering", "api"]
+permalink: "/blog/simple-integration-live-in-hours/"
+---
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Most AI meeting integrations take months to build. You need to navigate OAuth consent flows, handle platform-specific authentication, manage user provisioning, and build an admin interface — all before you write a single line of agent logic.</p>
+
+<p>Sonesse reduces this to hours.</p>
+
+<h2 id="admin-experience">The Admin Experience</h2>
+
+<p>Here's what onboarding looks like with Sonesse: An admin clicks a consent link, approves a limited set of API permissions, and assigns users through their existing identity provider — Entra, Google Workspace, or Zoom admin portal.</p>
+
+<p>That's it. AI agents start joining meetings as native participants, governed by your existing policies and compliance controls. No code changes, no software installs, no infrastructure to manage.</p>
+
+<h2 id="marketplace-api">The Marketplace API</h2>
+
+<p>Our marketplace API makes it simple to schedule, join, stream, transcribe, and interact. The same API call works across all three platforms. You don't need to learn Zoom's SDK, Teams' Bot Framework, and Google's Meet API separately — Sonesse abstracts all of that away.</p>
+
+<pre><code>import sonesse
+
+client = sonesse.Client(api_key="your_api_key")
+
+# Works with any meeting URL — Zoom, Teams, or Google Meet
+bot = client.bots.create(
+    meeting_url="https://teams.microsoft.com/l/meetup-join/...",
+    bot_name="My AI Assistant",
+    transcription={"provider": "sonesse"},
+    capabilities=["audio", "video", "chat"]
+)</code></pre>
+
+<p>From note-taking and transcription to real-time coaching and workflow execution, your team can go from concept to deployment in minutes — not weeks.</p>
+
+<h2 id="compliance">Enterprise Compliance Built In</h2>
+
+<p>Sonesse handles the compliance layer that usually slows enterprise deployments to a crawl. Agents operate within your existing security policies, access controls, and audit requirements. There's no additional security review needed for each meeting platform because Sonesse's consent model aligns with what IT teams already use.</p>
+
+<h2 id="focus">Focus on Intelligence, Not Infrastructure</h2>
+
+<p>Let Sonesse take on the complexity of scale, latency, and compliance. You focus on building the intelligence — we handle the engineering.</p>
+
+<p>The result? Products that ship faster, cost less to maintain, and work reliably across every major meeting platform from day one.</p>
+
+<p>Ready to simplify your integration? <a href="/demo/">Book a demo</a> and go live in hours.</p>

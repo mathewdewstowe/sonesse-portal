@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sonesse Experience Builder</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #ffffff; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+// ─── Icons (inline SVG helpers) ───
+const Icons = {
+  eye: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+  ),
+  eyeOff: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+  ),
+  arrowLeft: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+  ),
+  arrowRight: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  ),
+  check: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  ),
+  sparkle: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+  ),
+  logout: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+  ),
+  user: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  ),
+  users: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  ),
+  userSingle: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  ),
+  video: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+  ),
+  videoLg: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+  ),
+  mic: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  ),
+  micLg: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  ),
+  plug: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22v-5"/><path d="M9 7V2"/><path d="M15 7V2"/><path d="M6 13V8h12v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4Z"/></svg>
+  ),
+  workflow: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M6 9v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9"/><path d="M12 13v2"/></svg>
+  ),
+  rocket: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+  ),
+  link: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+  ),
+  bell: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+  ),
+  mail: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+  ),
+  upload: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  ),
+  chevronDown: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  ),
+  key: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+  ),
+  fileText: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+  ),
+};
+
+// ─── Theme ───
+const theme = {
+  bg: "#ffffff",
+  surface: "#f8f9fb",
+  surfaceHover: "#f0f1f5",
+  border: "#e0e1e6",
+  borderFocus: "#6d28d9",
+  primary: "#6d28d9",
+  primaryHover: "#5b21b6",
+  primaryLight: "rgba(109, 40, 217, 0.06)",
+  primaryMed: "rgba(109, 40, 217, 0.12)",
+  selectedBg: "rgba(109, 40, 217, 0.08)",
+  selectedBorder: "#6d28d9",
+  text: "#1a1a2e",
+  textMuted: "#5c5c72",
+  textDim: "#9494a8",
+  white: "#ffffff",
+  heading: "#0f0f1a",
+  danger: "#ef4444",
+  success: "#16a34a",
+  successBg: "rgba(22, 163, 74, 0.08)",
+  successBorder: "rgba(22, 163, 74, 0.25)",
+  warning: "#f59e0b",
+};
+
+// ─── Styles ───
+const styles = {
+  page: { minHeight: "100vh", background: "#ffffff", color: theme.text, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: "14px", lineHeight: 1.5 },
+  container: { maxWidth: 480, margin: "0 auto", padding: "60px 24px" },
+  wideContainer: { maxWidth: 960, margin: "0 auto", padding: "0 24px" },
+
+  card: { background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 12, padding: 32 },
+  cardSm: { background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 10, padding: "16px 20px" },
+
+  label: { display: "block", fontSize: 13, fontWeight: 600, color: theme.textMuted, marginBottom: 6, letterSpacing: "0.01em" },
+  input: { width: "100%", padding: "10px 14px", background: "#ffffff", border: `1px solid ${theme.border}`, borderRadius: 8, color: theme.text, fontSize: 14, outline: "none", boxSizing: "border-box", transition: "border-color 0.15s" },
+  textarea: { width: "100%", padding: "12px 14px", background: "#ffffff", border: `1px solid ${theme.border}`, borderRadius: 8, color: theme.text, fontSize: 14, outline: "none", boxSizing: "border-box", resize: "vertical", minHeight: 120, fontFamily: "inherit", lineHeight: 1.6, transition: "border-color 0.15s" },
+  select: { width: "100%", padding: "10px 14px", background: "#ffffff", border: `1px solid ${theme.border}`, borderRadius: 8, color: theme.text, fontSize: 14, outline: "none", boxSizing: "border-box", cursor: "pointer", appearance: "none", backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235c5c72' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", paddingRight: 36 },
+
+  btnPrimary: { display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: theme.primary, color: "#ffffff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "background 0.15s" },
+  btnSecondary: { display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "transparent", color: theme.textMuted, border: `1px solid ${theme.border}`, borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: "pointer", transition: "all 0.15s" },
+  btnGhost: { display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "transparent", color: theme.textMuted, border: "none", borderRadius: 6, fontSize: 13, cursor: "pointer" },
+  btnLink: { background: "none", border: "none", color: theme.primary, cursor: "pointer", fontSize: 13, padding: 0, fontWeight: 500 },
+
+  wizardNav: { display: "flex", justifyContent: "space-between", marginTop: 32, paddingTop: 24, borderTop: `1px solid ${theme.border}` },
+};
+
+// ─── Selection card helper – consistent selected state ───
+function selCard(isSelected, extraStyle = {}) {
+  return {
+    ...styles.cardSm,
+    cursor: "pointer",
+    textAlign: "left",
+    borderColor: isSelected ? theme.selectedBorder : theme.border,
+    background: isSelected ? theme.selectedBg : theme.surface,
+    boxShadow: isSelected ? `0 0 0 1px ${theme.selectedBorder}` : "none",
+    transition: "all 0.15s",
+    ...extraStyle,
+  };
+}
+
+// ─── Data ───
+const WIZARD_STEPS = [
+  { id: "usecase", label: "Use Case" },
+  { id: "bottype", label: "Bot Type" },
+  { id: "participants", label: "Participants" },
+  { id: "avatar", label: "Avatar" },
+  { id: "persona", label: "Persona" },
+  { id: "integration", label: "Integration" },
+  { id: "trigger", label: "Trigger Workflow" },
+  { id: "postmeeting", label: "Post-Meeting" },
+  { id: "notifications", label: "Notifications" },
+  { id: "email", label: "Custom Email" },
+  { id: "deploy", label: "Deploy" },
+];
+
+const AVATAR_VENDORS = [
+  { id: "tavus", name: "Tavus", type: "video", desc: "Real-time conversational video avatars with lip sync", color: "#1e40af", logo: "T", previewImg: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" },
+  { id: "anam", name: "Anam", type: "video", desc: "Low-latency photorealistic AI avatars for live interaction", color: "#7c3aed", logo: "A", previewImg: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face" },
+  { id: "heygen", name: "HeyGen", type: "video", desc: "Hyper-realistic video avatars for business communication", color: "#0891b2", logo: "H", previewImg: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face" },
+  { id: "synthesia", name: "Synthesia", type: "video", desc: "Enterprise AI video avatars for training and presentations", color: "#db2777", logo: "S", previewImg: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face" },
+  { id: "elevenlabs", name: "ElevenLabs", type: "voice", desc: "Ultra-realistic voice synthesis and cloning", color: "#d97706", logo: "XI", previewImg: null },
+  { id: "deepgram", name: "Deepgram", type: "voice", desc: "Fast, accurate voice agents for enterprise scale", color: "#16a34a", logo: "D", previewImg: null },
+];
+
+const INTEGRATIONS = {
+  recruitment: [
+    { id: "greenhouse", name: "Greenhouse", desc: "Applicant tracking system" },
+    { id: "lever", name: "Lever", desc: "Talent acquisition suite" },
+    { id: "workday", name: "Workday", desc: "HR and recruiting platform" },
+    { id: "bamboohr", name: "BambooHR", desc: "HR software for SMBs" },
+    { id: "ashby", name: "Ashby", desc: "All-in-one recruiting platform" },
+  ],
+  sales: [
+    { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM" },
+    { id: "hubspot", name: "HubSpot", desc: "Inbound CRM platform" },
+    { id: "pipedrive", name: "Pipedrive", desc: "Sales-first CRM" },
+    { id: "close", name: "Close", desc: "CRM for inside sales" },
+    { id: "outreach", name: "Outreach", desc: "Sales engagement platform" },
+  ],
+  tutoring: [
+    { id: "moodle", name: "Moodle", desc: "Open-source LMS" },
+    { id: "canvas", name: "Canvas", desc: "Learning management system" },
+    { id: "blackboard", name: "Blackboard", desc: "Education LMS" },
+    { id: "google-classroom", name: "Google Classroom", desc: "Education suite" },
+  ],
+  coaching: [
+    { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM" },
+    { id: "hubspot", name: "HubSpot", desc: "Inbound CRM platform" },
+    { id: "betterup", name: "BetterUp", desc: "Coaching platform" },
+    { id: "lattice", name: "Lattice", desc: "People management" },
+  ],
+  lms: [
+    { id: "moodle", name: "Moodle", desc: "Open-source LMS" },
+    { id: "canvas", name: "Canvas", desc: "Learning management system" },
+    { id: "cornerstone", name: "Cornerstone", desc: "Enterprise learning" },
+    { id: "docebo", name: "Docebo", desc: "AI-powered LMS" },
+  ],
+};
+
+const TRIGGER_OPTIONS = [
+  { id: "calendar", label: "Calendar event starts", desc: "Avatar joins when a scheduled meeting begins" },
+  { id: "webhook", label: "Webhook received", desc: "Triggered by an external API call or event" },
+  { id: "form", label: "Form submission", desc: "Candidate or user submits an application or form" },
+  { id: "manual", label: "Manual launch", desc: "User clicks a button to start the session" },
+  { id: "schedule", label: "Scheduled time", desc: "Runs at a specific date and time" },
+];
+
+// ═══════════════════════════════════════════
+// LOGIN PAGE
+// ═══════════════════════════════════════════
+function LoginPage({ onLogin, onForgot }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+    if (!email || !password) { setError("Please enter your email and password."); return; }
+    setLoading(true);
+    setTimeout(() => { setLoading(false); onLogin(email); }, 800);
+  };
+
+  return (
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <svg width="32" height="32" viewBox="0 0 40 40"><circle cx="8" cy="20" r="4" fill="#6d28d9"/><circle cx="20" cy="20" r="4" fill="#7c3aed"/><circle cx="32" cy="20" r="4" fill="#8b5cf6"/><circle cx="14" cy="10" r="3" fill="#7c3aed"/><circle cx="26" cy="10" r="3" fill="#8b5cf6"/><circle cx="14" cy="30" r="3" fill="#7c3aed"/><circle cx="26" cy="30" r="3" fill="#8b5cf6"/></svg>
+            <span style={{ fontSize: 22, fontWeight: 700, color: theme.heading, letterSpacing: "-0.02em" }}>Sonesse</span>
+          </div>
+          <p style={{ color: theme.textMuted, fontSize: 14, margin: 0 }}>Sign in to the Experience Builder</p>
+        </div>
+
+        <div style={styles.card}>
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: 18 }}>
+              <label style={styles.label}>Email address</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+            </div>
+            <div style={{ marginBottom: 8 }}>
+              <label style={styles.label}>Password</label>
+              <div style={{ position: "relative" }}>
+                <input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+                <button type="button" onClick={() => setShowPw(!showPw)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: theme.textMuted, cursor: "pointer", padding: 0 }}>
+                  {showPw ? Icons.eyeOff : Icons.eye}
+                </button>
+              </div>
+            </div>
+            <div style={{ textAlign: "right", marginBottom: 24 }}>
+              <button type="button" onClick={onForgot} style={styles.btnLink}>Forgot password?</button>
+            </div>
+            {error && <div style={{ color: theme.danger, fontSize: 13, marginBottom: 16, padding: "8px 12px", background: "rgba(239,68,68,0.08)", borderRadius: 6 }}>{error}</div>}
+            <button type="submit" disabled={loading} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", opacity: loading ? 0.7 : 1 }}>
+              {loading ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+          <div style={{ marginTop: 24, textAlign: "center", color: theme.textMuted, fontSize: 13 }}>
+            Don't have an account? <button style={styles.btnLink}>Request access</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// FORGOT PASSWORD PAGE
+// ═══════════════════════════════════════════
+function ForgotPasswordPage({ onBack }) {
+  const [email, setEmail] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (email) setSent(true);
+  };
+
+  return (
+    <div style={styles.page}>
+      <div style={styles.container}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+            <svg width="32" height="32" viewBox="0 0 40 40"><circle cx="8" cy="20" r="4" fill="#6d28d9"/><circle cx="20" cy="20" r="4" fill="#7c3aed"/><circle cx="32" cy="20" r="4" fill="#8b5cf6"/><circle cx="14" cy="10" r="3" fill="#7c3aed"/><circle cx="26" cy="10" r="3" fill="#8b5cf6"/><circle cx="14" cy="30" r="3" fill="#7c3aed"/><circle cx="26" cy="30" r="3" fill="#8b5cf6"/></svg>
+            <span style={{ fontSize: 22, fontWeight: 700, color: theme.heading, letterSpacing: "-0.02em" }}>Sonesse</span>
+          </div>
+          <p style={{ color: theme.textMuted, fontSize: 14, margin: 0 }}>Reset your password</p>
+        </div>
+        <div style={styles.card}>
+          {sent ? (
+            <div style={{ textAlign: "center" }}>
+              <div style={{ width: 48, height: 48, borderRadius: "50%", background: theme.successBg, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: theme.success }}>{Icons.check}</div>
+              <h3 style={{ color: theme.heading, margin: "0 0 8px", fontSize: 18 }}>Check your email</h3>
+              <p style={{ color: theme.textMuted, fontSize: 13, margin: "0 0 24px" }}>We sent a reset link to <strong style={{ color: theme.text }}>{email}</strong></p>
+              <button onClick={onBack} style={{ ...styles.btnSecondary, width: "100%", justifyContent: "center" }}>Back to sign in</button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <p style={{ color: theme.textMuted, fontSize: 13, margin: "0 0 20px" }}>Enter your email and we'll send you a link to reset your password.</p>
+              <div style={{ marginBottom: 20 }}>
+                <label style={styles.label}>Email address</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+              </div>
+              <button type="submit" style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center" }}>Send reset link</button>
+              <div style={{ marginTop: 16, textAlign: "center" }}>
+                <button type="button" onClick={onBack} style={styles.btnLink}>Back to sign in</button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// WIZARD STEPS
+// ═══════════════════════════════════════════
+
+// Step 1: Use Case
+function StepUseCase({ data, onChange }) {
+  const useCases = [
+    { id: "recruitment", label: "Recruitment", desc: "Screen, interview and qualify candidates" },
+    { id: "sales", label: "Sales", desc: "Qualify leads and book meetings" },
+    { id: "tutoring", label: "Tutoring", desc: "Personalised learning and practice" },
+    { id: "coaching", label: "Coaching", desc: "Structured coaching at scale" },
+    { id: "lms", label: "LMS", desc: "Interactive learning experiences" },
+  ];
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>What do you want to build?</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select the domain for your experience.</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
+        {useCases.map((uc) => (
+          <button key={uc.id} onClick={() => onChange({ ...data, useCase: uc.id })} style={selCard(data.useCase === uc.id, { padding: "16px 20px" })}>
+            <div style={{ fontWeight: 600, fontSize: 14, color: data.useCase === uc.id ? theme.primary : theme.heading, marginBottom: 2 }}>{uc.label}</div>
+            <div style={{ fontSize: 12, color: theme.textMuted }}>{uc.desc}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Step 2: Bot Type (Voice Bot or Video Avatar)
+function StepBotType({ data, onChange }) {
+  const options = [
+    { id: "video", label: "Video Avatar", desc: "A photorealistic visual avatar that appears on-screen during sessions. Lip-synced, expressive and fully interactive.", icon: Icons.videoLg },
+    { id: "voice", label: "Voice Bot", desc: "An intelligent voice-only agent that listens and responds in real time. No visual — just fast, natural conversation.", icon: Icons.micLg },
+  ];
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Choose your bot type</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Would you like a visual avatar or a voice-only agent?</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {options.map((opt) => (
+          <button key={opt.id} onClick={() => onChange({ ...data, botType: opt.id })} style={{
+            ...styles.card, cursor: "pointer", textAlign: "center", padding: "36px 24px",
+            borderColor: data.botType === opt.id ? theme.selectedBorder : theme.border,
+            background: data.botType === opt.id ? theme.selectedBg : theme.surface,
+            boxShadow: data.botType === opt.id ? `0 0 0 1px ${theme.selectedBorder}` : "none",
+            transition: "all 0.15s",
+          }}>
+            <div style={{ color: data.botType === opt.id ? theme.primary : theme.textMuted, marginBottom: 16 }}>{opt.icon}</div>
+            <div style={{ fontWeight: 700, fontSize: 17, color: data.botType === opt.id ? theme.primary : theme.heading, marginBottom: 8 }}>{opt.label}</div>
+            <div style={{ fontSize: 13, color: theme.textMuted, lineHeight: 1.5 }}>{opt.desc}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Step 3: Participants
+function StepParticipants({ data, onChange }) {
+  const options = [
+    { id: "single", label: "Single Participant", desc: "One-on-one sessions between the avatar and a single user. Ideal for interviews, coaching and tutoring.", icon: Icons.userSingle },
+    { id: "multi", label: "Multi-Participant", desc: "Group sessions with multiple users in the same call. Ideal for team training, panel interviews and workshops.", icon: Icons.users },
+  ];
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Session type</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>How many participants will be in each session?</p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        {options.map((opt) => (
+          <button key={opt.id} onClick={() => onChange({ ...data, participants: opt.id })} style={{
+            ...styles.card, cursor: "pointer", textAlign: "center", padding: "32px 24px",
+            borderColor: data.participants === opt.id ? theme.selectedBorder : theme.border,
+            background: data.participants === opt.id ? theme.selectedBg : theme.surface,
+            boxShadow: data.participants === opt.id ? `0 0 0 1px ${theme.selectedBorder}` : "none",
+            transition: "all 0.15s",
+          }}>
+            <div style={{ color: data.participants === opt.id ? theme.primary : theme.textMuted, marginBottom: 16 }}>{opt.icon}</div>
+            <div style={{ fontWeight: 600, fontSize: 16, color: theme.heading, marginBottom: 8 }}>{opt.label}</div>
+            <div style={{ fontSize: 13, color: theme.textMuted, lineHeight: 1.5 }}>{opt.desc}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Step 4: Avatar — filtered by bot type, with face previews
+function StepAvatar({ data, onChange }) {
+  const botType = data.botType || "video";
+  const filtered = AVATAR_VENDORS.filter((v) => v.type === botType);
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Choose your {botType === "video" ? "avatar" : "voice"} vendor</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 24px", fontSize: 14 }}>Select a vendor. You can switch at any time — fully vendor-agnostic.</p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+        {filtered.map((vendor) => (
+          <button key={vendor.id} onClick={() => onChange({ ...data, avatar: vendor.id })} style={{
+            ...styles.card, cursor: "pointer", textAlign: "left", padding: 0, overflow: "hidden",
+            borderColor: data.avatar === vendor.id ? theme.selectedBorder : theme.border,
+            background: data.avatar === vendor.id ? theme.selectedBg : theme.surface,
+            boxShadow: data.avatar === vendor.id ? `0 0 0 1px ${theme.selectedBorder}` : "none",
+            transition: "all 0.15s",
+          }}>
+            {/* Avatar face preview */}
+            {vendor.previewImg ? (
+              <div style={{ width: "100%", height: 160, background: `linear-gradient(135deg, ${vendor.color}15, ${vendor.color}30)`, position: "relative", overflow: "hidden" }}>
+                <img src={vendor.previewImg} alt={`${vendor.name} avatar`} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.9 }} onError={(e) => { e.target.style.display = "none"; }} />
+                <div style={{ position: "absolute", top: 10, right: 10, padding: "3px 10px", borderRadius: 12, background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{vendor.type}</div>
+              </div>
+            ) : (
+              <div style={{ width: "100%", height: 120, background: `linear-gradient(135deg, ${vendor.color}15, ${vendor.color}30)`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                <div style={{ color: vendor.color, opacity: 0.6 }}>{Icons.mic}</div>
+                <div style={{ position: "absolute", top: 10, right: 10, padding: "3px 10px", borderRadius: 12, background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{vendor.type}</div>
+              </div>
+            )}
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: vendor.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, color: "#fff", flexShrink: 0 }}>
+                  {vendor.logo}
+                </div>
+                <span style={{ fontWeight: 700, fontSize: 15, color: theme.heading }}>{vendor.name}</span>
+                {data.avatar === vendor.id && <span style={{ marginLeft: "auto", color: theme.primary }}>{Icons.check}</span>}
+              </div>
+              <div style={{ fontSize: 12, color: theme.textMuted, lineHeight: 1.4 }}>{vendor.desc}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Step 5: Persona — improved layout with logo upload
+function StepPersona({ data, onChange }) {
+  const tones = ["Professional", "Friendly", "Direct", "Empathetic", "Formal", "Casual"];
+  const [logoPreview, setLogoPreview] = useState(data.logoPreview || null);
+
+  const handleLogoUpload = () => {
+    // Simulated upload
+    setLogoPreview("uploaded");
+    onChange({ ...data, logoPreview: "uploaded", logoName: "company-logo.png" });
+  };
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Define the persona</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Set the identity, goals and guardrails for your avatar.</p>
+
+      {/* Top row: name + logo side by side */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 20, marginBottom: 24, alignItems: "end" }}>
+        <div>
+          <label style={styles.label}>Experience name</label>
+          <input value={data.name || ""} onChange={(e) => onChange({ ...data, name: e.target.value })} placeholder="e.g. Senior Engineer Screening Interview" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+        </div>
+        <div>
+          <label style={styles.label}>Brand logo</label>
+          {logoPreview ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 14px", border: `1px solid ${theme.successBorder}`, borderRadius: 8, background: theme.successBg }}>
+              <div style={{ width: 28, height: 28, borderRadius: 6, background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 11, fontWeight: 700 }}>LG</div>
+              <span style={{ fontSize: 13, color: theme.success, fontWeight: 600 }}>Logo uploaded</span>
+              <button onClick={() => { setLogoPreview(null); onChange({ ...data, logoPreview: null, logoName: null }); }} style={{ ...styles.btnLink, color: theme.textDim, fontSize: 12, marginLeft: 4 }}>Remove</button>
+            </div>
+          ) : (
+            <button onClick={handleLogoUpload} style={{ ...styles.btnSecondary, padding: "8px 16px", fontSize: 13, gap: 6 }}>
+              {Icons.upload} <span>Upload logo</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Two-column: goals + guardrails */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
+        <div>
+          <label style={styles.label}>Goals — what should the avatar achieve?</label>
+          <textarea value={data.goals || ""} onChange={(e) => onChange({ ...data, goals: e.target.value })} placeholder="e.g. Screen candidates for technical fit, assess communication skills, determine culture alignment." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+        </div>
+        <div>
+          <label style={styles.label}>Guardrails — what should it NOT do?</label>
+          <textarea value={data.guardrails || ""} onChange={(e) => onChange({ ...data, guardrails: e.target.value })} placeholder="e.g. Do not ask about salary expectations, age, or personal circumstances. Do not make hiring decisions." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+        </div>
+      </div>
+
+      {/* Tone of voice */}
+      <div style={{ marginBottom: 24 }}>
+        <label style={styles.label}>Tone of voice</label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {tones.map((t) => (
+            <button key={t} onClick={() => onChange({ ...data, tone: t })} style={{
+              padding: "7px 18px", borderRadius: 20,
+              border: `1.5px solid ${data.tone === t ? theme.primary : theme.border}`,
+              background: data.tone === t ? theme.selectedBg : "transparent",
+              color: data.tone === t ? theme.primary : theme.textMuted,
+              fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
+            }}>
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* System prompt */}
+      <div>
+        <label style={styles.label}>System prompt <span style={{ fontWeight: 400, color: theme.textDim }}>(advanced)</span></label>
+        <textarea value={data.systemPrompt || ""} onChange={(e) => onChange({ ...data, systemPrompt: e.target.value })} placeholder="Optional: provide a full system prompt to override the generated persona. Leave blank to auto-generate from the fields above." style={{ ...styles.textarea, minHeight: 80, fontFamily: "'SF Mono', 'Fira Code', monospace", fontSize: 12 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+      </div>
+    </div>
+  );
+}
+
+// Step 6: Integration — dropdown with OAuth / API key options
+function StepIntegration({ data, onChange }) {
+  const uc = data.useCase || "recruitment";
+  const integrations = INTEGRATIONS[uc] || INTEGRATIONS.recruitment;
+  const [selectedId, setSelectedId] = useState(data.selectedIntegration || "");
+  const [authMethod, setAuthMethod] = useState("oauth");
+  const [apiKeyValue, setApiKeyValue] = useState("");
+  const [connecting, setConnecting] = useState(false);
+
+  const selectedIntg = integrations.find((i) => i.id === selectedId);
+  const isConnected = (data.connectedIntegrations || []).includes(selectedId);
+  const systemLabel = uc === "recruitment" ? "ATS" : uc === "sales" ? "CRM" : "LMS";
+
+  const handleConnect = () => {
+    setConnecting(true);
+    setTimeout(() => {
+      const updated = [...new Set([...(data.connectedIntegrations || []), selectedId])];
+      onChange({ ...data, connectedIntegrations: updated, selectedIntegration: selectedId });
+      setConnecting(false);
+    }, 1200);
+  };
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Connect your {systemLabel}</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>
+        Select your integration and authenticate to enable data sync.
+      </p>
+
+      {/* Dropdown */}
+      <div style={{ marginBottom: 24 }}>
+        <label style={styles.label}>Select integration</label>
+        <select value={selectedId} onChange={(e) => { setSelectedId(e.target.value); setAuthMethod("oauth"); setApiKeyValue(""); }} style={styles.select}>
+          <option value="">Choose a {systemLabel}...</option>
+          {integrations.map((intg) => {
+            const connected = (data.connectedIntegrations || []).includes(intg.id);
+            return <option key={intg.id} value={intg.id}>{intg.name}{connected ? " ✓ Connected" : ""}</option>;
+          })}
+        </select>
+      </div>
+
+      {/* Auth panel when a selection is made */}
+      {selectedId && selectedIntg && (
+        <div style={{ ...styles.card, padding: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 10, background: theme.primaryLight, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 18, color: theme.primary, flexShrink: 0 }}>
+              {selectedIntg.name.charAt(0)}
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 16, color: theme.heading }}>{selectedIntg.name}</div>
+              <div style={{ fontSize: 13, color: theme.textMuted }}>{selectedIntg.desc}</div>
+            </div>
+            {isConnected && (
+              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6, color: theme.success, fontSize: 13, fontWeight: 600 }}>
+                {Icons.check} Connected
+              </div>
+            )}
+          </div>
+
+          {isConnected ? (
+            <div style={{ padding: "14px 16px", background: theme.successBg, borderRadius: 8, border: `1px solid ${theme.successBorder}`, fontSize: 13, color: theme.success, fontWeight: 500 }}>
+              Successfully connected to {selectedIntg.name}. Data will sync automatically.
+            </div>
+          ) : (
+            <>
+              {/* Auth method toggle */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+                <button onClick={() => setAuthMethod("oauth")} style={{
+                  flex: 1, padding: "10px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                  border: `1.5px solid ${authMethod === "oauth" ? theme.primary : theme.border}`,
+                  background: authMethod === "oauth" ? theme.selectedBg : "transparent",
+                  color: authMethod === "oauth" ? theme.primary : theme.textMuted,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                }}>
+                  {Icons.link} OAuth
+                </button>
+                <button onClick={() => setAuthMethod("apikey")} style={{
+                  flex: 1, padding: "10px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                  border: `1.5px solid ${authMethod === "apikey" ? theme.primary : theme.border}`,
+                  background: authMethod === "apikey" ? theme.selectedBg : "transparent",
+                  color: authMethod === "apikey" ? theme.primary : theme.textMuted,
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                }}>
+                  {Icons.key} API Key
+                </button>
+              </div>
+
+              {authMethod === "oauth" ? (
+                <div>
+                  <div style={{ padding: 16, background: theme.bg, borderRadius: 8, border: `1px solid ${theme.border}`, textAlign: "center", marginBottom: 16 }}>
+                    <div style={{ fontSize: 13, color: theme.textMuted, marginBottom: 8 }}>You'll be redirected to {selectedIntg.name} to authorise access.</div>
+                    <div style={{ fontSize: 11, color: theme.textDim }}>Permissions: Read contacts · Read/Write records · Webhooks</div>
+                  </div>
+                  <button onClick={handleConnect} disabled={connecting} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", opacity: connecting ? 0.7 : 1 }}>
+                    {connecting ? "Connecting..." : `Authorise with ${selectedIntg.name}`}
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={styles.label}>API Key</label>
+                    <input type="password" value={apiKeyValue} onChange={(e) => setApiKeyValue(e.target.value)} placeholder="Paste your API key here" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+                    <div style={{ fontSize: 11, color: theme.textDim, marginTop: 6 }}>Find your API key in {selectedIntg.name} → Settings → API & Integrations</div>
+                  </div>
+                  <button onClick={handleConnect} disabled={connecting || !apiKeyValue} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", opacity: (connecting || !apiKeyValue) ? 0.5 : 1 }}>
+                    {connecting ? "Connecting..." : "Connect with API Key"}
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Step 7: Trigger Workflow
+function StepTriggerWorkflow({ data, onChange }) {
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Trigger workflow</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 24px", fontSize: 14 }}>What starts an avatar session? Select all that apply.</p>
+      <div style={{ display: "grid", gap: 10 }}>
+        {TRIGGER_OPTIONS.map((opt) => {
+          const isSelected = (data.triggers || []).includes(opt.id);
+          return (
+            <button key={opt.id} onClick={() => {
+              const triggers = data.triggers || [];
+              const updated = isSelected ? triggers.filter((t) => t !== opt.id) : [...triggers, opt.id];
+              onChange({ ...data, triggers: updated });
+            }} style={selCard(isSelected, { display: "flex", alignItems: "center", gap: 14, padding: "14px 18px" })}>
+              <div style={{ width: 22, height: 22, borderRadius: 4, border: `2px solid ${isSelected ? theme.primary : theme.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: isSelected ? theme.primary : "transparent", color: "#fff", transition: "all 0.15s" }}>
+                {isSelected && Icons.check}
+              </div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 14, color: theme.heading }}>{opt.label}</div>
+                <div style={{ fontSize: 12, color: theme.textMuted }}>{opt.desc}</div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Step 8: Post-Meeting Workflow
+function StepPostMeeting({ data, onChange }) {
+  const destinations = [
+    { id: "transcript_dest", label: "Transcript destination", desc: "Where should the full conversation transcript be saved?", options: ["CRM/ATS Record", "Google Drive", "S3 Bucket", "Webhook", "Email"] },
+    { id: "summary_dest", label: "Summary destination", desc: "Where should the AI-generated session summary go?", options: ["CRM/ATS Record", "Slack Channel", "Email", "Notion", "Webhook"] },
+    { id: "recording_dest", label: "Recording destination", desc: "Where should the audio/video recording be stored?", options: ["S3 Bucket", "Google Drive", "Azure Blob", "Dropbox", "None — don't record"] },
+    { id: "ats_event", label: "ATS/CRM event", desc: "What event should be triggered in your system after the session?", options: ["Move to next stage", "Update candidate score", "Create task for reviewer", "Add note to record", "No action"] },
+  ];
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Post-meeting workflow</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Configure what happens after each session completes.</p>
+
+      <div style={{ display: "grid", gap: 20 }}>
+        {destinations.map((dest) => (
+          <div key={dest.id} style={{ ...styles.card, padding: 20 }}>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: 2 }}>{dest.label}</div>
+              <div style={{ fontSize: 12, color: theme.textMuted }}>{dest.desc}</div>
+            </div>
+            <select value={data[dest.id] || ""} onChange={(e) => onChange({ ...data, [dest.id]: e.target.value })} style={styles.select}>
+              <option value="">Select destination...</option>
+              {dest.options.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Step 9: Notifications
+function StepNotifications({ data, onChange }) {
+  const notifications = [
+    { id: "notify_session_start", label: "Session started", desc: "Notify when an avatar session begins" },
+    { id: "notify_session_end", label: "Session completed", desc: "Notify when a session finishes with summary" },
+    { id: "notify_high_score", label: "High-score candidate", desc: "Alert when a candidate scores above threshold" },
+    { id: "notify_error", label: "Session error", desc: "Alert when a session encounters an issue" },
+    { id: "notify_daily_digest", label: "Daily digest", desc: "Summary of all sessions from the past 24 hours" },
+  ];
+
+  const channels = [
+    { id: "slack", label: "Slack" },
+    { id: "email_notif", label: "Email" },
+    { id: "webhook_notif", label: "Webhook" },
+    { id: "teams", label: "Microsoft Teams" },
+  ];
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Notifications</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Choose which events trigger notifications and where they're sent.</p>
+
+      {/* Notification channel */}
+      <div style={{ marginBottom: 28 }}>
+        <label style={styles.label}>Notification channel</label>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {channels.map((ch) => {
+            const isSelected = (data.notifChannels || []).includes(ch.id);
+            return (
+              <button key={ch.id} onClick={() => {
+                const current = data.notifChannels || [];
+                const updated = isSelected ? current.filter((c) => c !== ch.id) : [...current, ch.id];
+                onChange({ ...data, notifChannels: updated });
+              }} style={{
+                padding: "7px 18px", borderRadius: 20,
+                border: `1.5px solid ${isSelected ? theme.primary : theme.border}`,
+                background: isSelected ? theme.selectedBg : "transparent",
+                color: isSelected ? theme.primary : theme.textMuted,
+                fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
+              }}>
+                {ch.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Notification events */}
+      <label style={styles.label}>Events</label>
+      <div style={{ display: "grid", gap: 10 }}>
+        {notifications.map((notif) => {
+          const isSelected = (data.notifEvents || []).includes(notif.id);
+          return (
+            <button key={notif.id} onClick={() => {
+              const current = data.notifEvents || [];
+              const updated = isSelected ? current.filter((n) => n !== notif.id) : [...current, notif.id];
+              onChange({ ...data, notifEvents: updated });
+            }} style={selCard(isSelected, { display: "flex", alignItems: "center", gap: 14, padding: "14px 18px" })}>
+              <div style={{ width: 22, height: 22, borderRadius: 4, border: `2px solid ${isSelected ? theme.primary : theme.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, background: isSelected ? theme.primary : "transparent", color: "#fff", transition: "all 0.15s" }}>
+                {isSelected && Icons.check}
+              </div>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 14, color: theme.heading }}>{notif.label}</div>
+                <div style={{ fontSize: 12, color: theme.textMuted }}>{notif.desc}</div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Step 10: Custom Email
+function StepCustomEmail({ data, onChange }) {
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Custom email invite</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Configure the email that invites participants and adds the avatar to sessions.</p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
+        <div>
+          <label style={styles.label}>Sender name</label>
+          <input value={data.emailSenderName || ""} onChange={(e) => onChange({ ...data, emailSenderName: e.target.value })} placeholder="e.g. Sonesse Interviews" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+        </div>
+        <div>
+          <label style={styles.label}>Reply-to email</label>
+          <input type="email" value={data.emailReplyTo || ""} onChange={(e) => onChange({ ...data, emailReplyTo: e.target.value })} placeholder="e.g. interviews@yourcompany.com" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 24 }}>
+        <label style={styles.label}>Email subject line</label>
+        <input value={data.emailSubject || ""} onChange={(e) => onChange({ ...data, emailSubject: e.target.value })} placeholder="e.g. You're invited: AI Interview Session with {{company_name}}" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+      </div>
+
+      <div style={{ marginBottom: 24 }}>
+        <label style={styles.label}>Email body</label>
+        <textarea value={data.emailBody || ""} onChange={(e) => onChange({ ...data, emailBody: e.target.value })} placeholder={"Hi {{participant_name}},\n\nYou have been invited to an AI-powered session.\n\nPlease join at the scheduled time using the link below.\n\n{{session_link}}\n\nBest regards,\n{{sender_name}}"} style={{ ...styles.textarea, minHeight: 160 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+        <div style={{ fontSize: 11, color: theme.textDim, marginTop: 6 }}>
+          Available variables: {"{{participant_name}}, {{session_link}}, {{company_name}}, {{sender_name}}, {{date}}, {{time}}"}
+        </div>
+      </div>
+
+      {/* Preview */}
+      <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
+        <div style={{ padding: "12px 20px", background: theme.surface, borderBottom: `1px solid ${theme.border}`, display: "flex", alignItems: "center", gap: 8 }}>
+          {Icons.mail}
+          <span style={{ fontWeight: 600, fontSize: 13, color: theme.heading }}>Email preview</span>
+        </div>
+        <div style={{ padding: 20 }}>
+          <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 4 }}>From: <span style={{ color: theme.text }}>{data.emailSenderName || "Sonesse Interviews"}</span></div>
+          <div style={{ fontSize: 12, color: theme.textDim, marginBottom: 4 }}>Subject: <span style={{ color: theme.text, fontWeight: 600 }}>{data.emailSubject || "You're invited: AI Interview Session"}</span></div>
+          <hr style={{ border: "none", borderTop: `1px solid ${theme.border}`, margin: "12px 0" }} />
+          <div style={{ fontSize: 13, color: theme.text, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
+            {data.emailBody || "Hi {{participant_name}},\n\nYou have been invited to an AI-powered session.\n\nPlease join at the scheduled time using the link below.\n\n{{session_link}}\n\nBest regards,\n{{sender_name}}"}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Step 11: Deploy
+function StepDeploy({ data }) {
+  const [deploying, setDeploying] = useState(false);
+  const [deployed, setDeployed] = useState(false);
+
+  const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
+
+  const handleDeploy = () => {
+    setDeploying(true);
+    setTimeout(() => { setDeploying(false); setDeployed(true); }, 2000);
+  };
+
+  return (
+    <div>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Review &amp; Deploy</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Everything looks good. Review your configuration and deploy.</p>
+
+      <div style={{ display: "grid", gap: 10, marginBottom: 32 }}>
+        {[
+          { label: "Domain", value: (data.useCase || "").charAt(0).toUpperCase() + (data.useCase || "").slice(1) },
+          { label: "Bot Type", value: data.botType === "voice" ? "Voice Bot" : "Video Avatar" },
+          { label: "Session Type", value: data.participants === "multi" ? "Multi-Participant" : "Single Participant" },
+          { label: "Vendor", value: vendor ? `${vendor.name} (${vendor.type})` : "Not selected" },
+          { label: "Experience", value: data.name || "Untitled" },
+          { label: "Tone", value: data.tone || "Not set" },
+          { label: "Logo", value: data.logoName || "None" },
+          { label: "Integrations", value: (data.connectedIntegrations || []).length > 0 ? (data.connectedIntegrations || []).join(", ") : "None" },
+          { label: "Triggers", value: (data.triggers || []).length > 0 ? (data.triggers || []).join(", ") : "None" },
+          { label: "Transcript", value: data.transcript_dest || "Not configured" },
+          { label: "Summary", value: data.summary_dest || "Not configured" },
+          { label: "Recording", value: data.recording_dest || "Not configured" },
+          { label: "Notifications", value: (data.notifEvents || []).length > 0 ? `${(data.notifEvents || []).length} events configured` : "None" },
+          { label: "Email Invite", value: data.emailSenderName ? `From: ${data.emailSenderName}` : "Default" },
+        ].map((item) => (
+          <div key={item.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 16px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8 }}>
+            <span style={{ fontSize: 13, color: theme.textMuted, fontWeight: 500 }}>{item.label}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: theme.heading, textAlign: "right", maxWidth: "60%" }}>{item.value}</span>
+          </div>
+        ))}
+      </div>
+
+      {deployed ? (
+        <div style={{ textAlign: "center", padding: 40, background: theme.successBg, borderRadius: 12, border: `1px solid ${theme.successBorder}` }}>
+          <div style={{ color: theme.success, marginBottom: 12 }}>{Icons.rocket}</div>
+          <h3 style={{ color: theme.heading, margin: "0 0 8px", fontSize: 20 }}>Deployed successfully</h3>
+          <p style={{ color: theme.textMuted, fontSize: 13, margin: "0 0 20px" }}>Your experience is live and ready to accept sessions across Zoom, Teams and Google Meet.</p>
+          <div style={{ padding: "10px 16px", background: theme.bg, borderRadius: 8, border: `1px solid ${theme.border}`, display: "inline-block" }}>
+            <span style={{ fontSize: 12, color: theme.textDim }}>Endpoint: </span>
+            <span style={{ fontSize: 12, color: theme.primary, fontFamily: "monospace" }}>https://api.sonesse.ai/v1/experiences/{data.name ? data.name.toLowerCase().replace(/\s+/g, "-") : "untitled"}</span>
+          </div>
+        </div>
+      ) : (
+        <button onClick={handleDeploy} disabled={deploying} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", padding: "14px 20px", fontSize: 16, opacity: deploying ? 0.7 : 1 }}>
+          {deploying ? (
+            <span>Deploying...</span>
+          ) : (
+            <><span style={{ display: "flex", alignItems: "center", gap: 8 }}>{Icons.rocket} Deploy Experience</span></>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// WIZARD SHELL
+// ═══════════════════════════════════════════
+function Wizard({ user, onLogout }) {
+  const [step, setStep] = useState(0);
+  const [data, setData] = useState({});
+
+  const canProceed = () => {
+    switch (step) {
+      case 0: return data.useCase;
+      case 1: return data.botType;
+      case 2: return data.participants;
+      case 3: return data.avatar;
+      case 4: return data.name;
+      case 5: return true; // integration optional
+      case 6: return true; // triggers optional
+      case 7: return true; // post-meeting optional
+      case 8: return true; // notifications optional
+      case 9: return true; // email optional
+      case 10: return true; // deploy
+      default: return false;
+    }
+  };
+
+  const totalSteps = WIZARD_STEPS.length;
+
+  return (
+    <div style={styles.page}>
+      {/* Top bar */}
+      <div style={{ borderBottom: `1px solid ${theme.border}`, padding: "12px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "#ffffff", zIndex: 50 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <svg width="24" height="24" viewBox="0 0 40 40"><circle cx="8" cy="20" r="4" fill="#6d28d9"/><circle cx="20" cy="20" r="4" fill="#7c3aed"/><circle cx="32" cy="20" r="4" fill="#8b5cf6"/></svg>
+          <span style={{ fontWeight: 700, color: theme.heading, fontSize: 15 }}>Sonesse</span>
+          <span style={{ color: theme.textDim, fontSize: 13 }}>/</span>
+          <span style={{ color: theme.textMuted, fontSize: 13 }}>Experience Builder</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {/* Progress indicator */}
+          <span style={{ fontSize: 12, color: theme.textDim, fontWeight: 500 }}>Step {step + 1} of {totalSteps}</span>
+          <div style={{ width: 80, height: 4, background: theme.border, borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ width: `${((step + 1) / totalSteps) * 100}%`, height: "100%", background: theme.primary, borderRadius: 2, transition: "width 0.3s" }} />
+          </div>
+          <span style={{ fontSize: 12, color: theme.textMuted, display: "flex", alignItems: "center", gap: 6 }}>{Icons.user} {user}</span>
+          <button onClick={onLogout} style={{ ...styles.btnGhost, color: theme.textDim }}>{Icons.logout}</button>
+        </div>
+      </div>
+
+      {/* Wizard content */}
+      <div style={styles.wideContainer}>
+        <div style={{ padding: "32px 0 60px" }}>
+          {step === 0 && <StepUseCase data={data} onChange={setData} />}
+          {step === 1 && <StepBotType data={data} onChange={setData} />}
+          {step === 2 && <StepParticipants data={data} onChange={setData} />}
+          {step === 3 && <StepAvatar data={data} onChange={setData} />}
+          {step === 4 && <StepPersona data={data} onChange={setData} />}
+          {step === 5 && <StepIntegration data={data} onChange={setData} />}
+          {step === 6 && <StepTriggerWorkflow data={data} onChange={setData} />}
+          {step === 7 && <StepPostMeeting data={data} onChange={setData} />}
+          {step === 8 && <StepNotifications data={data} onChange={setData} />}
+          {step === 9 && <StepCustomEmail data={data} onChange={setData} />}
+          {step === 10 && <StepDeploy data={data} />}
+
+          {/* Navigation */}
+          <div style={styles.wizardNav}>
+            {step > 0 ? (
+              <button onClick={() => setStep(step - 1)} style={styles.btnSecondary}>
+                {Icons.arrowLeft} <span>Back</span>
+              </button>
+            ) : <div />}
+            {step < totalSteps - 1 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <button onClick={() => setStep(step + 1)} style={{ ...styles.btnGhost, color: theme.textDim, fontSize: 13, fontWeight: 500 }}>
+                  Skip
+                </button>
+                <button onClick={() => canProceed() && setStep(step + 1)} disabled={!canProceed()} style={{ ...styles.btnPrimary, opacity: canProceed() ? 1 : 0.4 }}>
+                  <span>Continue</span> {Icons.arrowRight}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════
+// APP ROOT
+// ═══════════════════════════════════════════
+function App() {
+  const [view, setView] = useState("login"); // login | forgot | wizard
+  const [user, setUser] = useState("");
+
+  if (view === "forgot") return <ForgotPasswordPage onBack={() => setView("login")} />;
+  if (view === "wizard") return <Wizard user={user} onLogout={() => { setUser(""); setView("login"); }} />;
+  return <LoginPage onLogin={(email) => { setUser(email); setView("wizard"); }} onForgot={() => setView("forgot")} />;
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
