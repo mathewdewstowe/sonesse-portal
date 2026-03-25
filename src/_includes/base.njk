@@ -29,6 +29,9 @@
 
 	<!-- Styles -->
 	<link rel="stylesheet" href="/css/styles.css" />
+	{% if extraCss %}
+	<link rel="stylesheet" href="{{ extraCss }}" />
+	{% endif %}
 
 	<!-- Favicons -->
 	{% include "partials/head-favicons.njk" %}
