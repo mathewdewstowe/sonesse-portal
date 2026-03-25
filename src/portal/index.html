@@ -1361,9 +1361,8 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
 
           {/* Experiences */}
           <div style={{ marginBottom: 32 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ marginBottom: 14 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Your Experiences</h2>
-              <button onClick={onNewExperience} style={styles.btnLink}>+ Create new</button>
             </div>
             <div style={{ display: "grid", gap: 12 }}>
               {experiences.map((exp) => (
