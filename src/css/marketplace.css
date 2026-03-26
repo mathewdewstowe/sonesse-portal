@@ -168,3 +168,37 @@
     font-size: 13px;
   }
 }
+
+/* Recruitment — Feature Grid */
+.usecase-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+  margin-top: 22px;
+}
+
+.usecase-feature {
+  border-left: 2px solid rgba(179, 138, 238, 0.45);
+  padding-left: 12px;
+}
+
+.usecase-feature__title {
+  color: #e2caff;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 3px;
+  letter-spacing: 0.01em;
+}
+
+.usecase-feature__desc {
+  color: #b0b0c0 !important;
+  font-size: 12.5px !important;
+  line-height: 1.55 !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 690px) {
+  .usecase-features {
+    grid-template-columns: 1fr;
+  }
+}
