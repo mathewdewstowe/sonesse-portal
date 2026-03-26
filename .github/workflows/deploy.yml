@@ -22,29 +22,19 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy public --project-name sonesse-website --branch main
 
-      - name: Reprovision sonesse.ai Pages custom domain + DNS
+      - name: Fix sonesse.ai DNS record
         env:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          BASE="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/pages/projects/sonesse-website/domains"
+          echo "=== Token permissions ==="
+          curl -s "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+            -H "Authorization: Bearer $CF_TOKEN" | jq '{id: .result.id, status: .result.status}'
 
-          echo "=== Deleting sonesse.ai custom domain (forces DNS reprovision) ==="
-          DEL=$(curl -s -X DELETE "$BASE/sonesse.ai" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json")
-          echo "Delete result: $DEL"
+          echo "=== Zone lookup ==="
+          curl -s "https://api.cloudflare.com/client/v4/zones?name=sonesse.ai" \
+            -H "Authorization: Bearer $CF_TOKEN" | jq '{success: .success, errors: .errors, count: (.result | length)}'
 
-          sleep 3
-
-          echo "=== Re-adding sonesse.ai custom domain ==="
-          ADD=$(curl -s -X POST "$BASE" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data '{"name":"sonesse.ai"}')
-          echo "Add result: $ADD"
-
-          echo "=== Current domains ==="
-          curl -s "$BASE" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json" | jq '.result[] | {name: .name, status: .status}'
+          echo "=== Try direct DNS record creation with account-scoped endpoint ==="
+          curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/pages/projects/sonesse-website" \
+            -H "Authorization: Bearer $CF_TOKEN" | jq '{name: .result.name, domains: .result.domains}'
