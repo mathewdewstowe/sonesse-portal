@@ -21,20 +21,3 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy public --project-name sonesse-website --branch main
-
-      - name: Fix sonesse.ai DNS record
-        env:
-          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          echo "=== Token permissions ==="
-          curl -s "https://api.cloudflare.com/client/v4/user/tokens/verify" \
-            -H "Authorization: Bearer $CF_TOKEN" | jq '{id: .result.id, status: .result.status}'
-
-          echo "=== Zone lookup ==="
-          curl -s "https://api.cloudflare.com/client/v4/zones?name=sonesse.ai" \
-            -H "Authorization: Bearer $CF_TOKEN" | jq '{success: .success, errors: .errors, count: (.result | length)}'
-
-          echo "=== Try direct DNS record creation with account-scoped endpoint ==="
-          curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/pages/projects/sonesse-website" \
-            -H "Authorization: Bearer $CF_TOKEN" | jq '{name: .result.name, domains: .result.domains}'
