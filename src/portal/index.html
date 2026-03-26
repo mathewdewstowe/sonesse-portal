@@ -18,29 +18,68 @@
     textarea { font-family: inherit; }
     table { font-family: inherit; }
 
-    /* Ã¢ÂÂÃ¢ÂÂ Portal responsive grid helpers Ã¢ÂÂÃ¢ÂÂ */
-    @media (max-width: 600px) {
-      /* 4-col grids Ã¢ÂÂ 2-col on mobile */
-      .portal-grid-4 {
-        grid-template-columns: repeat(2, 1fr) !important;
+    /* ── Portal comprehensive mobile styles ── */
+    @media (max-width: 640px) {
+      /* ── Grid helpers ── */
+      .portal-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+      .portal-grid-3 { grid-template-columns: 1fr !important; }
+      .portal-grid-2 { grid-template-columns: 1fr !important; }
+
+      /* ── Table ── */
+      .portal-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+
+      /* ── Nav ── */
+      .portal-nav { padding: 0 12px !important; }
+      .portal-nav-user-text { display: none !important; }
+
+      /* ── Auth pages ── */
+      .portal-auth-container { padding-top: 32px !important; padding-bottom: 32px !important; }
+
+      /* ── Home header: stack title + button ── */
+      .portal-home-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
       }
-      /* 3-col grids Ã¢ÂÂ 1-col on mobile */
-      .portal-grid-3 {
-        grid-template-columns: 1fr !important;
+      .portal-home-header > button { justify-content: center !important; }
+
+      /* ── Experience cards: allow wrap ── */
+      .portal-exp-card { flex-wrap: wrap !important; gap: 10px !important; }
+
+      /* ── Sessions filter bar ── */
+      .portal-sessions-filter { flex-wrap: wrap !important; row-gap: 8px !important; }
+      .portal-sessions-stats {
+        width: 100% !important;
+        margin-left: 0 !important;
+        justify-content: flex-start !important;
+        gap: 16px !important;
       }
-      /* 2-col grids Ã¢ÂÂ 1-col on mobile */
-      .portal-grid-2 {
-        grid-template-columns: 1fr !important;
+
+      /* ── Wizard breadcrumb + progress: stack ── */
+      .portal-wizard-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
       }
-      /* Sessions table Ã¢ÂÂ horizontal scroll */
-      .portal-table-wrap {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
+
+      /* ── Wizard nav buttons: full-width ── */
+      .portal-wizard-nav { flex-wrap: wrap !important; gap: 8px !important; }
+      .portal-wizard-nav > div {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        gap: 8px !important;
       }
-      /* Nav Ã¢ÂÂ reduce padding on small screens */
-      .portal-nav {
-        padding: 0 12px !important;
-      }
+      .portal-wizard-nav button { flex: 1 !important; justify-content: center !important; min-width: 0 !important; }
+
+      /* ── SettingRow: stack label + control ── */
+      .portal-setting-row { grid-template-columns: 1fr !important; gap: 8px !important; align-items: stretch !important; }
+
+      /* ── Wide container: tighter padding ── */
+      .portal-wide-container { padding-left: 16px !important; padding-right: 16px !important; }
+
+      /* ── Page title size ── */
+      .portal-page-title { font-size: 20px !important; }
     }
   </style>
 </head>
@@ -575,7 +614,7 @@ function LoginPage({ onLogin, onForgot }) {
 
   return (
     <div style={styles.page}>
-      <div style={styles.container}>
+      <div className="portal-auth-container" style={styles.container}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
             <svg width="32" height="32" viewBox="0 0 40 40"><circle cx="8" cy="20" r="4" fill="#6d28d9"/><circle cx="20" cy="20" r="4" fill="#7c3aed"/><circle cx="32" cy="20" r="4" fill="#8b5cf6"/><circle cx="14" cy="10" r="3" fill="#7c3aed"/><circle cx="26" cy="10" r="3" fill="#8b5cf6"/><circle cx="14" cy="30" r="3" fill="#7c3aed"/><circle cx="26" cy="30" r="3" fill="#8b5cf6"/></svg>
@@ -630,7 +669,7 @@ function ForgotPasswordPage({ onBack }) {
 
   return (
     <div style={styles.page}>
-      <div style={styles.container}>
+      <div className="portal-auth-container" style={styles.container}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
             <svg width="32" height="32" viewBox="0 0 40 40"><circle cx="8" cy="20" r="4" fill="#6d28d9"/><circle cx="20" cy="20" r="4" fill="#7c3aed"/><circle cx="32" cy="20" r="4" fill="#8b5cf6"/><circle cx="14" cy="10" r="3" fill="#7c3aed"/><circle cx="26" cy="10" r="3" fill="#8b5cf6"/><circle cx="14" cy="30" r="3" fill="#7c3aed"/><circle cx="26" cy="30" r="3" fill="#8b5cf6"/></svg>
@@ -826,7 +865,7 @@ function StepAvatarSettings({ data, onChange }) {
   const TTS_MODELS = ["Tavus Phoenix", "ElevenLabs Turbo v2", "OpenAI TTS-1", "OpenAI TTS-1-HD"];
 
   const SettingRow = ({ label, desc, fieldKey, options }) => (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "center", padding: "14px 20px", borderBottom: `1px solid ${theme.border}` }}>
+    <div className="portal-setting-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, alignItems: "center", padding: "14px 20px", borderBottom: `1px solid ${theme.border}` }}>
       <div>
         <div style={{ fontWeight: 600, fontSize: 13, color: theme.heading, marginBottom: 2 }}>{label}</div>
         <div style={{ fontSize: 11, color: theme.textMuted }}>{desc}</div>
@@ -1709,7 +1748,7 @@ function PortalNav({ user, onLogout, onHome, currentView }) {
         ))}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <span style={{ fontSize: 12, color: theme.textMuted, display: "flex", alignItems: "center", gap: 6 }}>{Icons.user} {user}</span>
+        <span style={{ fontSize: 12, color: theme.textMuted, display: "flex", alignItems: "center", gap: 6 }}>{Icons.user} <span className="portal-nav-user-text">{user}</span></span>
         <button onClick={onLogout} style={{ ...styles.btnGhost, color: theme.textDim, padding: "6px 10px" }}>{Icons.logout}</button>
       </div>
     </div>
@@ -1731,12 +1770,12 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
   return (
     <div style={styles.page}>
       <PortalNav user={user} onLogout={onLogout} onHome={(subview) => { if (subview === "sessions") onSessions(); }} currentView="home" />
-      <div style={styles.wideContainer}>
+      <div className="portal-wide-container" style={styles.wideContainer}>
         <div style={{ padding: "36px 0 60px" }}>
           {/* Header row */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32 }}>
+          <div className="portal-home-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32 }}>
             <div>
-              <h1 style={{ color: theme.heading, fontSize: 24, fontWeight: 700, margin: "0 0 4px" }}>Welcome back{user ? `, ${user.split("@")[0]}` : ""}</h1>
+              <h1 className="portal-page-title" style={{ color: theme.heading, fontSize: 24, fontWeight: 700, margin: "0 0 4px" }}>Welcome back{user ? `, ${user.split("@")[0]}` : ""}</h1>
               <p style={{ color: theme.textMuted, fontSize: 14, margin: 0 }}>Manage your AI experiences and review session activity.</p>
             </div>
             <button onClick={onNewExperience} style={{ ...styles.btnPrimary, padding: "10px 18px", gap: 8 }}>
@@ -1766,7 +1805,7 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
             </div>
             <div style={{ display: "grid", gap: 12 }}>
               {experiences.map((exp) => (
-                <div key={exp.id} style={{ ...styles.card, padding: "16px 20px", display: "flex", alignItems: "center", gap: 16 }}>
+                <div key={exp.id} className="portal-exp-card" style={{ ...styles.card, padding: "16px 20px", display: "flex", alignItems: "center", gap: 16 }}>
                   <div style={{ width: 44, height: 44, borderRadius: 10, background: `${ucColors[exp.useCase] || theme.primary}15`, overflow: "hidden", flexShrink: 0, border: `1px solid ${theme.border}` }}>
                     {exp.avatarImg ? (
                       <img src={exp.avatarImg} alt={exp.vendor} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} onError={(e) => { e.target.style.display = "none"; }} />
@@ -1887,7 +1926,7 @@ function SessionsPage({ user, onLogout, onHome }) {
   return (
     <div style={styles.page}>
       <PortalNav user={user} onLogout={onLogout} onHome={onHome} currentView="sessions" />
-      <div style={styles.wideContainer}>
+      <div className="portal-wide-container" style={styles.wideContainer}>
         <div style={{ padding: "36px 0 60px" }}>
           <div style={{ marginBottom: 28 }}>
             <h1 style={{ color: theme.heading, fontSize: 24, fontWeight: 700, margin: "0 0 4px" }}>Sessions</h1>
@@ -1895,7 +1934,7 @@ function SessionsPage({ user, onLogout, onHome }) {
           </div>
 
           {/* Filter bar */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+          <div className="portal-sessions-filter" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
             <span style={{ fontSize: 12, color: theme.textMuted, fontWeight: 600, marginRight: 4 }}>Filter by:</span>
             {experiences.map((exp) => (
               <button key={exp} onClick={() => setFilter(exp)} style={{
@@ -1908,7 +1947,7 @@ function SessionsPage({ user, onLogout, onHome }) {
               </button>
             ))}
             {/* Summary stats */}
-            <div style={{ marginLeft: "auto", display: "flex", gap: 20 }}>
+            <div className="portal-sessions-stats" style={{ marginLeft: "auto", display: "flex", gap: 20 }}>
               {[
                 { label: "Total", value: MOCK_SESSIONS.length },
                 { label: "Completed", value: MOCK_SESSIONS.filter(s => s.status === "completed").length },
@@ -1956,10 +1995,10 @@ function Wizard({ user, onLogout, onHome }) {
       <PortalNav user={user} onLogout={onLogout} onHome={onHome} currentView="wizard" />
 
       {/* Wizard content */}
-      <div style={styles.wideContainer}>
+      <div className="portal-wide-container" style={styles.wideContainer}>
         <div style={{ padding: "28px 0 60px" }}>
           {/* Breadcrumb + progress */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+          <div className="portal-wizard-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <button onClick={onHome} style={{ ...styles.btnLink, fontSize: 13, color: theme.textMuted }}>Portal</button>
               <span style={{ color: theme.textDim }}>Ã¢ÂÂº</span>
@@ -1989,7 +2028,7 @@ function Wizard({ user, onLogout, onHome }) {
           {step === 13 && <StepDeploy data={data} />}
 
           {/* Navigation */}
-          <div style={styles.wizardNav}>
+          <div className="portal-wizard-nav" style={styles.wizardNav}>
             {step > 0 ? (
               <button onClick={() => setStep(step - 1)} style={styles.btnSecondary}>
                 {Icons.arrowLeft} <span>Back</span>
