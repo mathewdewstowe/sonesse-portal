@@ -22,29 +22,26 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy public --project-name sonesse-website --branch main
 
-      - name: Ensure sonesse.ai apex DNS record exists
+      - name: Ensure sonesse.ai is a Pages custom domain
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          ZONE_ID=$(curl -s "https://api.cloudflare.com/client/v4/zones?name=sonesse.ai" \
-            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-            -H "Content-Type: application/json" | jq -r '.result[0].id')
-          echo "Zone ID: $ZONE_ID"
+          echo "Checking existing custom domains..."
+          DOMAINS=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/pages/projects/sonesse-website/domains" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json")
+          echo "$DOMAINS" | jq '.result[] | .name' 2>/dev/null || echo "No domains or jq parse issue"
 
-          RECORD_ID=$(curl -s "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=CNAME&name=sonesse.ai" \
-            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-            -H "Content-Type: application/json" | jq -r '.result[0].id')
-          echo "Existing record ID: $RECORD_ID"
-
-          if [ "$RECORD_ID" = "null" ] || [ -z "$RECORD_ID" ]; then
-            echo "Creating apex CNAME record..."
-            curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
-              -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+          EXISTS=$(echo "$DOMAINS" | jq -r '.result[] | select(.name=="sonesse.ai") | .name' 2>/dev/null)
+          if [ -z "$EXISTS" ]; then
+            echo "Adding sonesse.ai as custom domain to Pages project..."
+            RESULT=$(curl -s -X POST \
+              "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/pages/projects/sonesse-website/domains" \
+              -H "Authorization: Bearer $CF_TOKEN" \
               -H "Content-Type: application/json" \
-              --data '{"type":"CNAME","name":"@","content":"sonesse-website-5gg.pages.dev","proxied":true}'
+              --data '{"name":"sonesse.ai"}')
+            echo "Result: $RESULT"
           else
-            echo "Updating apex CNAME record $RECORD_ID..."
-            curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$RECORD_ID" \
-              -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-              -H "Content-Type: application/json" \
-              --data '{"type":"CNAME","name":"@","content":"sonesse-website-5gg.pages.dev","proxied":true}'
+            echo "sonesse.ai already configured as custom domain."
           fi
-          echo "DNS step complete."
