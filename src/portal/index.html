@@ -18,26 +18,26 @@
     textarea { font-family: inherit; }
     table { font-family: inherit; }
 
-    /* ââ Portal responsive grid helpers ââ */
+    /* Ã¢ÂÂÃ¢ÂÂ Portal responsive grid helpers Ã¢ÂÂÃ¢ÂÂ */
     @media (max-width: 600px) {
-      /* 4-col grids â 2-col on mobile */
+      /* 4-col grids Ã¢ÂÂ 2-col on mobile */
       .portal-grid-4 {
         grid-template-columns: repeat(2, 1fr) !important;
       }
-      /* 3-col grids â 1-col on mobile */
+      /* 3-col grids Ã¢ÂÂ 1-col on mobile */
       .portal-grid-3 {
         grid-template-columns: 1fr !important;
       }
-      /* 2-col grids â 1-col on mobile */
+      /* 2-col grids Ã¢ÂÂ 1-col on mobile */
       .portal-grid-2 {
         grid-template-columns: 1fr !important;
       }
-      /* Sessions table â horizontal scroll */
+      /* Sessions table Ã¢ÂÂ horizontal scroll */
       .portal-table-wrap {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch;
       }
-      /* Nav â reduce padding on small screens */
+      /* Nav Ã¢ÂÂ reduce padding on small screens */
       .portal-nav {
         padding: 0 12px !important;
       }
@@ -46,11 +46,11 @@
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel" data-presets="react">
+  <script type="text/babel" data-presets="react" data-type="module">
     const { useState, useEffect } = React;
 
 
-// âââ Icons (inline SVG helpers) âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Icons (inline SVG helpers) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const Icons = {
   eye: (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -126,7 +126,7 @@ const Icons = {
   ),
 };
 
-// âââ Theme âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Theme Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const theme = {
   bg: "#ffffff",
   surface: "#f8f9fb",
@@ -151,7 +151,7 @@ const theme = {
   warning: "#f59e0b",
 };
 
-// âââ Styles âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Styles Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const styles = {
   page: { minHeight: "100vh", background: "#ffffff", color: theme.text, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: "14px", lineHeight: 1.5 },
   container: { maxWidth: 480, margin: "0 auto", padding: "60px 24px" },
@@ -173,7 +173,7 @@ const styles = {
   wizardNav: { display: "flex", justifyContent: "space-between", marginTop: 32, paddingTop: 24, borderTop: `1px solid ${theme.border}` },
 };
 
-// âââ Selection card helper â consistent selected state âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Selection card helper Ã¢ÂÂ consistent selected state Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function selCard(isSelected, extraStyle = {}) {
   return {
     ...styles.cardSm,
@@ -187,7 +187,7 @@ function selCard(isSelected, extraStyle = {}) {
   };
 }
 
-// âââ Data âââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ Data Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const WIZARD_STEPS = [
   { id: "usecase", label: "Use Case" },
   { id: "bottype", label: "Bot Type" },
@@ -230,16 +230,16 @@ const STACKONE_ATS_IDS = ["greenhouse", "lever", "workday", "ashby", "smartrecru
 
 const INTEGRATIONS = {
   recruitment: [
-    { id: "greenhouse", name: "Greenhouse", desc: "Applicant tracking system Â· via StackOne", stackone: true },
-    { id: "lever", name: "Lever", desc: "Talent acquisition suite Â· via StackOne", stackone: true },
-    { id: "workday", name: "Workday", desc: "HR and recruiting platform Â· via StackOne", stackone: true },
-    { id: "ashby", name: "Ashby", desc: "All-in-one recruiting platform Â· via StackOne", stackone: true },
-    { id: "smartrecruiters", name: "SmartRecruiters", desc: "Enterprise talent acquisition Â· via StackOne", stackone: true },
-    { id: "bamboohr", name: "BambooHR", desc: "HR software for SMBs Â· via StackOne", stackone: true },
-    { id: "teamtailor", name: "Teamtailor", desc: "Employer branding & ATS Â· via StackOne", stackone: true },
-    { id: "personio", name: "Personio", desc: "European HR & recruiting platform Â· via StackOne", stackone: true },
-    { id: "workable", name: "Workable", desc: "Hiring software for growing teams Â· via StackOne", stackone: true },
-    { id: "recruitee", name: "Recruitee", desc: "Collaborative hiring software Â· via StackOne", stackone: true },
+    { id: "greenhouse", name: "Greenhouse", desc: "Applicant tracking system ÃÂ· via StackOne", stackone: true },
+    { id: "lever", name: "Lever", desc: "Talent acquisition suite ÃÂ· via StackOne", stackone: true },
+    { id: "workday", name: "Workday", desc: "HR and recruiting platform ÃÂ· via StackOne", stackone: true },
+    { id: "ashby", name: "Ashby", desc: "All-in-one recruiting platform ÃÂ· via StackOne", stackone: true },
+    { id: "smartrecruiters", name: "SmartRecruiters", desc: "Enterprise talent acquisition ÃÂ· via StackOne", stackone: true },
+    { id: "bamboohr", name: "BambooHR", desc: "HR software for SMBs ÃÂ· via StackOne", stackone: true },
+    { id: "teamtailor", name: "Teamtailor", desc: "Employer branding & ATS ÃÂ· via StackOne", stackone: true },
+    { id: "personio", name: "Personio", desc: "European HR & recruiting platform ÃÂ· via StackOne", stackone: true },
+    { id: "workable", name: "Workable", desc: "Hiring software for growing teams ÃÂ· via StackOne", stackone: true },
+    { id: "recruitee", name: "Recruitee", desc: "Collaborative hiring software ÃÂ· via StackOne", stackone: true },
   ],
   sales: [
     { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM" },
@@ -303,21 +303,21 @@ const STACKONE_ATS_TRIGGERS = [
     id: "so_stage_changed",
     label: "Application stage changed",
     desc: "Fires when a candidate moves to a configured stage in your ATS",
-    badge: "Webhook Â· application.stage_changed",
+    badge: "Webhook ÃÂ· application.stage_changed",
     endpoint: null,
   },
   {
     id: "so_application_created",
     label: "New application submitted",
-    desc: "Fires when a candidate applies â auto-invite them to a screening session",
-    badge: "Webhook Â· application.created",
+    desc: "Fires when a candidate applies Ã¢ÂÂ auto-invite them to a screening session",
+    badge: "Webhook ÃÂ· application.created",
     endpoint: null,
   },
   {
     id: "so_interview_created",
     label: "Interview scheduled",
-    desc: "Fires when an interview is created in the ATS â send a pre-interview prep bot",
-    badge: "Webhook Â· interview.created",
+    desc: "Fires when an interview is created in the ATS Ã¢ÂÂ send a pre-interview prep bot",
+    badge: "Webhook ÃÂ· interview.created",
     endpoint: null,
   },
   {
@@ -331,7 +331,7 @@ const STACKONE_ATS_TRIGGERS = [
     id: "so_external_webhook",
     label: "External webhook",
     desc: "Send a POST to your Sonesse endpoint from any system or automation",
-    badge: "Webhook Â· custom",
+    badge: "Webhook ÃÂ· custom",
     endpoint: null,
   },
 ];
@@ -388,9 +388,9 @@ const STACKONE_POST_MEETING_ACTIONS = [
   },
 ];
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // LOGIN PAGE
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function LoginPage({ onLogin, onForgot }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -450,9 +450,9 @@ function LoginPage({ onLogin, onForgot }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // FORGOT PASSWORD PAGE
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function ForgotPasswordPage({ onBack }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -499,9 +499,9 @@ function ForgotPasswordPage({ onBack }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // WIZARD STEPS
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 
 // Step 1: Use Case
 function StepUseCase({ data, onChange }) {
@@ -536,7 +536,7 @@ function StepUseCase({ data, onChange }) {
 function StepBotType({ data, onChange }) {
   const options = [
     { id: "video", label: "Video Avatar", desc: "A photorealistic visual avatar that appears on-screen during sessions. Lip-synced, expressive and fully interactive.", icon: Icons.videoLg },
-    { id: "voice", label: "Voice Bot", desc: "An intelligent voice-only agent that listens and responds in real time. No visual â just fast, natural conversation.", icon: Icons.micLg },
+    { id: "voice", label: "Voice Bot", desc: "An intelligent voice-only agent that listens and responds in real time. No visual Ã¢ÂÂ just fast, natural conversation.", icon: Icons.micLg },
   ];
 
   return (
@@ -592,7 +592,7 @@ function StepParticipants({ data, onChange }) {
   );
 }
 
-// Step 4: Avatar â filtered by bot type, with face previews
+// Step 4: Avatar Ã¢ÂÂ filtered by bot type, with face previews
 function StepAvatar({ data, onChange }) {
   const botType = data.botType || "video";
   const filtered = AVATAR_VENDORS.filter((v) => v.type === botType);
@@ -600,7 +600,7 @@ function StepAvatar({ data, onChange }) {
   return (
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Choose your {botType === "video" ? "avatar" : "voice"} vendor</h2>
-      <p style={{ color: theme.textMuted, margin: "0 0 24px", fontSize: 14 }}>Select a vendor. You can switch at any time â fully vendor-agnostic.</p>
+      <p style={{ color: theme.textMuted, margin: "0 0 24px", fontSize: 14 }}>Select a vendor. You can switch at any time Ã¢ÂÂ fully vendor-agnostic.</p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
         {filtered.map((vendor) => (
@@ -611,7 +611,7 @@ function StepAvatar({ data, onChange }) {
             boxShadow: data.avatar === vendor.id ? `0 0 0 1px ${theme.selectedBorder}` : "none",
             transition: "all 0.15s",
           }}>
-            {/* Avatar face preview â fixed 130px height, face centred */}
+            {/* Avatar face preview Ã¢ÂÂ fixed 130px height, face centred */}
             {vendor.previewImg ? (
               <div style={{ width: "100%", height: 130, background: `linear-gradient(135deg, ${vendor.color}20, ${vendor.color}10)`, position: "relative", overflow: "hidden" }}>
                 <img
@@ -648,7 +648,7 @@ function StepAvatar({ data, onChange }) {
   );
 }
 
-// Step 5: Avatar Settings â default or advanced model configuration
+// Step 5: Avatar Settings Ã¢ÂÂ default or advanced model configuration
 function StepAvatarSettings({ data, onChange }) {
   const [mode, setMode] = useState(data.avatarSettingsMode || "default");
   const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
@@ -692,10 +692,10 @@ function StepAvatarSettings({ data, onChange }) {
         </div>
       )}
 
-      {/* Mode selector â radio-style */}
+      {/* Mode selector Ã¢ÂÂ radio-style */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
         {[
-          { id: "default", label: "Default", desc: "Optimised settings for your use case â no configuration needed" },
+          { id: "default", label: "Default", desc: "Optimised settings for your use case Ã¢ÂÂ no configuration needed" },
           { id: "advanced", label: "Advanced", desc: "Fine-tune every model parameter for full control" },
         ].map((m) => (
           <button key={m.id} onClick={() => { setMode(m.id); onChange({ ...data, avatarSettingsMode: m.id }); }} style={{
@@ -749,7 +749,7 @@ function StepAvatarSettings({ data, onChange }) {
   );
 }
 
-// Step 6: Persona â improved layout with logo upload
+// Step 6: Persona Ã¢ÂÂ improved layout with logo upload
 function StepPersona({ data, onChange }) {
   const tones = ["Professional", "Friendly", "Direct", "Empathetic", "Formal", "Casual"];
   const [logoPreview, setLogoPreview] = useState(data.logoPreview || null);
@@ -799,11 +799,11 @@ function StepPersona({ data, onChange }) {
       {/* Two-column: goals + guardrails */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
         <div>
-          <label style={styles.label}>Goals â what should the avatar achieve?</label>
+          <label style={styles.label}>Goals Ã¢ÂÂ what should the avatar achieve?</label>
           <textarea value={data.goals || ""} onChange={(e) => onChange({ ...data, goals: e.target.value })} placeholder="e.g. Screen candidates for technical fit, assess communication skills, determine culture alignment." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
         <div>
-          <label style={styles.label}>Guardrails â what should it NOT do?</label>
+          <label style={styles.label}>Guardrails Ã¢ÂÂ what should it NOT do?</label>
           <textarea value={data.guardrails || ""} onChange={(e) => onChange({ ...data, guardrails: e.target.value })} placeholder="e.g. Do not ask about salary expectations, age, or personal circumstances. Do not make hiring decisions." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
       </div>
@@ -835,7 +835,7 @@ function StepPersona({ data, onChange }) {
   );
 }
 
-// Step 7: Knowledge Base â upload files or add URLs
+// Step 7: Knowledge Base Ã¢ÂÂ upload files or add URLs
 function StepKnowledgeBase({ data, onChange }) {
   const [urlInput, setUrlInput] = useState("");
   const files = data.kbFiles || [];
@@ -873,7 +873,7 @@ function StepKnowledgeBase({ data, onChange }) {
           onMouseLeave={(e) => e.currentTarget.style.borderColor = theme.border}>
           <div style={{ color: theme.textMuted, marginBottom: 8, display: "flex", justifyContent: "center" }}>{Icons.upload}</div>
           <div style={{ fontWeight: 600, fontSize: 13, color: theme.heading, marginBottom: 4 }}>Drop files here or click to upload</div>
-          <div style={{ fontSize: 12, color: theme.textMuted }}>PDF, DOCX, TXT, CSV â up to 20MB each</div>
+          <div style={{ fontSize: 12, color: theme.textMuted }}>PDF, DOCX, TXT, CSV Ã¢ÂÂ up to 20MB each</div>
         </div>
         {files.length > 0 && (
           <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
@@ -936,7 +936,7 @@ function StepKnowledgeBase({ data, onChange }) {
   );
 }
 
-// Step 8: Integration â dropdown with OAuth / API key options
+// Step 8: Integration Ã¢ÂÂ dropdown with OAuth / API key options
 function StepIntegration({ data, onChange }) {
   const uc = data.useCase || "recruitment";
   const integrations = INTEGRATIONS[uc] || INTEGRATIONS.recruitment;
@@ -972,7 +972,7 @@ function StepIntegration({ data, onChange }) {
           <option value="">Choose a {systemLabel}...</option>
           {integrations.map((intg) => {
             const connected = (data.connectedIntegrations || []).includes(intg.id);
-            return <option key={intg.id} value={intg.id}>{intg.name}{connected ? " â Connected" : ""}</option>;
+            return <option key={intg.id} value={intg.id}>{intg.name}{connected ? " Ã¢ÂÂ Connected" : ""}</option>;
           })}
         </select>
       </div>
@@ -1027,7 +1027,7 @@ function StepIntegration({ data, onChange }) {
                 <div>
                   <div style={{ padding: 16, background: theme.bg, borderRadius: 8, border: `1px solid ${theme.border}`, textAlign: "center", marginBottom: 16 }}>
                     <div style={{ fontSize: 13, color: theme.textMuted, marginBottom: 8 }}>You'll be redirected to {selectedIntg.name} to authorise access.</div>
-                    <div style={{ fontSize: 11, color: theme.textDim }}>Permissions: Read contacts Â· Read/Write records Â· Webhooks</div>
+                    <div style={{ fontSize: 11, color: theme.textDim }}>Permissions: Read contacts ÃÂ· Read/Write records ÃÂ· Webhooks</div>
                   </div>
                   <button onClick={handleConnect} disabled={connecting} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", opacity: connecting ? 0.7 : 1 }}>
                     {connecting ? "Connecting..." : `Authorise with ${selectedIntg.name}`}
@@ -1038,7 +1038,7 @@ function StepIntegration({ data, onChange }) {
                   <div style={{ marginBottom: 16 }}>
                     <label style={styles.label}>API Key</label>
                     <input type="password" value={apiKeyValue} onChange={(e) => setApiKeyValue(e.target.value)} placeholder="Paste your API key here" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
-                    <div style={{ fontSize: 11, color: theme.textDim, marginTop: 6 }}>Find your API key in {selectedIntg.name} â Settings â API & Integrations</div>
+                    <div style={{ fontSize: 11, color: theme.textDim, marginTop: 6 }}>Find your API key in {selectedIntg.name} Ã¢ÂÂ Settings Ã¢ÂÂ API & Integrations</div>
                   </div>
                   <button onClick={handleConnect} disabled={connecting || !apiKeyValue} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", opacity: (connecting || !apiKeyValue) ? 0.5 : 1 }}>
                     {connecting ? "Connecting..." : "Connect with API Key"}
@@ -1070,7 +1070,7 @@ function StepTriggerWorkflow({ data, onChange }) {
           <div style={{ width: 28, height: 28, borderRadius: 6, background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 11, color: "#fff", flexShrink: 0 }}>S1</div>
           <div>
             <div style={{ fontSize: 13, fontWeight: 600, color: theme.primary }}>StackOne unified ATS webhooks</div>
-            <div style={{ fontSize: 11, color: theme.textMuted }}>Connected to <strong>{atsName}</strong> â triggers use the StackOne unified webhook API across your ATS</div>
+            <div style={{ fontSize: 11, color: theme.textMuted }}>Connected to <strong>{atsName}</strong> Ã¢ÂÂ triggers use the StackOne unified webhook API across your ATS</div>
           </div>
         </div>
       )}
@@ -1111,7 +1111,7 @@ function StepPostMeeting({ data, onChange }) {
   const destinations = [
     { id: "transcript_dest", label: "Transcript destination", desc: "Where should the full conversation transcript be saved?", options: ["CRM/ATS Record", "Google Drive", "S3 Bucket", "Webhook", "Email"] },
     { id: "summary_dest", label: "Summary destination", desc: "Where should the AI-generated session summary go?", options: ["CRM/ATS Record", "Slack Channel", "Email", "Notion", "Webhook"] },
-    { id: "recording_dest", label: "Recording destination", desc: "Where should the audio/video recording be stored?", options: ["S3 Bucket", "Google Drive", "Azure Blob", "Dropbox", "None â don't record"] },
+    { id: "recording_dest", label: "Recording destination", desc: "Where should the audio/video recording be stored?", options: ["S3 Bucket", "Google Drive", "Azure Blob", "Dropbox", "None Ã¢ÂÂ don't record"] },
   ];
 
   return (
@@ -1476,14 +1476,14 @@ function StepDeploy({ data }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // PORTAL TOP NAV (shared)
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function PortalNav({ user, onLogout, onHome, currentView }) {
   return (
     <div className="portal-nav" style={{ borderBottom: `1px solid ${theme.border}`, padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: "#ffffff", zIndex: 50, height: 52 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
-        {/* Logo â clickable, goes home */}
+        {/* Logo Ã¢ÂÂ clickable, goes home */}
         <button onClick={onHome} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: "0 16px 0 0", borderRight: `1px solid ${theme.border}`, marginRight: 16 }}>
           <svg width="22" height="22" viewBox="0 0 40 40"><circle cx="8" cy="20" r="4" fill="#6d28d9"/><circle cx="20" cy="20" r="4" fill="#7c3aed"/><circle cx="32" cy="20" r="4" fill="#8b5cf6"/></svg>
           <span style={{ fontWeight: 700, color: theme.heading, fontSize: 15 }}>Sonesse</span>
@@ -1510,9 +1510,9 @@ function PortalNav({ user, onLogout, onHome, currentView }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // PORTAL HOME
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
   const experiences = [
     { id: 1, name: "Senior Engineer Screening", useCase: "recruitment", status: "live", sessions: 42, vendor: "Anam", avatarImg: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=80&h=80&fit=crop&crop=faces,center" },
@@ -1572,10 +1572,10 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: 2 }}>{exp.name}</div>
-                    <div style={{ fontSize: 12, color: theme.textMuted }}>{exp.vendor} Â· {exp.useCase.charAt(0).toUpperCase() + exp.useCase.slice(1)} Â· {exp.sessions} sessions</div>
+                    <div style={{ fontSize: 12, color: theme.textMuted }}>{exp.vendor} ÃÂ· {exp.useCase.charAt(0).toUpperCase() + exp.useCase.slice(1)} ÃÂ· {exp.sessions} sessions</div>
                   </div>
                   <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: exp.status === "live" ? theme.successBg : theme.surface, color: exp.status === "live" ? theme.success : theme.textDim, border: `1px solid ${exp.status === "live" ? theme.successBorder : theme.border}` }}>
-                    {exp.status === "live" ? "â Live" : "Draft"}
+                    {exp.status === "live" ? "Ã¢ÂÂ Live" : "Draft"}
                   </span>
                   <button style={{ ...styles.btnSecondary, padding: "6px 14px", fontSize: 12 }}>Edit</button>
                 </div>
@@ -1587,7 +1587,7 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Recent Sessions</h2>
-              <button onClick={onSessions} style={styles.btnLink}>View all â</button>
+              <button onClick={onSessions} style={styles.btnLink}>View all Ã¢ÂÂ</button>
             </div>
             <SessionsTable preview={true} />
           </div>
@@ -1597,9 +1597,9 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // SESSIONS TABLE (shared component)
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const MOCK_SESSIONS = [
   { id: "s001", experience: "Senior Engineer Screening", participant: "Alex Johnson", email: "alex.johnson@techcorp.com", date: "25 Mar 2026", time: "10:30", duration: "18m", status: "completed", score: 82, transcript: "#", video: "#" },
   { id: "s002", experience: "Senior Engineer Screening", participant: "Sarah Chen", email: "s.chen@devstudio.io", date: "25 Mar 2026", time: "14:00", duration: "22m", status: "completed", score: 91, transcript: "#", video: "#" },
@@ -1654,14 +1654,14 @@ function SessionsTable({ preview = false }) {
                   <button style={{ ...styles.btnLink, fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
                     {Icons.fileText} View
                   </button>
-                ) : <span style={{ color: theme.textDim }}>â</span>}
+                ) : <span style={{ color: theme.textDim }}>Ã¢ÂÂ</span>}
               </td>
               <td style={{ padding: "12px 16px" }}>
                 {row.video ? (
                   <button style={{ ...styles.btnLink, fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
                     {Icons.video} Watch
                   </button>
-                ) : <span style={{ color: theme.textDim }}>â</span>}
+                ) : <span style={{ color: theme.textDim }}>Ã¢ÂÂ</span>}
               </td>
             </tr>
           ))}
@@ -1671,9 +1671,9 @@ function SessionsTable({ preview = false }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // SESSIONS PAGE
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function SessionsPage({ user, onLogout, onHome }) {
   const [filter, setFilter] = useState("all");
   const experiences = ["All", "Senior Engineer Screening", "SDR Outreach Bot", "New Hire Onboarding"];
@@ -1723,9 +1723,9 @@ function SessionsPage({ user, onLogout, onHome }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // WIZARD SHELL
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function Wizard({ user, onLogout, onHome }) {
   const [step, setStep] = useState(0);
   const [data, setData] = useState({});
@@ -1736,9 +1736,9 @@ function Wizard({ user, onLogout, onHome }) {
       case 1: return data.botType;
       case 2: return data.participants;
       case 3: return data.avatar;
-      case 4: return true;  // avatarsettings â optional
+      case 4: return true;  // avatarsettings Ã¢ÂÂ optional
       case 5: return data.name;
-      case 6: return true;  // knowledgebase â optional
+      case 6: return true;  // knowledgebase Ã¢ÂÂ optional
       default: return true;
     }
   };
@@ -1756,7 +1756,7 @@ function Wizard({ user, onLogout, onHome }) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <button onClick={onHome} style={{ ...styles.btnLink, fontSize: 13, color: theme.textMuted }}>Portal</button>
-              <span style={{ color: theme.textDim }}>âº</span>
+              <span style={{ color: theme.textDim }}>Ã¢ÂÂº</span>
               <span style={{ fontSize: 13, color: theme.heading, fontWeight: 600 }}>New Experience</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1806,9 +1806,9 @@ function Wizard({ user, onLogout, onHome }) {
   );
 }
 
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // APP ROOT
-// âââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 export default function App() {
   const [view, setView] = useState("login"); // login | forgot | home | sessions | wizard
   const [user, setUser] = useState("");
