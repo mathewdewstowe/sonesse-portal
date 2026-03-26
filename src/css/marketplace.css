@@ -98,34 +98,26 @@
 
 /* Marketplace — Use Case Panel */
 .marketplace-usecase {
-  display: grid;
-  grid-template-columns: 160px 1fr;
-  gap: 32px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 24px;
 }
 
 .marketplace-usecase__img {
-  width: 160px;
-  height: 160px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
   display: block;
   object-fit: cover;
   object-position: top center;
   border: 3px solid rgba(179, 138, 238, 0.3);
+  flex-shrink: 0;
 }
 
 .marketplace-usecase__body {
   text-align: left;
-}
-
-@media (max-width: 690px) {
-  .marketplace-usecase {
-    grid-template-columns: 1fr;
-  }
-  .marketplace-usecase__img {
-    max-width: 180px;
-    margin: 0 auto;
-  }
+  width: 100%;
 }
 
 .marketplace-usecase h3 {
