@@ -1,0 +1,197 @@
+/* ============================================
+   Marketplace — Two-Column Layout
+   ============================================ */
+.marketplace-layout {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 680px);
+  gap: 60px;
+  align-items: start;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@media (max-width: 999px) {
+  .marketplace-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.marketplace-layout__left {
+  position: sticky;
+  top: 120px;
+}
+
+@media (max-width: 999px) {
+  .marketplace-layout__left {
+    position: static;
+  }
+}
+
+/* Marketplace — Vertical Steps */
+.steps-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.step-v {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0;
+  position: relative;
+}
+
+.step-v::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 52px;
+  bottom: -16px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--color-primary-border), transparent);
+}
+
+.step-v:last-child::before {
+  display: none;
+}
+
+.step-v__number {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-lighter));
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-v__content h4 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.step-v__content p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-light);
+}
+
+/* Marketplace — Tabs Card (right column) */
+.marketplace-tabs-card {
+  background: linear-gradient(135deg, #040108 0%, #0d0518 40%, #1e0d38 100%);
+  border-radius: 20px;
+  padding: 40px 35px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+
+/* Marketplace — Use Case Panel */
+.marketplace-usecase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.marketplace-usecase__img {
+  width: 100%;
+  max-width: 420px;
+  height: 260px;
+  border-radius: 14px;
+  display: block;
+  object-fit: cover;
+  object-position: top center;
+  border: 2px solid rgba(179, 138, 238, 0.25);
+  flex-shrink: 0;
+}
+
+.marketplace-usecase__body {
+  text-align: left;
+  width: 100%;
+}
+
+.marketplace-usecase h3 {
+  color: #ffffff;
+  font-size: clamp(22px, 3vw, 30px);
+  margin-bottom: 8px;
+}
+
+.marketplace-usecase__sub {
+  color: #c9a0ff;
+  font-size: clamp(16px, 2vw, 19px);
+  font-weight: 600;
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.marketplace-usecase p {
+  color: #d7d7d7;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.marketplace-tabs-card .tabs__nav--pills {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.marketplace-tabs-card .tabs__nav--pills .tabs__btn {
+  padding: 7px 14px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+@media (max-width: 690px) {
+  .marketplace-tabs-card {
+    padding: 25px 20px;
+  }
+  .marketplace-tabs-card .tabs__nav--pills .tabs__btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Recruitment — Feature Grid */
+.usecase-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+  margin-top: 20px;
+}
+
+.usecase-feature {
+  border-left: 2px solid rgba(179, 138, 238, 0.45);
+  padding-left: 10px;
+}
+
+.usecase-feature__title {
+  color: #e2caff;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin: 0 0 2px;
+  letter-spacing: 0.01em;
+}
+
+.usecase-feature__desc {
+  color: #9898b0 !important;
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 690px) {
+  .usecase-features {
+    grid-template-columns: 1fr;
+  }
+}
