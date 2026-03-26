@@ -50,7 +50,7 @@
     const { useState, useEffect } = React;
 
 
-// ——Ã¢ÂÂ Icons (inline SVG helpers) ——Ã¢ÂÂ
+// ——— Icons (inline SVG helpers) ———
 const Icons = {
   eye: (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -126,7 +126,7 @@ const Icons = {
   ),
 };
 
-// ——Ã¢ÂÂ Theme ——Ã¢ÂÂ
+// ——— Theme ———
 const theme = {
   bg: "#ffffff",
   surface: "#f8f9fb",
@@ -151,7 +151,7 @@ const theme = {
   warning: "#f59e0b",
 };
 
-// ——Ã¢ÂÂ Styles ——Ã¢ÂÂ
+// ——— Styles ———
 const styles = {
   page: { minHeight: "100vh", background: "#ffffff", color: theme.text, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", fontSize: "14px", lineHeight: 1.5 },
   container: { maxWidth: 480, margin: "0 auto", padding: "60px 24px" },
@@ -173,7 +173,7 @@ const styles = {
   wizardNav: { display: "flex", justifyContent: "space-between", marginTop: 32, paddingTop: 24, borderTop: `1px solid ${theme.border}` },
 };
 
-// ——Ã¢ÂÂ Selection card helper – consistent selected state ——Ã¢ÂÂ
+// ——— Selection card helper – consistent selected state ———
 function selCard(isSelected, extraStyle = {}) {
   return {
     ...styles.cardSm,
@@ -187,7 +187,7 @@ function selCard(isSelected, extraStyle = {}) {
   };
 }
 
-// ——Ã¢ÂÂ Data ——Ã¢ÂÂ
+// ——— Data ———
 const WIZARD_STEPS = [
   { id: "usecase", label: "Use Case" },
   { id: "bottype", label: "Bot Type" },
@@ -210,7 +210,6 @@ const USE_CASE_DEFAULTS = {
   sales: "AI Sales Qualifier",
   tutoring: "AI Tutoring Session",
   coaching: "AI Coaching Session",
-  lms: "AI Learning Experience",
   onboarding: "AI Onboarding Guide",
   meetingbot: "AI Meeting Assistant",
   sdr: "AI SDR Outreach Bot",
@@ -226,66 +225,91 @@ const AVATAR_VENDORS = [
   { id: "deepgram", name: "Deepgram", type: "voice", desc: "Fast, accurate voice agents for enterprise scale", color: "#16a34a", logo: "D", previewImg: null },
 ];
 
-const STACKONE_ATS_IDS = ["greenhouse", "lever", "workday", "ashby", "smartrecruiters", "bamboohr", "teamtailor", "personio", "workable", "recruitee"];
+const STACKONE_ATS_IDS = [
+  "greenhouse-harvest-v3", "lever", "ashby", "bamboohr", "workday-rest-and-soap",
+  "smartrecruiters", "jobadder", "bullhorn", "eploy", "hibob", "recruitee", "icims"
+];
+const STACKONE_CRM_IDS = [
+  "salesforce", "hubspot", "zoho-crm", "attio", "affinity",
+  "activecampaign", "zendesk", "pipedrive"
+];
+const STACKONE_HRIS_IDS = [
+  "bamboohr", "workday-rest-and-soap", "hibob", "factorial", "gusto",
+  "sap-successfactors", "oracle-fusion-hcm", "ukg-ready", "rippling", "personio"
+];
+const STACKONE_LMS_IDS = [
+  "360learning", "docebo", "adobe-learning-manager", "cornerstone", "coursera",
+  "brainier", "skillsoft", "moodle", "canvas-lms"
+];
 
 const INTEGRATIONS = {
   recruitment: [
-    { id: "greenhouse", name: "Greenhouse", desc: "Applicant tracking system → via StackOne", stackone: true },
-    { id: "lever", name: "Lever", desc: "Talent acquisition suite → via StackOne", stackone: true },
-    { id: "workday", name: "Workday", desc: "HR and recruiting platform → via StackOne", stackone: true },
-    { id: "ashby", name: "Ashby", desc: "All-in-one recruiting platform → via StackOne", stackone: true },
-    { id: "smartrecruiters", name: "SmartRecruiters", desc: "Enterprise talent acquisition → via StackOne", stackone: true },
-    { id: "bamboohr", name: "BambooHR", desc: "HR software for SMBs → via StackOne", stackone: true },
-    { id: "teamtailor", name: "Teamtailor", desc: "Employer branding & ATS → via StackOne", stackone: true },
-    { id: "personio", name: "Personio", desc: "European HR & recruiting platform → via StackOne", stackone: true },
-    { id: "workable", name: "Workable", desc: "Hiring software for growing teams → via StackOne", stackone: true },
-    { id: "recruitee", name: "Recruitee", desc: "Collaborative hiring software → via StackOne", stackone: true },
+    { id: "greenhouse-harvest-v3", name: "Greenhouse", desc: "ATS — 99 unified StackOne actions" },
+    { id: "lever", name: "Lever", desc: "Talent acquisition suite" },
+    { id: "ashby", name: "Ashby", desc: "All-in-one recruiting platform" },
+    { id: "bamboohr", name: "BambooHR", desc: "HR & ATS for SMBs" },
+    { id: "workday-rest-and-soap", name: "Workday", desc: "Enterprise HR & recruiting" },
+    { id: "smartrecruiters", name: "SmartRecruiters", desc: "Talent acquisition suite" },
+    { id: "jobadder", name: "JobAdder", desc: "Recruitment CRM — 245 actions" },
+    { id: "bullhorn", name: "Bullhorn", desc: "Staffing & recruiting CRM" },
+    { id: "eploy", name: "Eploy", desc: "End-to-end recruitment platform" },
+    { id: "hibob", name: "HiBob", desc: "Modern HRIS with ATS" },
   ],
   sales: [
-    { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM" },
+    { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM — 371 actions" },
     { id: "hubspot", name: "HubSpot", desc: "Inbound CRM platform" },
+    { id: "zoho-crm", name: "Zoho CRM", desc: "CRM for growing teams" },
+    { id: "attio", name: "Attio", desc: "Modern CRM platform" },
+    { id: "affinity", name: "Affinity", desc: "Relationship intelligence CRM" },
     { id: "pipedrive", name: "Pipedrive", desc: "Sales-first CRM" },
-    { id: "close", name: "Close", desc: "CRM for inside sales" },
-    { id: "outreach", name: "Outreach", desc: "Sales engagement platform" },
+    { id: "activecampaign", name: "ActiveCampaign", desc: "CRM & marketing automation" },
+    { id: "zendesk", name: "Zendesk", desc: "Customer service & CRM" },
   ],
   tutoring: [
+    { id: "360learning", name: "360Learning", desc: "Collaborative LMS — 78 actions" },
+    { id: "docebo", name: "Docebo", desc: "AI-powered LMS" },
+    { id: "adobe-learning-manager", name: "Adobe Learning Manager", desc: "Enterprise LMS" },
+    { id: "cornerstone", name: "Cornerstone", desc: "Enterprise learning suite" },
+    { id: "coursera", name: "Coursera", desc: "Online learning platform" },
+    { id: "brainier", name: "Brainier", desc: "Cloud-based LMS" },
+    { id: "skillsoft", name: "Skillsoft", desc: "Corporate learning platform" },
     { id: "moodle", name: "Moodle", desc: "Open-source LMS" },
-    { id: "canvas", name: "Canvas", desc: "Learning management system" },
-    { id: "blackboard", name: "Blackboard", desc: "Education LMS" },
-    { id: "google-classroom", name: "Google Classroom", desc: "Education suite" },
   ],
   coaching: [
     { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM" },
     { id: "hubspot", name: "HubSpot", desc: "Inbound CRM platform" },
-    { id: "betterup", name: "BetterUp", desc: "Coaching platform" },
-    { id: "lattice", name: "Lattice", desc: "People management" },
-  ],
-  lms: [
-    { id: "moodle", name: "Moodle", desc: "Open-source LMS" },
-    { id: "canvas", name: "Canvas", desc: "Learning management system" },
-    { id: "cornerstone", name: "Cornerstone", desc: "Enterprise learning" },
-    { id: "docebo", name: "Docebo", desc: "AI-powered LMS" },
+    { id: "hibob", name: "HiBob", desc: "Modern HRIS & performance" },
+    { id: "factorial", name: "Factorial", desc: "HR & performance management" },
+    { id: "attio", name: "Attio", desc: "Modern CRM platform" },
+    { id: "zoho-crm", name: "Zoho CRM", desc: "CRM for growing teams" },
   ],
   onboarding: [
-    { id: "workday", name: "Workday", desc: "HR and onboarding platform" },
-    { id: "bamboohr", name: "BambooHR", desc: "HR software with onboarding" },
+    { id: "bamboohr", name: "BambooHR", desc: "HR & onboarding — 96 actions" },
+    { id: "workday-rest-and-soap", name: "Workday", desc: "Enterprise HRIS & onboarding" },
+    { id: "hibob", name: "HiBob", desc: "Modern HRIS — 121 actions" },
+    { id: "factorial", name: "Factorial", desc: "HR software — 127 actions" },
+    { id: "gusto", name: "Gusto", desc: "HR, payroll & benefits" },
+    { id: "sap-successfactors", name: "SAP SuccessFactors", desc: "Enterprise HCM suite" },
+    { id: "oracle-fusion-hcm", name: "Oracle Fusion HCM", desc: "Enterprise HR platform" },
     { id: "rippling", name: "Rippling", desc: "All-in-one HR platform" },
-    { id: "notion", name: "Notion", desc: "Team wiki and onboarding docs" },
-    { id: "slack", name: "Slack", desc: "Workspace communication" },
+    { id: "ukg-ready", name: "UKG Ready", desc: "Workforce management HCM" },
+    { id: "personio", name: "Personio", desc: "HR platform for Europe" },
   ],
   meetingbot: [
-    { id: "zoom", name: "Zoom", desc: "Video meetings platform" },
-    { id: "teams", name: "Microsoft Teams", desc: "Team collaboration and meetings" },
-    { id: "google-meet", name: "Google Meet", desc: "Google video conferencing" },
-    { id: "notion", name: "Notion", desc: "Save meeting notes and summaries" },
     { id: "salesforce", name: "Salesforce", desc: "Sync meeting insights to CRM" },
+    { id: "hubspot", name: "HubSpot", desc: "Log meetings to HubSpot" },
+    { id: "zoho-crm", name: "Zoho CRM", desc: "Sync meeting data to Zoho" },
+    { id: "bamboohr", name: "BambooHR", desc: "Log sessions to HR profile" },
+    { id: "hibob", name: "HiBob", desc: "Log sessions to HRIS" },
   ],
   sdr: [
-    { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM" },
+    { id: "salesforce", name: "Salesforce", desc: "Enterprise CRM — 371 actions" },
     { id: "hubspot", name: "HubSpot", desc: "Inbound CRM platform" },
-    { id: "outreach", name: "Outreach", desc: "Sales engagement platform" },
-    { id: "apollo", name: "Apollo.io", desc: "Sales intelligence and engagement" },
-    { id: "salesloft", name: "Salesloft", desc: "Revenue orchestration platform" },
+    { id: "zoho-crm", name: "Zoho CRM", desc: "CRM for growing teams" },
+    { id: "attio", name: "Attio", desc: "Modern CRM platform" },
+    { id: "affinity", name: "Affinity", desc: "Relationship intelligence CRM" },
+    { id: "activecampaign", name: "ActiveCampaign", desc: "CRM & marketing automation" },
+    { id: "pipedrive", name: "Pipedrive", desc: "Sales-first CRM" },
   ],
 };
 
@@ -332,6 +356,119 @@ const STACKONE_ATS_TRIGGERS = [
     label: "External webhook",
     desc: "Send a POST to your Sonesse endpoint from any system or automation",
     badge: "Webhook → custom",
+    endpoint: null,
+  },
+];
+
+// CRM triggers (shown when a CRM is connected)
+const STACKONE_CRM_TRIGGERS = [
+  {
+    id: "so_crm_deal_created",
+    label: "New deal created",
+    desc: "Fires when a deal or opportunity is created in your CRM",
+    badge: "Webhook → deal.created",
+    endpoint: null,
+  },
+  {
+    id: "so_crm_stage_changed",
+    label: "Deal stage changed",
+    desc: "Fires when a deal moves to a configured stage — trigger a qualification call",
+    badge: "Webhook → deal.stage_changed",
+    endpoint: null,
+  },
+  {
+    id: "so_crm_meeting_booked",
+    label: "Demo or meeting booked",
+    desc: "Fires when a meeting is scheduled via your CRM or calendar integration",
+    badge: "Webhook → activity.created",
+    endpoint: null,
+  },
+  {
+    id: "so_crm_contact_created",
+    label: "New contact added",
+    desc: "Fires when a new contact is created — auto-start an intro session",
+    badge: "Webhook → contact.created",
+    endpoint: null,
+  },
+  {
+    id: "so_crm_manual",
+    label: "Manual launch from CRM record",
+    desc: "Sales rep clicks Start Session directly from the contact or deal record",
+    endpoint: null,
+  },
+  {
+    id: "so_crm_webhook",
+    label: "External webhook",
+    desc: "Send a POST to your Sonesse endpoint from any system or automation",
+    endpoint: null,
+  },
+];
+
+// HRIS triggers (shown when an HRIS is connected)
+const STACKONE_HRIS_TRIGGERS = [
+  {
+    id: "so_hris_employee_created",
+    label: "New hire added",
+    desc: "Fires when a new employee is added to your HRIS — kick off onboarding",
+    badge: "Webhook → employee.created",
+    endpoint: null,
+  },
+  {
+    id: "so_hris_onboarding_started",
+    label: "Onboarding task activated",
+    desc: "Fires when an onboarding workflow starts in your HRIS",
+    badge: "Webhook → onboarding.started",
+    endpoint: null,
+  },
+  {
+    id: "so_hris_start_date_approaching",
+    label: "Start date approaching",
+    desc: "Fires 3 days before an employee's start date — send a welcome prep session",
+    badge: "Scheduled → start_date - 3d",
+    endpoint: null,
+  },
+  {
+    id: "so_hris_task_completed",
+    label: "Onboarding task completed",
+    desc: "Fires when an employee completes a task in the HRIS onboarding flow",
+    badge: "Webhook → task.completed",
+    endpoint: null,
+  },
+  {
+    id: "so_hris_manual",
+    label: "Manual launch from employee record",
+    desc: "HR clicks Start Session directly from the employee profile",
+    endpoint: null,
+  },
+];
+
+// LMS triggers (shown when an LMS is connected)
+const STACKONE_LMS_TRIGGERS = [
+  {
+    id: "so_lms_enrollment_created",
+    label: "Course enrollment created",
+    desc: "Fires when a learner is enrolled in a course — send an intro session",
+    badge: "Webhook → enrollment.created",
+    endpoint: null,
+  },
+  {
+    id: "so_lms_module_completed",
+    label: "Module completed",
+    desc: "Fires when a learner completes a module — offer a practice session",
+    badge: "Webhook → module.completed",
+    endpoint: null,
+  },
+  {
+    id: "so_lms_assessment_submitted",
+    label: "Assessment submitted",
+    desc: "Fires when a learner submits an assessment — debrief with AI tutor",
+    badge: "Webhook → assessment.submitted",
+    endpoint: null,
+  },
+  {
+    id: "so_lms_manual",
+    label: "Manual launch from learner profile",
+    desc: "Instructor starts a session from the learner record in the LMS",
     endpoint: null,
   },
 ];
@@ -386,6 +523,35 @@ const STACKONE_POST_MEETING_ACTIONS = [
     endpoint: "/unified/ats/scheduled-interviews",
     body: '{ "application_id": "<id>", "interview_stage_id": "<stage>", "start_at": "<time>" }',
   },
+];
+
+// CRM post-session actions
+const STACKONE_CRM_POST_ACTIONS = [
+  { id: "so_crm_update_stage", label: "Update deal stage", desc: "Advances the deal to the next configured stage in your CRM" },
+  { id: "so_crm_log_note", label: "Log session notes", desc: "Posts the AI-generated summary as a note on the contact or deal record" },
+  { id: "so_crm_add_task", label: "Create follow-up task", desc: "Adds a follow-up task assigned to the rep with a due date" },
+  { id: "so_crm_update_score", label: "Update lead score", desc: "Writes the AI engagement score back to the contact record" },
+  { id: "so_crm_schedule_meeting", label: "Schedule next meeting", desc: "Creates a follow-up meeting in your CRM and sends an invite" },
+  { id: "so_crm_attach_transcript", label: "Attach transcript", desc: "Uploads the session transcript as a file on the deal or contact record" },
+];
+
+// HRIS post-session actions
+const STACKONE_HRIS_POST_ACTIONS = [
+  { id: "so_hris_complete_task", label: "Mark onboarding task complete", desc: "Updates the task status in your HRIS onboarding workflow" },
+  { id: "so_hris_add_note", label: "Add note to employee record", desc: "Posts the session summary as a note on the employee profile" },
+  { id: "so_hris_next_stage", label: "Advance onboarding stage", desc: "Moves the employee to the next stage in their onboarding plan" },
+  { id: "so_hris_notify_hr", label: "Notify HR partner", desc: "Sends a summary to the assigned HR partner via email or Slack" },
+  { id: "so_hris_attach_recording", label: "Attach session recording", desc: "Uploads the recording to the employee's document folder in HRIS" },
+  { id: "so_hris_schedule_followup", label: "Schedule follow-up session", desc: "Books a follow-up onboarding session for the employee" },
+];
+
+// LMS post-session actions
+const STACKONE_LMS_POST_ACTIONS = [
+  { id: "so_lms_mark_complete", label: "Mark module complete", desc: "Updates module completion status in the LMS for the learner" },
+  { id: "so_lms_add_note", label: "Add coaching note", desc: "Adds the AI session summary as a note on the learner's profile" },
+  { id: "so_lms_update_score", label: "Update assessment score", desc: "Writes the AI-evaluated score back to the LMS gradebook" },
+  { id: "so_lms_enroll_next", label: "Enroll in next module", desc: "Automatically enrolls the learner in the next course or module" },
+  { id: "so_lms_notify_instructor", label: "Notify instructor", desc: "Sends a progress summary to the assigned instructor" },
 ];
 
 // ═══════════════════════════════════════════
@@ -510,7 +676,6 @@ function StepUseCase({ data, onChange }) {
     { id: "sales", label: "Sales", desc: "Qualify leads and book meetings" },
     { id: "tutoring", label: "Tutoring", desc: "Personalised learning and practice" },
     { id: "coaching", label: "Coaching", desc: "Structured coaching at scale" },
-    { id: "lms", label: "LMS", desc: "Interactive learning experiences" },
     { id: "onboarding", label: "Onboarding", desc: "Guide new hires or users through setup" },
     { id: "meetingbot", label: "Meeting Bot", desc: "Join meetings to take notes and assist" },
     { id: "sdr", label: "SDR", desc: "Automated outbound sales conversations" },
@@ -972,7 +1137,7 @@ function StepIntegration({ data, onChange }) {
           <option value="">Choose a {systemLabel}...</option>
           {integrations.map((intg) => {
             const connected = (data.connectedIntegrations || []).includes(intg.id);
-            return <option key={intg.id} value={intg.id}>{intg.name}{connected ? " Ã¢ÂÂ Connected" : ""}</option>;
+            return <option key={intg.id} value={intg.id}>{intg.name}{connected ? " ✓ Connected" : ""}</option>;
           })}
         </select>
       </div>
@@ -1055,12 +1220,22 @@ function StepIntegration({ data, onChange }) {
 
 // Step 7: Trigger Workflow
 function StepTriggerWorkflow({ data, onChange }) {
-  const connectedATS = (data.connectedIntegrations || []).find((id) => STACKONE_ATS_IDS.includes(id));
-  const atsName = connectedATS ? (INTEGRATIONS.recruitment.find((i) => i.id === connectedATS) || {}).name : null;
-  const useStackOne = !!(connectedATS && atsName);
-  const triggerList = useStackOne ? STACKONE_ATS_TRIGGERS : TRIGGER_OPTIONS;
+  const connectedATS  = (data.connectedIntegrations || []).find(id => STACKONE_ATS_IDS.includes(id));
+  const connectedCRM  = (data.connectedIntegrations || []).find(id => STACKONE_CRM_IDS.includes(id));
+  const connectedHRIS = (data.connectedIntegrations || []).find(id => STACKONE_HRIS_IDS.includes(id));
+  const connectedLMS  = (data.connectedIntegrations || []).find(id => STACKONE_LMS_IDS.includes(id));
+  const connectedInt  = connectedATS || connectedCRM || connectedHRIS || connectedLMS;
+  const allInts = INTEGRATIONS[data.useCase] || INTEGRATIONS.recruitment;
+  const intMeta = allInts.find(i => i.id === connectedInt) || {};
+  const intName = intMeta.name || null;
+  const useStackOne = !!connectedInt;
+  const triggerList = connectedATS  ? STACKONE_ATS_TRIGGERS
+                    : connectedCRM  ? STACKONE_CRM_TRIGGERS
+                    : connectedHRIS ? STACKONE_HRIS_TRIGGERS
+                    : connectedLMS  ? STACKONE_LMS_TRIGGERS
+                    : TRIGGER_OPTIONS;
 
-  return (
+    return (
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Trigger workflow</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 16px", fontSize: 14 }}>What starts an avatar session? Select all that apply.</p>
@@ -1104,17 +1279,27 @@ function StepTriggerWorkflow({ data, onChange }) {
 
 // Step 8: Post-Meeting Workflow
 function StepPostMeeting({ data, onChange }) {
-  const connectedATS = (data.connectedIntegrations || []).find((id) => STACKONE_ATS_IDS.includes(id));
-  const atsName = connectedATS ? (INTEGRATIONS.recruitment.find((i) => i.id === connectedATS) || {}).name : null;
-  const useStackOne = !!(connectedATS && atsName);
+  const connectedATS  = (data.connectedIntegrations || []).find(id => STACKONE_ATS_IDS.includes(id));
+  const connectedCRM  = (data.connectedIntegrations || []).find(id => STACKONE_CRM_IDS.includes(id));
+  const connectedHRIS = (data.connectedIntegrations || []).find(id => STACKONE_HRIS_IDS.includes(id));
+  const connectedLMS  = (data.connectedIntegrations || []).find(id => STACKONE_LMS_IDS.includes(id));
+  const connectedInt  = connectedATS || connectedCRM || connectedHRIS || connectedLMS;
+  const allInts = INTEGRATIONS[data.useCase] || INTEGRATIONS.recruitment;
+  const intMeta = allInts.find(i => i.id === connectedInt) || {};
+  const atsName = intMeta.name || null;
+  const useStackOne = !!connectedInt;
+  const stackoneActions = connectedATS  ? STACKONE_POST_MEETING_ACTIONS
+                        : connectedCRM  ? STACKONE_CRM_POST_ACTIONS
+                        : connectedHRIS ? STACKONE_HRIS_POST_ACTIONS
+                        : connectedLMS  ? STACKONE_LMS_POST_ACTIONS
+                        : null;
+  const systemLabel = connectedATS  ? 'ATS'
+                    : connectedCRM  ? 'CRM'
+                    : connectedHRIS ? 'HRIS'
+                    : connectedLMS  ? 'LMS'
+                    : 'System';
 
-  const destinations = [
-    { id: "transcript_dest", label: "Transcript destination", desc: "Where should the full conversation transcript be saved?", options: ["CRM/ATS Record", "Google Drive", "S3 Bucket", "Webhook", "Email"] },
-    { id: "summary_dest", label: "Summary destination", desc: "Where should the AI-generated session summary go?", options: ["CRM/ATS Record", "Slack Channel", "Email", "Notion", "Webhook"] },
-    { id: "recording_dest", label: "Recording destination", desc: "Where should the audio/video recording be stored?", options: ["S3 Bucket", "Google Drive", "Azure Blob", "Dropbox", "None — don't record"] },
-  ];
-
-  return (
+    return (
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Post-meeting workflow</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 20px", fontSize: 14 }}>Configure what happens after each session completes.</p>
@@ -1575,7 +1760,7 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
                     <div style={{ fontSize: 12, color: theme.textMuted }}>{exp.vendor} → {exp.useCase.charAt(0).toUpperCase() + exp.useCase.slice(1)} → {exp.sessions} sessions</div>
                   </div>
                   <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: exp.status === "live" ? theme.successBg : theme.surface, color: exp.status === "live" ? theme.success : theme.textDim, border: `1px solid ${exp.status === "live" ? theme.successBorder : theme.border}` }}>
-                    {exp.status === "live" ? "Ã¢ÂÂ Live" : "Draft"}
+                    {exp.status === "live" ? "● Live" : "Draft"}
                   </span>
                   <button style={{ ...styles.btnSecondary, padding: "6px 14px", fontSize: 12 }}>Edit</button>
                 </div>
@@ -1756,7 +1941,7 @@ function Wizard({ user, onLogout, onHome }) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <button onClick={onHome} style={{ ...styles.btnLink, fontSize: 13, color: theme.textMuted }}>Portal</button>
-              <span style={{ color: theme.textDim }}>Ã¢ÂÂº</span>
+              <span style={{ color: theme.textDim }}>›</span>
               <span style={{ fontSize: 13, color: theme.heading, fontWeight: 600 }}>New Experience</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
