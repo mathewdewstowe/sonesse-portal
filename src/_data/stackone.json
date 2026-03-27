@@ -1,0 +1,250 @@
+{
+  "useCases": [
+    {
+      "id": "recruitment",
+      "label": "Recruitment",
+      "desc": "Screen, interview and qualify candidates",
+      "connectorType": "ats",
+      "connectors": [
+        { "id": "greenhouse-harvest-v3", "name": "Greenhouse", "desc": "ATS — 99 unified StackOne actions" },
+        { "id": "lever", "name": "Lever", "desc": "Talent acquisition suite" },
+        { "id": "ashby", "name": "Ashby", "desc": "All-in-one recruiting platform" },
+        { "id": "bamboohr", "name": "BambooHR", "desc": "HR & ATS for SMBs" },
+        { "id": "workday-rest-and-soap", "name": "Workday", "desc": "Enterprise HR & recruiting" },
+        { "id": "smartrecruiters", "name": "SmartRecruiters", "desc": "Talent acquisition suite" },
+        { "id": "jobadder", "name": "JobAdder", "desc": "Recruitment CRM — 245 actions" },
+        { "id": "bullhorn", "name": "Bullhorn", "desc": "Staffing & recruiting CRM" },
+        { "id": "eploy", "name": "Eploy", "desc": "End-to-end recruitment platform" },
+        { "id": "hibob", "name": "HiBob", "desc": "Modern HRIS with ATS" }
+      ],
+      "triggerEvents": [
+        { "id": "so_stage_changed", "label": "Application stage changed", "badge": "application.stage_changed", "desc": "Fires when a candidate moves to a configured stage in your ATS" },
+        { "id": "so_application_created", "label": "New application submitted", "badge": "application.created", "desc": "Fires when a candidate applies — auto-invite them to a screening session" },
+        { "id": "so_interview_created", "label": "Interview scheduled", "badge": "interview.created", "desc": "Fires when an interview is created in the ATS" },
+        { "id": "so_manual", "label": "Manual launch from ATS record", "badge": "Manual", "desc": "Recruiter clicks Start Session directly from the candidate profile" },
+        { "id": "so_external_webhook", "label": "External webhook", "badge": "webhook.custom", "desc": "Send a POST to your Sonesse endpoint from any system or automation" }
+      ],
+      "postMeetingActions": [
+        { "id": "so_move_stage", "label": "Move to next stage", "desc": "Automatically advances the candidate to the next configured ATS stage", "endpoint": "PATCH /unified/ats/applications/{id}" },
+        { "id": "so_add_notes", "label": "Add interview notes", "desc": "Posts the AI-generated session summary as a note on the application record", "endpoint": "POST /unified/ats/applications/{id}/notes" },
+        { "id": "so_attach_transcript", "label": "Attach full transcript", "desc": "Uploads the session transcript as a file attachment to the candidate record", "endpoint": "POST /unified/ats/applications/{id}/attachments" },
+        { "id": "so_update_score", "label": "Update candidate score", "desc": "Writes the AI-generated interview score back to the candidate profile", "endpoint": "PATCH /unified/ats/candidates/{id}" },
+        { "id": "so_reject", "label": "Reject candidate", "desc": "Sets the application status to rejected with a configurable reason", "endpoint": "PATCH /unified/ats/applications/{id}" },
+        { "id": "so_schedule_interview", "label": "Schedule next interview", "desc": "Creates a follow-up interview in the ATS and sends an invite to the candidate", "endpoint": "POST /unified/ats/scheduled-interviews" }
+      ],
+      "outputs": {
+        "transcript": "Attached to ATS application record",
+        "video": "Stored in Sonesse, linked from candidate profile",
+        "summary": "Posted as note on ATS application"
+      }
+    },
+    {
+      "id": "sales",
+      "label": "Sales",
+      "desc": "Qualify leads and book meetings",
+      "connectorType": "crm",
+      "connectors": [
+        { "id": "salesforce", "name": "Salesforce", "desc": "Enterprise CRM — 371 actions" },
+        { "id": "hubspot", "name": "HubSpot", "desc": "Inbound CRM platform" },
+        { "id": "zoho-crm", "name": "Zoho CRM", "desc": "CRM for growing teams" },
+        { "id": "attio", "name": "Attio", "desc": "Modern CRM platform" },
+        { "id": "affinity", "name": "Affinity", "desc": "Relationship intelligence CRM" },
+        { "id": "pipedrive", "name": "Pipedrive", "desc": "Sales-first CRM" },
+        { "id": "activecampaign", "name": "ActiveCampaign", "desc": "CRM & marketing automation" },
+        { "id": "zendesk", "name": "Zendesk", "desc": "Customer service & CRM" }
+      ],
+      "triggerEvents": [
+        { "id": "so_crm_deal_created", "label": "New deal created", "badge": "deal.created", "desc": "Fires when a deal or opportunity is created in your CRM" },
+        { "id": "so_crm_stage_changed", "label": "Deal stage changed", "badge": "deal.stage_changed", "desc": "Fires when a deal moves to a configured stage — trigger a qualification call" },
+        { "id": "so_crm_meeting_booked", "label": "Demo or meeting booked", "badge": "activity.created", "desc": "Fires when a meeting is scheduled via your CRM or calendar integration" },
+        { "id": "so_crm_contact_created", "label": "New contact added", "badge": "contact.created", "desc": "Fires when a new contact is created — auto-start an intro session" },
+        { "id": "so_crm_manual", "label": "Manual launch from CRM record", "badge": "Manual", "desc": "Sales rep clicks Start Session directly from the contact or deal record" },
+        { "id": "so_crm_webhook", "label": "External webhook", "badge": "webhook.custom", "desc": "Send a POST to your Sonesse endpoint from any system or automation" }
+      ],
+      "postMeetingActions": [
+        { "id": "so_crm_update_stage", "label": "Update deal stage", "desc": "Advances the deal to the next configured stage in your CRM" },
+        { "id": "so_crm_log_note", "label": "Log session notes", "desc": "Posts the AI-generated summary as a note on the contact or deal record" },
+        { "id": "so_crm_add_task", "label": "Create follow-up task", "desc": "Adds a follow-up task assigned to the rep with a due date" },
+        { "id": "so_crm_update_score", "label": "Update lead score", "desc": "Writes the AI engagement score back to the contact record" },
+        { "id": "so_crm_schedule_meeting", "label": "Schedule next meeting", "desc": "Creates a follow-up meeting in your CRM and sends an invite" },
+        { "id": "so_crm_attach_transcript", "label": "Attach transcript", "desc": "Uploads the session transcript as a file on the deal or contact record" }
+      ],
+      "outputs": {
+        "transcript": "Attached to CRM deal or contact record",
+        "video": "Stored in Sonesse, linked from deal record",
+        "summary": "Posted as note on CRM contact"
+      }
+    },
+    {
+      "id": "tutoring",
+      "label": "Tutoring",
+      "desc": "Personalised learning and practice",
+      "connectorType": "lms",
+      "connectors": [
+        { "id": "360learning", "name": "360Learning", "desc": "Collaborative LMS — 78 actions" },
+        { "id": "docebo", "name": "Docebo", "desc": "AI-powered LMS" },
+        { "id": "adobe-learning-manager", "name": "Adobe Learning Manager", "desc": "Enterprise LMS" },
+        { "id": "cornerstone", "name": "Cornerstone", "desc": "Enterprise learning suite" },
+        { "id": "coursera", "name": "Coursera", "desc": "Online learning platform" },
+        { "id": "brainier", "name": "Brainier", "desc": "Cloud-based LMS" },
+        { "id": "skillsoft", "name": "Skillsoft", "desc": "Corporate learning platform" },
+        { "id": "moodle", "name": "Moodle", "desc": "Open-source LMS" }
+      ],
+      "triggerEvents": [
+        { "id": "so_lms_enrollment_created", "label": "Course enrollment created", "badge": "enrollment.created", "desc": "Fires when a learner is enrolled in a course — send an intro session" },
+        { "id": "so_lms_module_completed", "label": "Module completed", "badge": "module.completed", "desc": "Fires when a learner completes a module — offer a practice session" },
+        { "id": "so_lms_assessment_submitted", "label": "Assessment submitted", "badge": "assessment.submitted", "desc": "Fires when a learner submits an assessment — debrief with AI tutor" },
+        { "id": "so_lms_manual", "label": "Manual launch from learner profile", "badge": "Manual", "desc": "Instructor starts a session from the learner record in the LMS" }
+      ],
+      "postMeetingActions": [
+        { "id": "so_lms_mark_complete", "label": "Mark module complete", "desc": "Updates module completion status in the LMS for the learner" },
+        { "id": "so_lms_add_note", "label": "Add coaching note", "desc": "Adds the AI session summary as a note on the learner's profile" },
+        { "id": "so_lms_update_score", "label": "Update assessment score", "desc": "Writes the AI-evaluated score back to the LMS gradebook" },
+        { "id": "so_lms_enroll_next", "label": "Enroll in next module", "desc": "Automatically enrolls the learner in the next course or module" },
+        { "id": "so_lms_notify_instructor", "label": "Notify instructor", "desc": "Sends a progress summary to the assigned instructor" }
+      ],
+      "outputs": {
+        "transcript": "Attached to learner profile in LMS",
+        "video": "Stored in Sonesse, linked from learner record",
+        "summary": "Posted as coaching note in LMS"
+      }
+    },
+    {
+      "id": "coaching",
+      "label": "Coaching",
+      "desc": "Structured coaching at scale",
+      "connectorType": "crm",
+      "connectors": [
+        { "id": "salesforce", "name": "Salesforce", "desc": "Enterprise CRM" },
+        { "id": "hubspot", "name": "HubSpot", "desc": "Inbound CRM platform" },
+        { "id": "hibob", "name": "HiBob", "desc": "Modern HRIS & performance" },
+        { "id": "factorial", "name": "Factorial", "desc": "HR & performance management" },
+        { "id": "attio", "name": "Attio", "desc": "Modern CRM platform" },
+        { "id": "zoho-crm", "name": "Zoho CRM", "desc": "CRM for growing teams" }
+      ],
+      "triggerEvents": [
+        { "id": "so_crm_deal_created", "label": "New deal created", "badge": "deal.created", "desc": "Fires when a deal or opportunity is created in your CRM" },
+        { "id": "so_crm_stage_changed", "label": "Deal stage changed", "badge": "deal.stage_changed", "desc": "Fires when a deal moves to a configured stage — trigger a coaching session" },
+        { "id": "so_crm_contact_created", "label": "New contact added", "badge": "contact.created", "desc": "Fires when a new contact is created — auto-start an intro coaching session" },
+        { "id": "so_crm_manual", "label": "Manual launch", "badge": "Manual", "desc": "Manager or rep clicks Start Session from the record" },
+        { "id": "so_crm_webhook", "label": "External webhook", "badge": "webhook.custom", "desc": "Send a POST to your Sonesse endpoint from any system" }
+      ],
+      "postMeetingActions": [
+        { "id": "so_crm_log_note", "label": "Log session notes", "desc": "Posts the AI-generated coaching summary as a note on the record" },
+        { "id": "so_crm_add_task", "label": "Create follow-up task", "desc": "Adds a follow-up task with a due date assigned to the coachee" },
+        { "id": "so_crm_update_score", "label": "Update performance score", "desc": "Writes the AI coaching score back to the contact or profile" },
+        { "id": "so_crm_schedule_meeting", "label": "Schedule next session", "desc": "Books the next coaching session and sends an invite" },
+        { "id": "so_crm_attach_transcript", "label": "Attach transcript", "desc": "Uploads the session transcript to the record" }
+      ],
+      "outputs": {
+        "transcript": "Attached to CRM or HRIS contact record",
+        "video": "Stored in Sonesse, linked from profile",
+        "summary": "Posted as coaching note on record"
+      }
+    },
+    {
+      "id": "onboarding",
+      "label": "Onboarding",
+      "desc": "Guide new hires or users through setup",
+      "connectorType": "hris",
+      "connectors": [
+        { "id": "bamboohr", "name": "BambooHR", "desc": "HR & onboarding — 96 actions" },
+        { "id": "workday-rest-and-soap", "name": "Workday", "desc": "Enterprise HRIS & onboarding" },
+        { "id": "hibob", "name": "HiBob", "desc": "Modern HRIS — 121 actions" },
+        { "id": "factorial", "name": "Factorial", "desc": "HR software — 127 actions" },
+        { "id": "gusto", "name": "Gusto", "desc": "HR, payroll & benefits" },
+        { "id": "sap-successfactors", "name": "SAP SuccessFactors", "desc": "Enterprise HCM suite" },
+        { "id": "oracle-fusion-hcm", "name": "Oracle Fusion HCM", "desc": "Enterprise HR platform" },
+        { "id": "rippling", "name": "Rippling", "desc": "All-in-one HR platform" },
+        { "id": "ukg-ready", "name": "UKG Ready", "desc": "Workforce management HCM" },
+        { "id": "personio", "name": "Personio", "desc": "HR platform for Europe" }
+      ],
+      "triggerEvents": [
+        { "id": "so_hris_employee_created", "label": "New hire added", "badge": "employee.created", "desc": "Fires when a new employee is added to your HRIS — kick off onboarding" },
+        { "id": "so_hris_onboarding_started", "label": "Onboarding task activated", "badge": "onboarding.started", "desc": "Fires when an onboarding workflow starts in your HRIS" },
+        { "id": "so_hris_start_date_approaching", "label": "Start date approaching", "badge": "start_date - 3d", "desc": "Fires 3 days before an employee's start date — send a welcome prep session" },
+        { "id": "so_hris_task_completed", "label": "Onboarding task completed", "badge": "task.completed", "desc": "Fires when an employee completes a task in the HRIS onboarding flow" },
+        { "id": "so_hris_manual", "label": "Manual launch from employee record", "badge": "Manual", "desc": "HR clicks Start Session directly from the employee profile" }
+      ],
+      "postMeetingActions": [
+        { "id": "so_hris_complete_task", "label": "Mark onboarding task complete", "desc": "Updates the task status in your HRIS onboarding workflow" },
+        { "id": "so_hris_add_note", "label": "Add note to employee record", "desc": "Posts the session summary as a note on the employee profile" },
+        { "id": "so_hris_next_stage", "label": "Advance onboarding stage", "desc": "Moves the employee to the next stage in their onboarding plan" },
+        { "id": "so_hris_notify_hr", "label": "Notify HR partner", "desc": "Sends a summary to the assigned HR partner via email or Slack" },
+        { "id": "so_hris_attach_recording", "label": "Attach session recording", "desc": "Uploads the recording to the employee's document folder in HRIS" },
+        { "id": "so_hris_schedule_followup", "label": "Schedule follow-up session", "desc": "Books a follow-up onboarding session for the employee" }
+      ],
+      "outputs": {
+        "transcript": "Attached to employee record in HRIS",
+        "video": "Stored in employee document folder",
+        "summary": "Posted as note on HRIS employee profile"
+      }
+    },
+    {
+      "id": "meetingbot",
+      "label": "Meeting Bot",
+      "desc": "Join meetings to take notes and assist",
+      "connectorType": "crm",
+      "connectors": [
+        { "id": "salesforce", "name": "Salesforce", "desc": "Sync meeting insights to CRM" },
+        { "id": "hubspot", "name": "HubSpot", "desc": "Log meetings to HubSpot" },
+        { "id": "zoho-crm", "name": "Zoho CRM", "desc": "Sync meeting data to Zoho" },
+        { "id": "bamboohr", "name": "BambooHR", "desc": "Log sessions to HR profile" },
+        { "id": "hibob", "name": "HiBob", "desc": "Log sessions to HRIS" }
+      ],
+      "triggerEvents": [
+        { "id": "so_crm_meeting_booked", "label": "Meeting booked", "badge": "activity.created", "desc": "Fires when a meeting is scheduled — bot joins automatically" },
+        { "id": "so_crm_deal_created", "label": "New deal created", "badge": "deal.created", "desc": "Fires when a deal is created — bot joins the discovery call" },
+        { "id": "calendar", "label": "Calendar event starts", "badge": "calendar.event_start", "desc": "Bot joins when a scheduled calendar event begins" },
+        { "id": "so_crm_manual", "label": "Manual launch", "badge": "Manual", "desc": "User clicks to invite the bot into a live meeting" }
+      ],
+      "postMeetingActions": [
+        { "id": "so_crm_log_note", "label": "Log meeting notes", "desc": "Posts the AI-generated meeting summary as a note on the CRM record" },
+        { "id": "so_crm_add_task", "label": "Create action items as tasks", "desc": "Converts AI-detected action items into tasks assigned to the right owner" },
+        { "id": "so_crm_update_stage", "label": "Update deal stage", "desc": "Advances the deal based on meeting outcome signals" },
+        { "id": "so_crm_schedule_meeting", "label": "Schedule follow-up meeting", "desc": "Books the next meeting and sends invites" },
+        { "id": "so_crm_attach_transcript", "label": "Attach transcript", "desc": "Uploads the full meeting transcript to the CRM record" }
+      ],
+      "outputs": {
+        "transcript": "Attached to CRM deal or contact record",
+        "video": "Stored in Sonesse, shared link in CRM note",
+        "summary": "Posted as meeting summary note in CRM"
+      }
+    },
+    {
+      "id": "sdr",
+      "label": "SDR",
+      "desc": "Automated outbound sales conversations",
+      "connectorType": "crm",
+      "connectors": [
+        { "id": "salesforce", "name": "Salesforce", "desc": "Enterprise CRM — 371 actions" },
+        { "id": "hubspot", "name": "HubSpot", "desc": "Inbound CRM platform" },
+        { "id": "zoho-crm", "name": "Zoho CRM", "desc": "CRM for growing teams" },
+        { "id": "attio", "name": "Attio", "desc": "Modern CRM platform" },
+        { "id": "affinity", "name": "Affinity", "desc": "Relationship intelligence CRM" },
+        { "id": "activecampaign", "name": "ActiveCampaign", "desc": "CRM & marketing automation" },
+        { "id": "pipedrive", "name": "Pipedrive", "desc": "Sales-first CRM" }
+      ],
+      "triggerEvents": [
+        { "id": "so_crm_contact_created", "label": "New contact added", "badge": "contact.created", "desc": "Fires when a new contact is created — auto-launch an outreach session" },
+        { "id": "so_crm_deal_created", "label": "New deal created", "badge": "deal.created", "desc": "Fires when a deal is created — start a qualification call" },
+        { "id": "so_crm_stage_changed", "label": "Deal stage changed", "badge": "deal.stage_changed", "desc": "Fires when a prospect moves stage — trigger the next outreach step" },
+        { "id": "so_crm_manual", "label": "Manual launch from CRM record", "badge": "Manual", "desc": "SDR clicks Start Session from the contact or deal record" },
+        { "id": "so_crm_webhook", "label": "External webhook", "badge": "webhook.custom", "desc": "Triggered from a sequence tool, enrichment platform, or automation" }
+      ],
+      "postMeetingActions": [
+        { "id": "so_crm_update_stage", "label": "Update deal stage", "desc": "Advances the deal to the next stage based on qualification outcome" },
+        { "id": "so_crm_log_note", "label": "Log outreach notes", "desc": "Posts the AI-generated call summary as a note on the contact record" },
+        { "id": "so_crm_add_task", "label": "Create follow-up task", "desc": "Adds a follow-up task for the SDR with a due date" },
+        { "id": "so_crm_update_score", "label": "Update lead score", "desc": "Writes the AI qualification score back to the contact" },
+        { "id": "so_crm_schedule_meeting", "label": "Book discovery call", "desc": "Books a discovery call with an AE and sends the calendar invite" },
+        { "id": "so_crm_attach_transcript", "label": "Attach call transcript", "desc": "Uploads the transcript to the contact or deal record in CRM" }
+      ],
+      "outputs": {
+        "transcript": "Attached to CRM contact record",
+        "video": "Stored in Sonesse, linked from CRM",
+        "summary": "Posted as outreach note on CRM contact"
+      }
+    }
+  ]
+}
