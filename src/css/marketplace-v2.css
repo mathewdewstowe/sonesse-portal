@@ -237,3 +237,99 @@
     font-size: 15px;
   }
 }
+
+/* ── StackOne Integration Workflow Section ── */
+.usecase-integration {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.usecase-integration__heading {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-light, #6b7280);
+  margin: 0 0 10px;
+}
+
+.usecase-integration__triggers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.integration-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: rgba(124, 58, 237, 0.07);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #6d28d9;
+  font-family: ui-monospace, "SF Mono", monospace;
+  white-space: nowrap;
+}
+
+.usecase-integration__actions {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.usecase-integration__actions li {
+  font-size: 13px;
+  color: var(--color-text, #111827);
+  line-height: 1.5;
+}
+
+.usecase-integration__outputs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.usecase-integration__outputs li {
+  font-size: 13px;
+  color: var(--color-text, #111827);
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.output-label {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-light, #6b7280);
+  min-width: 68px;
+}
+
+@media (max-width: 690px) {
+  .usecase-integration {
+    margin-top: 20px;
+    padding-top: 18px;
+    gap: 16px;
+  }
+  .integration-badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+  }
+  .usecase-integration__actions li,
+  .usecase-integration__outputs li {
+    font-size: 12.5px;
+  }
+}
