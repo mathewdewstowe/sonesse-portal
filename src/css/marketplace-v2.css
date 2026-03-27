@@ -219,6 +219,44 @@
   }
 }
 
+/* Vendor logo strip */
+.marketplace-vendor-logos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 28px;
+}
+
+.marketplace-vendor-logos__label {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-text-light, #888);
+}
+
+.marketplace-vendor-logos__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+
+.marketplace-vendor-logo {
+  height: 24px;
+  width: auto;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  filter: grayscale(100%);
+}
+
+.marketplace-vendor-logo:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
 /* Marketplace hero responsive padding */
 .marketplace-hero {
   padding-top: 65px;
