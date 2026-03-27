@@ -21,10 +21,10 @@ extraCss: "/css/marketplace-v2.css"
 		<div class="marketplace-vendor-logos">
 			<span class="marketplace-vendor-logos__label">Powered by</span>
 			<div class="marketplace-vendor-logos__row">
-				<img src="/assets/2025/08/anam.png" alt="Anam" class="marketplace-vendor-logo" style="height: 28px;" />
+				<img src="/assets/2025/08/anam.png" alt="Anam" class="marketplace-vendor-logo" style="height: 24px;" />
 				<img src="/assets/2025/08/tavus.svg" alt="Tavus" class="marketplace-vendor-logo" style="height: 22px;" />
-				<img src="/assets/2025/08/heygen.svg" alt="HeyGen" class="marketplace-vendor-logo" style="height: 30px;" />
-				<img src="/assets/2025/08/beyond-presence-dark.svg" alt="Beyond Presence" class="marketplace-vendor-logo" style="height: 22px;" />
+				<img src="/assets/2025/08/heygen.svg" alt="HeyGen" class="marketplace-vendor-logo" style="height: 22px;" />
+				<img src="/assets/2025/08/beyond-presence-dark.svg" alt="Beyond Presence" class="marketplace-vendor-logo" style="height: 20px;" />
 			</div>
 		</div>
 	</div>
@@ -175,33 +175,6 @@ extraCss: "/css/marketplace-v2.css"
 									{% endfor %}
 								</div>
 
-								<!-- StackOne Integration Workflow -->
-								<div class="usecase-integration">
-									<div class="usecase-integration__section">
-										<p class="usecase-integration__heading">Trigger events</p>
-										<div class="usecase-integration__triggers">
-											{% for trigger in uc.triggerEvents %}
-											<span class="integration-badge">{{ trigger.badge }}</span>
-											{% endfor %}
-										</div>
-									</div>
-									<div class="usecase-integration__section">
-										<p class="usecase-integration__heading">Post-session workflow</p>
-										<ol class="usecase-integration__actions">
-											{% for action in uc.postMeetingActions %}
-											<li>{{ action.label }}</li>
-											{% endfor %}
-										</ol>
-									</div>
-									<div class="usecase-integration__section">
-										<p class="usecase-integration__heading">Output destinations</p>
-										<ul class="usecase-integration__outputs">
-											<li><span class="output-label">Transcript</span> {{ uc.outputs.transcript }}</li>
-											<li><span class="output-label">Video</span> {{ uc.outputs.video }}</li>
-											<li><span class="output-label">Summary</span> {{ uc.outputs.summary }}</li>
-										</ul>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>
