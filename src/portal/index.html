@@ -1140,6 +1140,29 @@ const TAVUS_SYSTEM_TOOLS = [
 
 const MODEL_VERSIONS = ["Cara 3", "Cara 2", "Cara 1"];
 
+const TAVUS_TURN_DETECTION_MODELS = [
+  { id: "sparrow-1",    name: "Sparrow-1",      badge: "recommended" },
+  { id: "silero-vad",   name: "Silero VAD",     badge: null },
+  { id: "default",      name: "Default",        badge: null },
+];
+
+const TAVUS_PERCEPTION_MODELS = [
+  { id: "raven-1",      name: "Raven-1",        badge: "recommended" },
+  { id: "none",         name: "None",           badge: null },
+];
+
+const TAVUS_TTS_ENGINES = [
+  { id: "tavus-default", name: "Tavus Default", badge: "recommended" },
+  { id: "cartesia",      name: "Cartesia",      badge: null },
+  { id: "elevenlabs",    name: "ElevenLabs",    badge: null },
+];
+
+const TAVUS_STT_ENGINES = [
+  { id: "tavus-advanced", name: "tavus-advanced", badge: "recommended" },
+  { id: "deepgram",       name: "Deepgram",       badge: null },
+  { id: "default",        name: "Default",        badge: null },
+];
+
 // Step 5: Avatar Settings — default or advanced model configuration
 // Step 4b: Choose Tavus Avatar (replica selection + live preview)
 function StepChooseTavusAvatar({ data, onChange }) {
@@ -1508,9 +1531,99 @@ function StepAvatarSettings({ data, onChange }) {
     </div>
   );
 
+  // Layers tab — Turn Detection, Perception, TTS, STT, Hotwords, Visual/Audio Tools
+  const LayersTab = () => {
+    const layers = data.tavusLayers || {};
+    const set = (key, val) => onChange({ ...data, tavusLayers: { ...layers, [key]: val } });
+
+    const [visualInput, setVisualInput] = useState("");
+    const [audioInput, setAudioInput]   = useState("");
+
+    const visualTools = layers.visualTools || [];
+    const audioTools  = layers.audioTools  || [];
+
+    const addVisual = () => { const v = visualInput.trim(); if (v && !visualTools.includes(v)) { set("visualTools", [...visualTools, v]); } setVisualInput(""); };
+    const addAudio  = () => { const v = audioInput.trim();  if (v && !audioTools.includes(v))  { set("audioTools",  [...audioTools,  v]); } setAudioInput(""); };
+
+    const rowStyle = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${theme.border}`, gap: 12 };
+    const labelStyle = { fontSize: 13, fontWeight: 600, color: theme.heading };
+    const selectStyle = { ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px", minWidth: 160 };
+
+    const OptionRow = ({ label, stateKey, options, defaultId }) => {
+      const val = layers[stateKey] || defaultId;
+      return (
+        <div style={rowStyle}>
+          <span style={labelStyle}>{label}</span>
+          <select value={val} onChange={e => set(stateKey, e.target.value)} style={selectStyle}>
+            {options.map(o => (
+              <option key={o.id} value={o.id}>{o.name}{o.badge === "recommended" ? " ★" : ""}</option>
+            ))}
+          </select>
+        </div>
+      );
+    };
+
+    return (
+      <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
+        <OptionRow label="Language Model (LLM)"   stateKey="llmModel"       options={TAVUS_LLMS.map(l => ({ id: l.id, name: l.name, badge: l.id === "gptoss20b" ? "recommended" : null }))} defaultId="gptoss20b" />
+        <OptionRow label="Turn Detection Model"   stateKey="turnDetection"  options={TAVUS_TURN_DETECTION_MODELS} defaultId="sparrow-1" />
+        <OptionRow label="Perception Model"       stateKey="perception"     options={TAVUS_PERCEPTION_MODELS}     defaultId="raven-1" />
+        <OptionRow label="Text-to-Speech (TTS)"   stateKey="tts"            options={TAVUS_TTS_ENGINES}           defaultId="tavus-default" />
+        <OptionRow label="Speech-to-Text (STT)"   stateKey="stt"            options={TAVUS_STT_ENGINES}           defaultId="tavus-advanced" />
+
+        {/* Hotwords */}
+        <div style={{ ...rowStyle, flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+          <span style={labelStyle}>Hotwords <span style={{ fontSize: 11, fontWeight: 400, color: theme.textMuted }}>(STT — comma separated)</span></span>
+          <input
+            value={layers.hotwords || ""}
+            onChange={e => set("hotwords", e.target.value)}
+            placeholder="e.g. Sonesse, StackOne, demo"
+            style={{ ...styles.input, marginBottom: 0, fontSize: 13 }}
+            onFocus={e => e.target.style.borderColor = theme.borderFocus}
+            onBlur={e => e.target.style.borderColor = theme.border}
+          />
+        </div>
+
+        {/* Visual Tools */}
+        <div style={{ ...rowStyle, flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+          <span style={labelStyle}>Visual Tools</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, width: "100%" }}>
+            {visualTools.map(t => (
+              <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 20, background: theme.primaryLight, color: theme.primary, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+                {t}
+                <span onClick={() => set("visualTools", visualTools.filter(x => x !== t))} style={{ cursor: "pointer", fontSize: 14, lineHeight: 1, color: theme.primary, fontWeight: 700 }}>×</span>
+              </span>
+            ))}
+            <div style={{ display: "flex", gap: 6 }}>
+              <input value={visualInput} onChange={e => setVisualInput(e.target.value)} onKeyDown={e => e.key === "Enter" && addVisual()} placeholder="Tool name…" style={{ ...styles.input, marginBottom: 0, fontSize: 12, padding: "4px 10px", width: 140 }} onFocus={e => e.target.style.borderColor = theme.borderFocus} onBlur={e => e.target.style.borderColor = theme.border} />
+              <button onClick={addVisual} style={{ ...styles.btnSecondary, padding: "4px 12px", fontSize: 12 }}>+ Add</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Audio Tools */}
+        <div style={{ ...rowStyle, borderBottom: "none", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+          <span style={labelStyle}>Audio Tools</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, width: "100%" }}>
+            {audioTools.map(t => (
+              <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 20, background: theme.primaryLight, color: theme.primary, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+                {t}
+                <span onClick={() => set("audioTools", audioTools.filter(x => x !== t))} style={{ cursor: "pointer", fontSize: 14, lineHeight: 1, color: theme.primary, fontWeight: 700 }}>×</span>
+              </span>
+            ))}
+            <div style={{ display: "flex", gap: 6 }}>
+              <input value={audioInput} onChange={e => setAudioInput(e.target.value)} onKeyDown={e => e.key === "Enter" && addAudio()} placeholder="Tool name…" style={{ ...styles.input, marginBottom: 0, fontSize: 12, padding: "4px 10px", width: 140 }} onFocus={e => e.target.style.borderColor = theme.borderFocus} onBlur={e => e.target.style.borderColor = theme.border} />
+              <button onClick={addAudio} style={{ ...styles.btnSecondary, padding: "4px 12px", fontSize: 12 }}>+ Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const MAIN_TABS = ["avatar", "voice"];
-  const MORE_TABS = ["llm", "tools"];
-  const tabLabels  = { avatar: "Avatar", voice: "Voice", llm: "LLM", tools: "Tools" };
+  const MORE_TABS = ["llm", "tools", "layers"];
+  const tabLabels  = { avatar: "Avatar", voice: "Voice", llm: "LLM", tools: "Tools", layers: "Layers" };
 
   return (
     <div>
@@ -1574,10 +1687,11 @@ function StepAvatarSettings({ data, onChange }) {
           </div>
 
           {/* Tab content */}
-          {tab === "avatar" && <AvatarTab />}
-          {tab === "voice"  && <VoiceTab />}
-          {tab === "llm"    && <LLMTab />}
-          {tab === "tools"  && <ToolsTab />}
+          {tab === "avatar"  && <AvatarTab />}
+          {tab === "voice"   && <VoiceTab />}
+          {tab === "llm"     && <LLMTab />}
+          {tab === "tools"   && <ToolsTab />}
+          {tab === "layers"  && <LayersTab />}
         </div>
       )}
     </div>
@@ -2508,11 +2622,18 @@ function StepPreview({ data }) {
   );
 }
 
-// Step 13: Save (StepDeploy)
+// Step 13: Save + Deploy (StepDeploy)
 function StepDeploy({ data, onSaved, user }) {
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState("");
+  const [saving, setSaving]         = useState(false);
+  const [saved, setSaved]           = useState(false);
+  const [experienceId, setExpId]    = useState(null);
+  const [error, setError]           = useState("");
+  const [deploying, setDeploying]   = useState(false);
+  const [deployed, setDeployed]     = useState(false);
+  const [meetingUrl, setMeetingUrl] = useState("");
+  const [botEmail, setBotEmail]     = useState("");
+  const [deployError, setDeployError] = useState("");
+  const [copied, setCopied]         = useState(false);
   const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
 
   const handleSave = async () => {
@@ -2531,10 +2652,10 @@ function StepDeploy({ data, onSaved, user }) {
         logo_url: data.logoPreview || null,
         updated_at: new Date().toISOString(),
       };
-      const { error: dbErr } = await sb.from("experiences").insert(payload);
+      const { data: inserted, error: dbErr } = await sb.from("experiences").insert(payload).select().single();
       if (dbErr) throw dbErr;
+      setExpId(inserted.id);
       setSaved(true);
-      if (onSaved) onSaved();
     } catch (e) {
       setError(e.message || "Failed to save. Please try again.");
     } finally {
@@ -2542,10 +2663,41 @@ function StepDeploy({ data, onSaved, user }) {
     }
   };
 
+  const handleDeploy = async () => {
+    setDeploying(true);
+    setDeployError("");
+    try {
+      const resp = await fetch("/api/teams/create-meeting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          experienceId,
+          experienceName: data.name || "Sonesse Experience",
+        }),
+      });
+      const result = await resp.json();
+      if (!result.ok) throw new Error(result.error || "Failed to create Teams meeting");
+      setMeetingUrl(result.joinWebUrl || "");
+      setBotEmail(result.botEmail || "");
+      setDeployed(true);
+      if (onSaved) onSaved();
+    } catch (e) {
+      setDeployError(e.message || "Failed to create Teams meeting. Please try again.");
+    } finally {
+      setDeploying(false);
+    }
+  };
+
+  const copyUrl = () => {
+    if (meetingUrl) {
+      navigator.clipboard.writeText(meetingUrl).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); });
+    }
+  };
+
   return (
     <div>
-      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Save experience</h2>
-      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Review your configuration and save your experience.</p>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Save &amp; Deploy</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Review your configuration, save your experience, then deploy to Microsoft Teams.</p>
 
       <div style={{ display: "grid", gap: 10, marginBottom: 32 }}>
         {[
@@ -2566,16 +2718,79 @@ function StepDeploy({ data, onSaved, user }) {
 
       {error && <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, fontSize: 13, color: theme.danger }}>{error}</div>}
 
-      {saved ? (
-        <div style={{ textAlign: "center", padding: 40, background: theme.successBg, borderRadius: 12, border: `1px solid ${theme.successBorder}` }}>
-          <div style={{ color: theme.success, marginBottom: 12 }}>{Icons.rocket}</div>
-          <h3 style={{ color: theme.heading, margin: "0 0 8px", fontSize: 20 }}>Experience saved!</h3>
-          <p style={{ color: theme.textMuted, fontSize: 13, margin: 0 }}>Your experience has been saved and is ready. You can find it on your dashboard.</p>
-        </div>
-      ) : (
+      {/* ── Step 1: Save ── */}
+      {!saved && (
         <button onClick={handleSave} disabled={saving} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", padding: "14px 20px", fontSize: 16, opacity: saving ? 0.7 : 1 }}>
-          {saving ? <span>Saving…</span> : <><span style={{ display: "flex", alignItems: "center", gap: 8 }}>{Icons.rocket} Save experience</span></>}
+          {saving ? <span>Saving…</span> : <span style={{ display: "flex", alignItems: "center", gap: 8 }}>{Icons.rocket} Save experience</span>}
         </button>
+      )}
+
+      {/* ── Step 2: Deploy to Teams ── */}
+      {saved && !deployed && (
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 8, marginBottom: 20 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={theme.success} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span style={{ fontSize: 13, fontWeight: 600, color: theme.success }}>Experience saved</span>
+          </div>
+
+          {deployError && <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, fontSize: 13, color: theme.danger }}>{deployError}</div>}
+
+          <button onClick={handleDeploy} disabled={deploying} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", padding: "14px 20px", fontSize: 16, opacity: deploying ? 0.7 : 1, background: "#0078d4" }}>
+            {deploying ? (
+              <span>Creating Teams meeting…</span>
+            ) : (
+              <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {/* Teams logo mark */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.5 8.25a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5zm-9 1.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM21 10.5h-3a.75.75 0 0 0-.75.75v5.25a4.5 4.5 0 0 1-9 0v-5.25A.75.75 0 0 0 7.5 10.5H4.5A.75.75 0 0 0 3.75 11.25v5.25a7.5 7.5 0 0 0 15 0v-5.25A.75.75 0 0 0 21 10.5z"/></svg>
+                Deploy to Microsoft Teams
+              </span>
+            )}
+          </button>
+          <p style={{ fontSize: 12, color: theme.textDim, textAlign: "center", marginTop: 8 }}>
+            Creates a Teams meeting in your umified.com calendar and invites the meeting bot.
+          </p>
+        </div>
+      )}
+
+      {/* ── Step 3: Deployed ── */}
+      {deployed && (
+        <div style={{ background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 12, padding: 28 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#0078d4", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <h3 style={{ color: theme.heading, margin: 0, fontSize: 17, fontWeight: 700 }}>Deployed to Teams!</h3>
+              <p style={{ color: theme.textMuted, margin: 0, fontSize: 12 }}>Meeting created in your umified.com calendar</p>
+            </div>
+          </div>
+
+          {/* Bot email */}
+          {botEmail && (
+            <div style={{ marginBottom: 12, padding: "8px 14px", background: "#fff", border: `1px solid ${theme.border}`, borderRadius: 8 }}>
+              <div style={{ fontSize: 11, color: theme.textMuted, fontWeight: 600, marginBottom: 3, textTransform: "uppercase", letterSpacing: "0.05em" }}>Meeting bot invited</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: theme.heading, fontFamily: "monospace" }}>{botEmail}</div>
+            </div>
+          )}
+
+          {/* Teams URL */}
+          {meetingUrl ? (
+            <div style={{ padding: "10px 14px", background: "#fff", border: `1px solid ${theme.border}`, borderRadius: 8 }}>
+              <div style={{ fontSize: 11, color: theme.textMuted, fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.05em" }}>Teams join URL</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 12, color: "#0078d4", fontFamily: "monospace", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{meetingUrl}</span>
+                <button onClick={copyUrl} style={{ ...styles.btnSecondary, padding: "5px 14px", fontSize: 12, flexShrink: 0, color: copied ? theme.success : undefined, borderColor: copied ? theme.successBorder : undefined }}>
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+                <a href={meetingUrl} target="_blank" rel="noopener noreferrer" style={{ ...styles.btnSecondary, padding: "5px 14px", fontSize: 12, flexShrink: 0, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  Open ↗
+                </a>
+              </div>
+            </div>
+          ) : (
+            <p style={{ fontSize: 13, color: theme.textMuted, margin: 0 }}>Teams meeting created. Check your umified.com calendar for the join link.</p>
+          )}
+        </div>
       )}
     </div>
   );
