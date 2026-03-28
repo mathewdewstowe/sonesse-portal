@@ -1384,41 +1384,110 @@ function StepAvatarSettings({ data, onChange }) {
     </div>
   );
 
-  // Avatar persona tab
+  // Avatar config tab — live replica picker from Tavus API + video/background settings
   const AvatarTab = () => {
-    const [search, setSearch] = useState("");
-    const filtered = TAVUS_PERSONAS.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
-    return (
-      <div>
-        {/* Search bar */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", border: `1px solid ${theme.border}`, borderRadius: 10, marginBottom: 16, background: theme.surface }}>
-          <span style={{ color: theme.textDim, fontSize: 13, fontWeight: 600, flexShrink: 0 }}>+ Add</span>
-          <span style={{ color: theme.border, margin: "0 4px" }}>|</span>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="A futuristic space explorer in sleek suit with wonder in…" style={{ border: "none", outline: "none", background: "transparent", flex: 1, fontSize: 12, color: theme.textMuted }} />
-          <span style={{ color: theme.textDim, cursor: "pointer" }}>✦</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={theme.textDim} strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-        </div>
+    const [replicas, setReplicas] = useState(null); // null = loading
+    const layers = data.tavusLayers || {};
+    const setLayer = (key, val) => onChange({ ...data, tavusLayers: { ...layers, [key]: val } });
 
-        {/* Avatar grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 16 }}>
-          {filtered.map(p => {
-            const sel = data.avatarPersona === p.id;
-            return (
-              <button key={p.id} onClick={() => onChange({ ...data, avatarPersona: p.id })} style={{ padding: 0, border: `2px solid ${sel ? theme.primary : "transparent"}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", background: "none", position: "relative", transition: "border-color 0.15s" }}>
-                <img src={p.img} alt={p.name} style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", objectPosition: "center top", display: "block" }} onError={(e) => { e.target.style.background = "#eee"; }} />
-                {sel && <div style={{ position: "absolute", top: 6, right: 6, width: 18, height: 18, borderRadius: "50%", background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 10 }}>✓</div>}
-              </button>
-            );
-          })}
+    useEffect(() => {
+      fetch("/api/tavus/replicas")
+        .then(r => r.json())
+        .then(d => setReplicas((d.data || d.replicas || d || []).slice(0, 12)))
+        .catch(() => setReplicas([]));
+    }, []);
+
+    const row = (label, children) => (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8 }}>
+        <span style={{ fontSize: 13, color: theme.textMuted, fontWeight: 500 }}>{label}</span>
+        {children}
+      </div>
+    );
+
+    const sel = (val, opts, key) => (
+      <select value={val || ""} onChange={e => setLayer(key, e.target.value)} style={{ ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px", minWidth: 140 }}>
+        {opts.map(o => <option key={o.id} value={o.id}>{o.name}{o.badge ? ` (${o.badge})` : ""}</option>)}
+      </select>
+    );
+
+    return (
+      <div style={{ display: "grid", gap: 8 }}>
+        {/* Live replica picker from Tavus API */}
+        <div style={{ marginBottom: 4 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: theme.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10 }}>Choose avatar</div>
+          {replicas === null ? (
+            <div style={{ fontSize: 13, color: theme.textMuted, padding: "16px 0" }}>Loading avatars…</div>
+          ) : replicas.length === 0 ? (
+            <div style={{ fontSize: 13, color: theme.textMuted, padding: "16px 0" }}>No replicas found in your Tavus account.</div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: 8 }}>
+              {replicas.map(r => {
+                const sel = data.tavusReplicaId === r.replica_id;
+                return (
+                  <button key={r.replica_id} onClick={() => onChange({ ...data, tavusReplicaId: r.replica_id, tavusReplicaName: r.replica_name, tavusReplicaImg: r.thumbnail_image_url })}
+                    style={{ padding: 0, border: `2.5px solid ${sel ? theme.primary : "transparent"}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", background: "none", position: "relative", transition: "border-color 0.15s", boxShadow: sel ? `0 0 0 1px ${theme.primary}` : "none" }}>
+                    <img src={r.thumbnail_image_url} alt={r.replica_name} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} onError={e => { e.target.style.background = "#eee"; e.target.style.minHeight = "90px"; }} />
+                    <div style={{ padding: "4px 6px", background: sel ? theme.primary : theme.surface, borderTop: `1px solid ${sel ? theme.primary : theme.border}` }}>
+                      <div style={{ fontSize: 10, fontWeight: 600, color: sel ? "#fff" : theme.heading, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.replica_name}</div>
+                    </div>
+                    {sel && <div style={{ position: "absolute", top: 5, right: 5, width: 16, height: 16, borderRadius: "50%", background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700 }}>✓</div>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Model version */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8 }}>
-          <span style={{ fontSize: 13, color: theme.textMuted, fontWeight: 500, flex: 1 }}>Model version</span>
+        {row("Model version",
           <select value={data.avatarModelVersion || "Cara 3"} onChange={e => onChange({ ...data, avatarModelVersion: e.target.value })} style={{ ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px" }}>
             {MODEL_VERSIONS.map(v => <option key={v} value={v}>{v}</option>)}
           </select>
-        </div>
+        )}
+
+        {/* Greenscreen */}
+        {row("Apply greenscreen",
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <span style={{ fontSize: 12, color: theme.textMuted }}>{layers.applyGreenscreen ? "On" : "Off"}</span>
+            <div onClick={() => setLayer("applyGreenscreen", !layers.applyGreenscreen)} style={{ width: 38, height: 22, borderRadius: 11, background: layers.applyGreenscreen ? theme.primary : "#d1d5db", position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 3, left: layers.applyGreenscreen ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+            </div>
+          </label>
+        )}
+
+        {/* Max call duration */}
+        {row("Max call duration (seconds)",
+          <input type="number" min={30} max={3600} value={layers.maxCallDuration || 1800}
+            onChange={e => setLayer("maxCallDuration", parseInt(e.target.value) || 1800)}
+            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
+        )}
+
+        {/* Enable recording */}
+        {row("Enable recording",
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <span style={{ fontSize: 12, color: theme.textMuted }}>{layers.enableRecording ? "On" : "Off"}</span>
+            <div onClick={() => setLayer("enableRecording", !layers.enableRecording)} style={{ width: 38, height: 22, borderRadius: 11, background: layers.enableRecording ? theme.primary : "#d1d5db", position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 3, left: layers.enableRecording ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+            </div>
+          </label>
+        )}
+
+        {/* Participant left timeout */}
+        {row("Participant left timeout (seconds)",
+          <input type="number" min={0} max={3600} value={layers.participantLeftTimeout ?? 60}
+            onChange={e => setLayer("participantLeftTimeout", parseInt(e.target.value) || 60)}
+            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
+        )}
+
+        {/* Enable transcription */}
+        {row("Enable transcription",
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <span style={{ fontSize: 12, color: theme.textMuted }}>{layers.enableTranscription !== false ? "On" : "Off"}</span>
+            <div onClick={() => setLayer("enableTranscription", layers.enableTranscription === false ? true : false)} style={{ width: 38, height: 22, borderRadius: 11, background: layers.enableTranscription !== false ? theme.primary : "#d1d5db", position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 3, left: layers.enableTranscription !== false ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+            </div>
+          </label>
+        )}
       </div>
     );
   };
