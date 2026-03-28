@@ -947,6 +947,26 @@ function ComingSoonStep({ title, desc }) {
   );
 }
 
+// Wrapper: renders real UI greyed-out with a "Coming Soon" lock overlay
+function LockedStep({ children }) {
+  return (
+    <div style={{ position: "relative", minHeight: 200 }}>
+      {/* Real content — desaturated, non-interactive */}
+      <div style={{ opacity: 0.28, filter: "grayscale(40%)", pointerEvents: "none", userSelect: "none" }}>
+        {children}
+      </div>
+      {/* Overlay */}
+      <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(6px)", borderRadius: 16, padding: "24px 36px", textAlign: "center", boxShadow: "0 8px 32px rgba(0,0,0,0.10)", border: `1px solid ${theme.border}` }}>
+          <div style={{ fontSize: 28, marginBottom: 10 }}>🔒</div>
+          <div style={{ fontWeight: 700, fontSize: 16, color: theme.heading, marginBottom: 4 }}>Coming Soon</div>
+          <div style={{ fontSize: 13, color: theme.textMuted }}>This feature is in development.<br/>Click <strong>Continue</strong> to skip for now.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Step 1: Use Case
 function StepUseCase({ data, onChange }) {
   const useCases = [
@@ -3477,10 +3497,10 @@ function Wizard({ user, onLogout, onHome, onSaved }) {
           {step === 5  && <StepAvatarSettings data={data} onChange={setData} />}
           {step === 6  && <StepPersona data={data} onChange={setData} />}
           {step === 7  && <StepKnowledgeBase data={data} onChange={setData} />}
-          {step === 8  && <ComingSoonStep title="Connect your ATS" desc="Native ATS integrations are coming soon. We'll support Greenhouse, Lever, Ashby and more." />}
-          {step === 9  && <ComingSoonStep title="Trigger workflow" desc="Automated triggers to start sessions from your ATS or CRM are coming soon." />}
-          {step === 10 && <ComingSoonStep title="Data sources" desc="Automatic data pulling from connected systems is coming soon." />}
-          {step === 11 && <ComingSoonStep title="Post-meeting workflow" desc="Automatic writeback to candidate records and CRM is coming soon." />}
+          {step === 8  && <LockedStep><StepIntegration data={data} onChange={setData} /></LockedStep>}
+          {step === 9  && <LockedStep><StepTriggerWorkflow data={data} onChange={setData} /></LockedStep>}
+          {step === 10 && <LockedStep><StepDataSources data={data} onChange={setData} /></LockedStep>}
+          {step === 11 && <LockedStep><StepPostMeeting data={data} onChange={setData} /></LockedStep>}
           {step === 12 && <ComingSoonStep title="Notifications" desc="Slack, email and webhook notifications are coming soon." />}
           {step === 13 && <StepPreview data={data} />}
           {step === 14 && <StepDeploy data={data} onSaved={onSaved} user={user} />}
