@@ -809,6 +809,12 @@ function SignUpPage({ onBack, onSignedUp }) {
     const { data, error: err } = await sb.auth.signUp({ email, password });
     setLoading(false);
     if (err) { setError(err.message); return; }
+    // Notify matthew@sonesse.ai — fire-and-forget, don't block signup
+    fetch("/api/notify-signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    }).catch(() => {});
     // Supabase may auto-confirm or require email confirmation depending on settings
     if (data.session) {
       onSignedUp(data.user.email);
