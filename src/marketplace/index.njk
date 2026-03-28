@@ -173,6 +173,33 @@ extraCss: "/css/marketplace-v2.css"
 									{% endfor %}
 								</div>
 
+								<!-- StackOne Integration Workflow -->
+								<div class="usecase-integration">
+									<div class="usecase-integration__section">
+										<p class="usecase-integration__heading">Trigger events</p>
+										<div class="usecase-integration__triggers">
+											{% for trigger in uc.triggerEvents %}
+											<span class="integration-badge">{{ trigger.badge }}</span>
+											{% endfor %}
+										</div>
+									</div>
+									<div class="usecase-integration__section">
+										<p class="usecase-integration__heading">Post-session workflow</p>
+										<ol class="usecase-integration__actions">
+											{% for action in uc.postMeetingActions %}
+											<li>{{ action.label }}</li>
+											{% endfor %}
+										</ol>
+									</div>
+									<div class="usecase-integration__section">
+										<p class="usecase-integration__heading">Output destinations</p>
+										<ul class="usecase-integration__outputs">
+											<li><span class="output-label">Transcript</span> {{ uc.outputs.transcript }}</li>
+											<li><span class="output-label">Video</span> {{ uc.outputs.video }}</li>
+											<li><span class="output-label">Summary</span> {{ uc.outputs.summary }}</li>
+										</ul>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
