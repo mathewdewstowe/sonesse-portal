@@ -1138,7 +1138,17 @@ const TAVUS_SYSTEM_TOOLS = [
   { id: "skip_turn",       label: "skip_turn",       desc: "Allows the user to request the persona for more time to respond." },
 ];
 
-const MODEL_VERSIONS = ["Cara 3", "Cara 2", "Cara 1"];
+const TAVUS_LANGUAGES = [
+  { id: "english",    name: "English" },
+  { id: "spanish",    name: "Spanish" },
+  { id: "french",     name: "French" },
+  { id: "german",     name: "German" },
+  { id: "italian",    name: "Italian" },
+  { id: "portuguese", name: "Portuguese" },
+  { id: "korean",     name: "Korean" },
+  { id: "chinese",    name: "Chinese" },
+  { id: "japanese",   name: "Japanese" },
+];
 
 const TAVUS_TURN_DETECTION_MODELS = [
   { id: "sparrow-1",    name: "Sparrow-1",      badge: "recommended" },
@@ -1207,14 +1217,18 @@ function StepChooseTavusAvatar({ data, onChange }) {
         }),
       });
       const res = await resp.json();
-      if (res.conversation_url) {
-        setPreviewUrl(res.conversation_url);
+      // Tavus may return conversation_url directly or nested
+      const url = res.conversation_url || res.data?.conversation_url;
+      if (url) {
+        setPreviewUrl(url);
         setPreviewOpen(true);
       } else {
-        setError("Preview not available yet. Add your Tavus API key to Cloudflare.");
+        // Show the actual API error so we know what's wrong
+        const msg = res.message || res.error || res.detail || JSON.stringify(res);
+        setError(`Preview failed: ${msg}`);
       }
-    } catch {
-      setError("Preview unavailable — set TAVUS_API_KEY in Cloudflare Pages.");
+    } catch (err) {
+      setError(`Preview unavailable: ${err.message}`);
     } finally {
       setPreviewing(null);
     }
@@ -1387,14 +1401,19 @@ function StepAvatarSettings({ data, onChange }) {
   // Avatar config tab — live replica picker from Tavus API + video/background settings
   const AvatarTab = () => {
     const [replicas, setReplicas] = useState(null); // null = loading
+    const [replicaError, setReplicaError] = useState("");
     const layers = data.tavusLayers || {};
     const setLayer = (key, val) => onChange({ ...data, tavusLayers: { ...layers, [key]: val } });
 
     useEffect(() => {
       fetch("/api/tavus/replicas")
         .then(r => r.json())
-        .then(d => setReplicas((d.data || d.replicas || d || []).slice(0, 12)))
-        .catch(() => setReplicas([]));
+        .then(d => {
+          const list = Array.isArray(d) ? d : (d.data || d.replicas || []);
+          if (list.length === 0 && d.error) setReplicaError(d.error);
+          setReplicas(list.slice(0, 12));
+        })
+        .catch(err => { setReplicaError(err.message); setReplicas([]); });
     }, []);
 
     const row = (label, children) => (
@@ -1418,7 +1437,9 @@ function StepAvatarSettings({ data, onChange }) {
           {replicas === null ? (
             <div style={{ fontSize: 13, color: theme.textMuted, padding: "16px 0" }}>Loading avatars…</div>
           ) : replicas.length === 0 ? (
-            <div style={{ fontSize: 13, color: theme.textMuted, padding: "16px 0" }}>No replicas found in your Tavus account.</div>
+            <div style={{ fontSize: 13, color: theme.textMuted, padding: "16px 0" }}>
+              {replicaError ? `Error: ${replicaError}` : "No replicas found in your Tavus account."}
+            </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: 8 }}>
               {replicas.map(r => {
@@ -1438,10 +1459,10 @@ function StepAvatarSettings({ data, onChange }) {
           )}
         </div>
 
-        {/* Model version */}
-        {row("Model version",
-          <select value={data.avatarModelVersion || "Cara 3"} onChange={e => onChange({ ...data, avatarModelVersion: e.target.value })} style={{ ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px" }}>
-            {MODEL_VERSIONS.map(v => <option key={v} value={v}>{v}</option>)}
+        {/* Language */}
+        {row("Language",
+          <select value={layers.language || "english"} onChange={e => setLayer("language", e.target.value)} style={{ ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px", minWidth: 140 }}>
+            {TAVUS_LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
           </select>
         )}
 
@@ -1476,6 +1497,13 @@ function StepAvatarSettings({ data, onChange }) {
         {row("Participant left timeout (seconds)",
           <input type="number" min={0} max={3600} value={layers.participantLeftTimeout ?? 60}
             onChange={e => setLayer("participantLeftTimeout", parseInt(e.target.value) || 60)}
+            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
+        )}
+
+        {/* Participant absent timeout */}
+        {row("Participant absent timeout (seconds)",
+          <input type="number" min={0} max={600} value={layers.participantAbsentTimeout ?? 300}
+            onChange={e => setLayer("participantAbsentTimeout", parseInt(e.target.value) || 300)}
             style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
         )}
 
