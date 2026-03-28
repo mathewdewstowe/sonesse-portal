@@ -1121,16 +1121,15 @@ const TAVUS_VOICES = [
   { id: "ava",       name: "Ava – Eager and Understanding", flag: "🇺🇸", speed: "Fast", desc: "Natural AI – Clear, helpful for AI agents, support flows, guided a..." },
 ];
 
+// Tavus-hosted model names — used as the `model` field in the persona's llm layer
 const TAVUS_LLMS = [
-  { id: "gemini25flash",   name: "Gemini 2.5 Flash",       desc: "Fast model, by Google.",                                              badge: null    },
-  { id: "gemini3preview",  name: "Gemini 3 Flash Preview",  desc: "A fast reasoning model with predictable tool calling. By Google Gemini.", badge: "beta" },
-  { id: "gpt41",           name: "GPT 4.1",                 desc: "Good at agentic tasks, by OpenAI.",                                  badge: null    },
-  { id: "gpt41mini",       name: "GPT 4.1 Mini",            desc: "Good all-rounder with good tool calling support. By Open AI.",       badge: null    },
-  { id: "gpt4omini",       name: "GPT 4o Mini",             desc: "Fast model, good tool calling. By Open AI.",                        badge: null    },
-  { id: "gpt5chat",        name: "GPT 5 Chat",              desc: "Conversational model, by OpenAI.",                                  badge: "beta"  },
-  { id: "gptoss120b",      name: "GPT OSS 120B",            desc: "A high throughput OpenAI GPT reasoning model, great at tool calling.", badge: null   },
-  { id: "gptoss20b",       name: "GPT OSS 20B",             desc: "A high throughput reasoning model with, good at tool calling. By OpenAI.", badge: null },
-  { id: "kimik2",          name: "Kimi k2",                 desc: "Great at agentic tasks, by Moonshot AI.",                           badge: "beta"  },
+  { id: "tavus-gpt-oss",          name: "GPT OSS",            desc: "Recommended — lowest latency, great tool calling. By OpenAI.",         badge: "recommended" },
+  { id: "tavus-gpt-4.1",          name: "GPT 4.1",            desc: "Good at agentic tasks, by OpenAI.",                                     badge: null          },
+  { id: "tavus-gpt-4o",           name: "GPT 4o",             desc: "Strong all-rounder with excellent reasoning. By OpenAI.",               badge: null          },
+  { id: "tavus-gpt-5.2",          name: "GPT 5.2",            desc: "Conversational model, by OpenAI.",                                      badge: "beta"        },
+  { id: "tavus-gemini-2.5-flash", name: "Gemini 2.5 Flash",   desc: "Fast model with strong multimodal support. By Google.",                 badge: null          },
+  { id: "tavus-gemini-3-flash",   name: "Gemini 3 Flash",     desc: "Fast reasoning model with predictable tool calling. By Google.",        badge: "beta"        },
+  { id: "tavus-claude-haiku-4.5", name: "Claude Haiku 4.5",   desc: "Fast, compact, and powerful. By Anthropic.",                           badge: null          },
 ];
 
 const TAVUS_SYSTEM_TOOLS = [
@@ -1139,38 +1138,43 @@ const TAVUS_SYSTEM_TOOLS = [
 ];
 
 const TAVUS_LANGUAGES = [
-  { id: "english",    name: "English" },
-  { id: "spanish",    name: "Spanish" },
-  { id: "french",     name: "French" },
-  { id: "german",     name: "German" },
-  { id: "italian",    name: "Italian" },
-  { id: "portuguese", name: "Portuguese" },
-  { id: "korean",     name: "Korean" },
-  { id: "chinese",    name: "Chinese" },
-  { id: "japanese",   name: "Japanese" },
+  { id: "multilingual", name: "Multilingual (auto-detect)" },
+  { id: "English",      name: "English" },
+  { id: "Spanish",      name: "Spanish" },
+  { id: "French",       name: "French" },
+  { id: "German",       name: "German" },
+  { id: "Italian",      name: "Italian" },
+  { id: "Portuguese",   name: "Portuguese" },
+  { id: "Korean",       name: "Korean" },
+  { id: "Chinese",      name: "Chinese" },
+  { id: "Japanese",     name: "Japanese" },
+  { id: "Hindi",        name: "Hindi" },
+  { id: "Arabic",       name: "Arabic" },
 ];
 
 const TAVUS_TURN_DETECTION_MODELS = [
-  { id: "sparrow-1",    name: "Sparrow-1",      badge: "recommended" },
-  { id: "silero-vad",   name: "Silero VAD",     badge: null },
-  { id: "default",      name: "Default",        badge: null },
+  { id: "sparrow-1",  name: "Sparrow-1",   badge: "recommended" },
+  { id: "sparrow-0",  name: "Sparrow-0",   badge: "legacy"      },
+  { id: "timebased",  name: "Time-based",  badge: "legacy"      },
 ];
 
 const TAVUS_PERCEPTION_MODELS = [
-  { id: "raven-1",      name: "Raven-1",        badge: "recommended" },
-  { id: "none",         name: "None",           badge: null },
+  { id: "raven-1",    name: "Raven-1",     badge: "recommended" },
+  { id: "raven-0",    name: "Raven-0",     badge: null          },
+  { id: "off",        name: "Off",         badge: null          },
 ];
 
 const TAVUS_TTS_ENGINES = [
-  { id: "tavus-default", name: "Tavus Default", badge: "recommended" },
-  { id: "cartesia",      name: "Cartesia",      badge: null },
-  { id: "elevenlabs",    name: "ElevenLabs",    badge: null },
+  { id: "cartesia",   name: "Cartesia",   badge: "default" },
+  { id: "elevenlabs", name: "ElevenLabs", badge: null      },
 ];
 
 const TAVUS_STT_ENGINES = [
-  { id: "tavus-advanced", name: "tavus-advanced", badge: "recommended" },
-  { id: "deepgram",       name: "Deepgram",       badge: null },
-  { id: "default",        name: "Default",        badge: null },
+  { id: "tavus-auto",             name: "Tavus Auto",             badge: "recommended" },
+  { id: "tavus-parakeet",         name: "Tavus Parakeet",         badge: null          },
+  { id: "tavus-soniox",           name: "Tavus Soniox",           badge: null          },
+  { id: "tavus-whisper",          name: "Tavus Whisper",          badge: null          },
+  { id: "tavus-deepgram-medical", name: "Deepgram Medical",       badge: null          },
 ];
 
 // Step 5: Avatar Settings — default or advanced model configuration
@@ -1459,11 +1463,24 @@ function StepAvatarSettings({ data, onChange }) {
           )}
         </div>
 
+        {/* ── Conversation properties ── */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: theme.textDim, textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 4 }}>Conversation settings</div>
+
         {/* Language */}
         {row("Language",
-          <select value={layers.language || "english"} onChange={e => setLayer("language", e.target.value)} style={{ ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px", minWidth: 140 }}>
+          <select value={layers.language || "English"} onChange={e => setLayer("language", e.target.value)} style={{ ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px", minWidth: 160 }}>
             {TAVUS_LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
           </select>
+        )}
+
+        {/* Audio only */}
+        {row("Audio only (disable video)",
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <span style={{ fontSize: 12, color: theme.textMuted }}>{layers.audioOnly ? "On" : "Off"}</span>
+            <div onClick={() => setLayer("audioOnly", !layers.audioOnly)} style={{ width: 38, height: 22, borderRadius: 11, background: layers.audioOnly ? theme.primary : "#d1d5db", position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 3, left: layers.audioOnly ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+            </div>
+          </label>
         )}
 
         {/* Greenscreen */}
@@ -1476,11 +1493,14 @@ function StepAvatarSettings({ data, onChange }) {
           </label>
         )}
 
-        {/* Max call duration */}
-        {row("Max call duration (seconds)",
-          <input type="number" min={30} max={3600} value={layers.maxCallDuration || 1800}
-            onChange={e => setLayer("maxCallDuration", parseInt(e.target.value) || 1800)}
-            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
+        {/* Enable closed captions */}
+        {row("Enable closed captions",
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <span style={{ fontSize: 12, color: theme.textMuted }}>{layers.enableClosedCaptions ? "On" : "Off"}</span>
+            <div onClick={() => setLayer("enableClosedCaptions", !layers.enableClosedCaptions)} style={{ width: 38, height: 22, borderRadius: 11, background: layers.enableClosedCaptions ? theme.primary : "#d1d5db", position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 3, left: layers.enableClosedCaptions ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+            </div>
+          </label>
         )}
 
         {/* Enable recording */}
@@ -1493,10 +1513,27 @@ function StepAvatarSettings({ data, onChange }) {
           </label>
         )}
 
+        {/* Private room (require auth) */}
+        {row("Private room (require auth)",
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <span style={{ fontSize: 12, color: theme.textMuted }}>{layers.requireAuth ? "On" : "Off"}</span>
+            <div onClick={() => setLayer("requireAuth", !layers.requireAuth)} style={{ width: 38, height: 22, borderRadius: 11, background: layers.requireAuth ? theme.primary : "#d1d5db", position: "relative", cursor: "pointer", transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 3, left: layers.requireAuth ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+            </div>
+          </label>
+        )}
+
+        {/* Max call duration */}
+        {row("Max call duration (seconds)",
+          <input type="number" min={30} max={7200} value={layers.maxCallDuration || 3600}
+            onChange={e => setLayer("maxCallDuration", parseInt(e.target.value) || 3600)}
+            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
+        )}
+
         {/* Participant left timeout */}
         {row("Participant left timeout (seconds)",
-          <input type="number" min={0} max={3600} value={layers.participantLeftTimeout ?? 60}
-            onChange={e => setLayer("participantLeftTimeout", parseInt(e.target.value) || 60)}
+          <input type="number" min={0} max={3600} value={layers.participantLeftTimeout ?? 0}
+            onChange={e => setLayer("participantLeftTimeout", parseInt(e.target.value) || 0)}
             style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
         )}
 
@@ -1504,6 +1541,13 @@ function StepAvatarSettings({ data, onChange }) {
         {row("Participant absent timeout (seconds)",
           <input type="number" min={0} max={600} value={layers.participantAbsentTimeout ?? 300}
             onChange={e => setLayer("participantAbsentTimeout", parseInt(e.target.value) || 300)}
+            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
+        )}
+
+        {/* Max participants */}
+        {row("Max participants",
+          <input type="number" min={2} max={10} value={layers.maxParticipants || 2}
+            onChange={e => setLayer("maxParticipants", parseInt(e.target.value) || 2)}
             style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
         )}
 
@@ -1515,6 +1559,14 @@ function StepAvatarSettings({ data, onChange }) {
               <div style={{ position: "absolute", top: 3, left: layers.enableTranscription !== false ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
             </div>
           </label>
+        )}
+
+        {/* Callback URL */}
+        {row("Callback URL (webhook)",
+          <input type="url" value={layers.callbackUrl || ""}
+            onChange={e => setLayer("callbackUrl", e.target.value)}
+            placeholder="https://…"
+            style={{ ...styles.select, width: 220, fontSize: 12, padding: "5px 10px" }} />
         )}
       </div>
     );
@@ -1580,7 +1632,7 @@ function StepAvatarSettings({ data, onChange }) {
       </div>
       <div style={{ display: "grid", gap: 6 }}>
         {TAVUS_LLMS.map(llm => {
-          const sel = (data.avatarLLM || "gptoss20b") === llm.id;
+          const sel = (data.avatarLLM || "tavus-gpt-oss") === llm.id;
           return (
             <div key={llm.id} onClick={() => onChange({ ...data, avatarLLM: llm.id })} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${sel ? theme.primary : theme.border}`, background: sel ? theme.selectedBg : theme.surface, cursor: "pointer", transition: "all 0.15s" }}>
               <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${sel ? theme.primary : theme.border}`, background: sel ? theme.primary : "transparent", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
@@ -1662,11 +1714,11 @@ function StepAvatarSettings({ data, onChange }) {
 
     return (
       <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
-        <OptionRow label="Language Model (LLM)"   stateKey="llmModel"       options={TAVUS_LLMS.map(l => ({ id: l.id, name: l.name, badge: l.id === "gptoss20b" ? "recommended" : null }))} defaultId="gptoss20b" />
+        <OptionRow label="Language Model (LLM)"   stateKey="llmModel"       options={TAVUS_LLMS.map(l => ({ id: l.id, name: l.name, badge: l.badge }))} defaultId="tavus-gpt-oss" />
         <OptionRow label="Turn Detection Model"   stateKey="turnDetection"  options={TAVUS_TURN_DETECTION_MODELS} defaultId="sparrow-1" />
         <OptionRow label="Perception Model"       stateKey="perception"     options={TAVUS_PERCEPTION_MODELS}     defaultId="raven-1" />
-        <OptionRow label="Text-to-Speech (TTS)"   stateKey="tts"            options={TAVUS_TTS_ENGINES}           defaultId="tavus-default" />
-        <OptionRow label="Speech-to-Text (STT)"   stateKey="stt"            options={TAVUS_STT_ENGINES}           defaultId="tavus-advanced" />
+        <OptionRow label="Text-to-Speech (TTS)"   stateKey="tts"            options={TAVUS_TTS_ENGINES}           defaultId="cartesia" />
+        <OptionRow label="Speech-to-Text (STT)"   stateKey="stt"            options={TAVUS_STT_ENGINES}           defaultId="tavus-auto" />
 
         {/* Hotwords */}
         <div style={{ ...rowStyle, flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
