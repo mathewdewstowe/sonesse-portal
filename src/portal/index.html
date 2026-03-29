@@ -1531,7 +1531,7 @@ function StepChooseTavusAvatar({ data, onChange }) {
 
 function StepAvatarSettings({ data, onChange }) {
   const [mode, setMode]         = useState(data.avatarSettingsMode || "default");
-  const [tab, setTab]           = useState(data.avatarConfigTab || "avatar");
+  const [tab, setTab]           = useState(data.avatarConfigTab || "voice");
   const [moreOpen, setMoreOpen] = useState(false);
   const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
 
@@ -2057,7 +2057,7 @@ function StepAvatarSettings({ data, onChange }) {
   );
 
   // ── Tab structure ─────────────────────────────────────────────────────────
-  const MAIN_TABS = ["avatar", "voice", "llm"];
+  const MAIN_TABS = ["voice", "llm"];
   const MORE_TABS = ["perception", "stt", "tools"];
   const tabLabels = { avatar: "Avatar", voice: "Voice", llm: "LLM", perception: "Perception", stt: "STT", tools: "Tools" };
 
@@ -2121,7 +2121,6 @@ function StepAvatarSettings({ data, onChange }) {
               )}
             </div>
           </div>
-          {tab === "avatar"     && <AvatarTab />}
           {tab === "voice"      && <VoiceTab />}
           {tab === "llm"        && <LLMTab />}
           {tab === "perception" && <PerceptionTab />}
