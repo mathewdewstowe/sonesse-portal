@@ -6,6 +6,8 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/_headers": "_headers" });
   eleventyConfig.addPassthroughCopy({ "src/_redirects": "_redirects" });
   eleventyConfig.addPassthroughCopy({ "src/_routes.json": "_routes.json" });
+  // Portal is a standalone React SPA — copy as-is, never process as template
+  eleventyConfig.ignores.add("src/portal/**");
   eleventyConfig.addPassthroughCopy({ "src/portal": "portal" });
 
   // Blog posts collection
@@ -37,6 +39,6 @@ module.exports = function(eleventyConfig) {
       data: "_data"
     },
     templateFormats: ["njk"],
-    htmlTemplateEngine: "njk"
+    htmlTemplateEngine: false   // Don't process .html through Nunjucks — portal is a React SPA
   };
 };
