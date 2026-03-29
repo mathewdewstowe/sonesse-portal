@@ -996,7 +996,7 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
       const resp = await fetch("/api/teams/create-meeting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ experienceId: personaId, experienceName: name }),
+        body: JSON.stringify({ experienceId: personaId, experienceName: name, botEmail: "tavus.demo@my-meeting-bot.com" }),
       });
       const result = await resp.json();
       if (!result.ok) throw new Error(result.error || "Failed to create Teams meeting");

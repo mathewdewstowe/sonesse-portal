@@ -58,7 +58,7 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const { experienceId, experienceName = "Sonesse Experience", startTime, endTime } = body;
+  const { experienceId, experienceName = "Sonesse Experience", startTime, endTime, botEmail: customBotEmail } = body;
   if (!experienceId) {
     return new Response(
       JSON.stringify({ ok: false, error: "experienceId is required" }),
@@ -66,7 +66,7 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const botEmail = `${experienceId}@my-meeting-bot.com`;
+  const botEmail = customBotEmail || `${experienceId}@my-meeting-bot.com`;
 
   // Default: start now, end in 1 hour
   const start = startTime ? new Date(startTime) : new Date();
