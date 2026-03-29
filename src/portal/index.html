@@ -947,6 +947,55 @@ function ComingSoonStep({ title, desc }) {
   );
 }
 
+// Pre-built avatar card shown on the dashboard
+function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
+  const [copied, setCopied] = useState(null);
+  const copy = (label, val) => {
+    navigator.clipboard.writeText(val);
+    setCopied(label);
+    setTimeout(() => setCopied(null), 1800);
+  };
+  return (
+    <div style={{ ...styles.card, padding: 0, overflow: "hidden", border: `1.5px solid ${theme.primary}30` }}>
+      {/* Accent stripe */}
+      <div style={{ height: 4, background: `linear-gradient(90deg, ${theme.primary}, #a855f7)` }} />
+      <div style={{ padding: "20px 24px", display: "flex", gap: 20, alignItems: "flex-start" }}>
+        {/* Avatar icon */}
+        <div style={{ width: 56, height: 56, borderRadius: 14, background: `linear-gradient(135deg, ${theme.primary}20, #a855f720)`, border: `1.5px solid ${theme.primary}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>
+          🎙️
+        </div>
+        {/* Content */}
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <span style={{ fontWeight: 700, fontSize: 15, color: theme.heading }}>{name}</span>
+            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: `${theme.primary}15`, color: theme.primary, letterSpacing: "0.05em", textTransform: "uppercase" }}>Sonesse</span>
+          </div>
+          <p style={{ fontSize: 13, color: theme.textMuted, margin: "0 0 14px", lineHeight: 1.5 }}>{desc}</p>
+          {/* Tags */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
+            {tags.map(t => (
+              <span key={t} style={{ fontSize: 11, padding: "2px 10px", borderRadius: 20, background: theme.surface, border: `1px solid ${theme.border}`, color: theme.textMuted }}>{t}</span>
+            ))}
+          </div>
+          {/* IDs */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 18 }}>
+            {[["Persona ID", personaId], ["Replica ID", replicaId]].map(([label, val]) => (
+              <button key={label} onClick={() => copy(label, val)} style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "8px 12px", textAlign: "left", cursor: "pointer", transition: "border-color 0.15s" }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: theme.textDim, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 3 }}>{label}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: theme.heading, fontFamily: "monospace" }}>{copied === label ? "✓ Copied!" : val}</div>
+              </button>
+            ))}
+          </div>
+          {/* Action */}
+          <button onClick={onUse} style={{ ...styles.btnPrimary, gap: 8 }}>
+            {Icons.sparkle} <span>Use this avatar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Wrapper: renders real UI greyed-out with a "Coming Soon" lock overlay
 function LockedStep({ children }) {
   return (
@@ -3208,6 +3257,22 @@ function PortalHome({ user, onLogout, onNewExperience, onSessions }) {
                 <div style={{ fontSize: 12, color: theme.textMuted }}>{stat.sub}</div>
               </div>
             ))}
+          </div>
+
+          {/* Pre-built avatars */}
+          <div style={{ marginBottom: 36 }}>
+            <div style={{ marginBottom: 14 }}>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Pre-built avatars</h2>
+              <p style={{ fontSize: 12, color: theme.textMuted, margin: "3px 0 0" }}>Ready-to-use templates you can launch immediately.</p>
+            </div>
+            <PreBuiltAvatarCard
+              name="AI Interview Assistant"
+              desc="A professional digital interviewer that conducts structured screening interviews with candidates."
+              personaId="pdac61133ac5"
+              replicaId="r5f0577fc829"
+              tags={["Recruitment", "Screening", "Pre-built"]}
+              onUse={onNewExperience}
+            />
           </div>
 
           {/* Experiences */}
