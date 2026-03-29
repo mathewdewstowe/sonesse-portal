@@ -950,6 +950,9 @@ function ComingSoonStep({ title, desc }) {
 // Pre-built avatar card shown on the dashboard
 function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
   const [copied, setCopied]       = useState(null);
+  const [webState, setWeb]        = useState("idle"); // idle | loading | done | error
+  const [webUrl, setWebUrl]       = useState("");
+  const [webError, setWebErr]     = useState("");
   const [teamsState, setTeams]    = useState("idle"); // idle | loading | done | error
   const [teamsUrl, setTeamsUrl]   = useState("");
   const [teamsError, setTeamsErr] = useState("");
@@ -958,6 +961,33 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
     navigator.clipboard.writeText(val);
     setCopied(label);
     setTimeout(() => setCopied(null), 1800);
+  };
+
+  const deployWeb = async () => {
+    if (webState === "loading") return;
+    setWeb("loading");
+    setWebErr("");
+    try {
+      const resp = await fetch("/api/tavus/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          replica_id: replicaId,
+          persona_id: personaId,
+          conversation_name: name,
+          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+        }),
+      });
+      const res = await resp.json();
+      const url = res.conversation_url || res.data?.conversation_url;
+      if (!url) throw new Error(res.error || res.message || "No conversation URL returned");
+      setWebUrl(url);
+      setWeb("done");
+      window.open(url, "_blank");
+    } catch (e) {
+      setWebErr(e.message || "Failed to create conversation");
+      setWeb("error");
+    }
   };
 
   const deployTeams = async () => {
@@ -1015,10 +1045,10 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
 
           {/* Deploy buttons */}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            {/* Deploy to Web — coming soon */}
-            <button disabled style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, border: `1.5px solid ${theme.border}`, background: theme.surface, color: theme.textDim, cursor: "not-allowed", opacity: 0.6 }}>
+            {/* Deploy to Web */}
+            <button onClick={deployWeb} disabled={webState === "loading"} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, border: `1.5px solid ${webState === "done" ? theme.successBorder : theme.primary}`, background: webState === "done" ? theme.successBg : theme.primary, color: webState === "done" ? theme.success : "#fff", cursor: webState === "loading" ? "wait" : "pointer", transition: "all 0.15s", opacity: webState === "loading" ? 0.75 : 1 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              Deploy to Web <span style={{ fontSize: 9, fontWeight: 700, background: "#e5e5e7", color: "#a0a0a8", borderRadius: 4, padding: "1px 5px", letterSpacing: "0.06em", textTransform: "uppercase" }}>Soon</span>
+              {webState === "loading" ? "Creating session…" : webState === "done" ? "✓ Session ready" : "Deploy to Web"}
             </button>
 
             {/* Deploy to Teams */}
@@ -1033,6 +1063,16 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
             </button>
           </div>
 
+          {/* Web result */}
+          {webState === "done" && webUrl && (
+            <div style={{ marginTop: 12, padding: "10px 14px", background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 8, fontSize: 12 }}>
+              <span style={{ color: theme.success, fontWeight: 600 }}>Session ready — </span>
+              <a href={webUrl} target="_blank" rel="noreferrer" style={{ color: theme.primary, wordBreak: "break-all" }}>{webUrl}</a>
+            </div>
+          )}
+          {webState === "error" && (
+            <div style={{ marginTop: 12, padding: "10px 14px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, fontSize: 12, color: theme.danger }}>{webError}</div>
+          )}
           {/* Teams result */}
           {teamsState === "done" && teamsUrl && (
             <div style={{ marginTop: 12, padding: "10px 14px", background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 8, fontSize: 12 }}>
