@@ -1017,8 +1017,8 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
       <div style={{ height: 4, background: `linear-gradient(90deg, ${theme.primary}, #a855f7)` }} />
       <div style={{ padding: "20px 24px", display: "flex", gap: 20, alignItems: "flex-start" }}>
         {/* Avatar icon */}
-        <div style={{ width: 56, height: 56, borderRadius: 14, background: `linear-gradient(135deg, ${theme.primary}20, #a855f720)`, border: `1.5px solid ${theme.primary}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, flexShrink: 0 }}>
-          🎙️
+        <div style={{ width: 64, height: 64, borderRadius: 14, overflow: "hidden", border: `2px solid ${theme.primary}30`, flexShrink: 0 }}>
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=128&h=128&fit=crop&crop=faces,center" alt="AI Interview Assistant" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         </div>
         {/* Content */}
         <div style={{ flex: 1 }}>
