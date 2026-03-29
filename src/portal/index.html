@@ -1002,6 +1002,13 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
       .catch(e => { setWebErr(e.message); setWeb("error"); });
   };
 
+  // Reset deploy state to create a fresh session
+  const resetWeb = () => {
+    setWeb("idle");
+    setWebUrl("");
+    setWebErr("");
+  };
+
   const deployTeams = async () => {
     if (teamsState === "loading") return;
     setTeams("loading");
@@ -1095,9 +1102,12 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
 
           {/* Web result */}
           {webState === "done" && webUrl && (
-            <div style={{ marginTop: 12, padding: "10px 14px", background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 8, fontSize: 12 }}>
-              <span style={{ color: theme.success, fontWeight: 600 }}>Session ready — </span>
-              <a href={webUrl} target="_blank" rel="noreferrer" style={{ color: theme.primary, wordBreak: "break-all" }}>{webUrl}</a>
+            <div style={{ marginTop: 12, padding: "10px 14px", background: theme.successBg, border: `1px solid ${theme.successBorder}`, borderRadius: 8, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+              <div>
+                <span style={{ color: theme.success, fontWeight: 600 }}>Session ready — </span>
+                <a href={webUrl} target="_blank" rel="noreferrer" style={{ color: theme.primary, wordBreak: "break-all" }}>{webUrl}</a>
+              </div>
+              <button onClick={resetWeb} style={{ flexShrink: 0, padding: "5px 12px", borderRadius: 6, fontSize: 11, fontWeight: 600, border: `1px solid ${theme.border}`, background: "#fff", color: theme.textMuted, cursor: "pointer" }}>New Session</button>
             </div>
           )}
           {webState === "error" && (
