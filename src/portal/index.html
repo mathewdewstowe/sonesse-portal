@@ -3418,16 +3418,16 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
               <p style={{ color: theme.textMuted, fontSize: 14, margin: 0 }}>Manage your AI experiences and review session activity.</p>
             </div>
             <button onClick={onNewExperience} style={{ ...styles.btnPrimary, padding: "10px 18px", gap: 8 }}>
-              {Icons.sparkle} <span>New Experience</span>
+              {Icons.sparkle} <span>Create Your Own</span>
             </button>
           </div>
 
           {/* Stats row */}
           <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
             {[
-              { label: "Total sessions",       value: "—", sub: "All time" },
-              { label: "Active experiences",   value: experiences.filter(e => e.status === "live").length || "—", sub: "Currently live" },
-              { label: "Avg. session length",  value: "—", sub: "Last 30 days" },
+              { label: "Total Sessions",        value: "—", sub: "All time" },
+              { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "—", sub: "Currently live" },
+              { label: "Average Session Time", value: "—", sub: "Last 30 days" },
             ].map((stat) => (
               <div key={stat.label} style={{ ...styles.card, padding: "20px 24px" }}>
                 <div style={{ fontSize: 28, fontWeight: 800, color: theme.heading, marginBottom: 4 }}>{stat.value}</div>
@@ -3440,32 +3440,48 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
           {/* Pre-built avatars */}
           <div style={{ marginBottom: 36 }}>
             <div style={{ marginBottom: 14 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Pre-built avatars</h2>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Pre-Built Avatars</h2>
               <p style={{ fontSize: 12, color: theme.textMuted, margin: "3px 0 0" }}>Ready-to-use templates you can launch immediately.</p>
             </div>
-            <div style={{ display: "grid", gap: 16 }}>
-              {personas.length > 0 ? personas.map(p => (
-                <PreBuiltAvatarCard
-                  key={p.persona_id}
-                  name={p.persona_name || "Untitled"}
-                  desc={p.system_prompt ? p.system_prompt.slice(0, 120) + (p.system_prompt.length > 120 ? "…" : "") : "Pre-built Tavus persona."}
-                  personaId={p.persona_id}
-                  replicaId={p.replica_id}
-                  thumb={p.thumb}
-                  tags={["Pre-built"]}
-                  onUse={onNewExperience}
-                />
-              )) : (
-                <PreBuiltAvatarCard
-                  name="AI Interview Assistant"
-                  desc="A professional digital interviewer that conducts structured screening interviews with candidates."
-                  personaId="pdac61133ac5"
-                  replicaId="r5f0577fc829"
-                  tags={["Recruitment", "Screening", "Pre-built"]}
-                  onUse={onNewExperience}
-                />
-              )}
-            </div>
+            {(() => {
+              const personaMeta = {
+                "Interviewer":            { desc: "A professional digital interviewer that conducts structured screening interviews with candidates.", tags: ["Recruitment", "Screening"] },
+                "Customer Support":       { desc: "A friendly customer success specialist for live video support calls.", tags: ["Support", "Video"] },
+                "Sales Coach":            { desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"] },
+                "Sales Coaching":         { desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"] },
+                "Sales Development Rep":  { desc: "An AI sales development representative that qualifies leads and books meetings.", tags: ["Sales", "SDR"] },
+                "Product Discovery":      { desc: "Guides users through product discovery conversations to uncover needs.", tags: ["Product", "Discovery"] },
+              };
+              const defaultMeta = { desc: "Pre-built Tavus avatar ready to deploy.", tags: ["Pre-built"] };
+              return (
+                <div style={{ display: "grid", gap: 16 }}>
+                  {personas.length > 0 ? personas.map(p => {
+                    const meta = personaMeta[p.persona_name] || defaultMeta;
+                    return (
+                      <PreBuiltAvatarCard
+                        key={p.persona_id}
+                        name={p.persona_name || "Untitled"}
+                        desc={meta.desc}
+                        personaId={p.persona_id}
+                        replicaId={p.replica_id}
+                        thumb={p.thumb}
+                        tags={[...meta.tags, "Pre-built"]}
+                        onUse={onNewExperience}
+                      />
+                    );
+                  }) : (
+                    <PreBuiltAvatarCard
+                      name="AI Interview Assistant"
+                      desc="A professional digital interviewer that conducts structured screening interviews with candidates."
+                      personaId="pdac61133ac5"
+                      replicaId="r5f0577fc829"
+                      tags={["Recruitment", "Screening", "Pre-built"]}
+                      onUse={onNewExperience}
+                    />
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Experiences */}
