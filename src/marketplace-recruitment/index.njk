@@ -16,13 +16,13 @@ extraCss: "/css/marketplace-v2.css"
 <section class="section use-cases-intro marketplace-hero" style="background-image: url(/assets/2025/08/banner-bg-scaled.png); background-size: cover; background-position: center top; background-repeat: no-repeat;">
 	<div class="section__inner text-center" style="max-width: 1100px;">
 		<span class="badge">Marketplace</span>
-		<h1>Build Emotionally Expressive <span class="gradient-text">AI Interview Assistants</span> That Scale</h1>
-		<p style="max-width: 760px; margin-left: auto; margin-right: auto; color: var(--color-text-light);">Vendor agnostic, fully integrated with your ATS or CRM, and no engineering effort.</p>
+		<h1>Emotionally Expressive <span class="gradient-text">AI Interview Assistants</span></h1>
+		<p style="max-width: 760px; margin-left: auto; margin-right: auto; margin-top: 20px; color: var(--color-text-light);">Build vendor-agnostic AI interview assistants fully integrated into your ATS with no engineering effort.</p>
 		<div class="marketplace-vendor-logos">
 			<span class="marketplace-vendor-logos__label">Powered by</span>
 			<div class="marketplace-vendor-logos__row">
-				<img src="/assets/2025/08/tavus.svg" alt="Tavus" class="marketplace-vendor-logo" style="height: 22px;" />
-				<img src="/assets/2025/08/anam.png" alt="Anam" class="marketplace-vendor-logo" style="height: 24px;" />
+				<img src="/assets/2025/08/tavus.svg" alt="Tavus" class="marketplace-vendor-logo" style="height: 36px;" />
+				<img src="/assets/2025/08/anam.png" alt="Anam" class="marketplace-vendor-logo" style="height: 38px;" />
 			</div>
 		</div>
 	</div>
@@ -81,130 +81,69 @@ extraCss: "/css/marketplace-v2.css"
 				</div>
 			</div>
 
-			<!-- RIGHT COLUMN: Tabbed Use Cases -->
+			<!-- RIGHT COLUMN: Recruitment Only -->
 			<div class="marketplace-layout__right">
-				<div class="marketplace-tabs-card" data-tabs>
-					<div class="tabs__nav tabs__nav--pills" style="justify-content: center; margin-bottom: 30px;">
-						{% for uc in stackone.useCases %}
-						<button class="tabs__btn{% if loop.first %} is-active{% endif %}" data-tab="{{ uc.id }}">{{ uc.label }}</button>
-						{% endfor %}
-					</div>
-
-					{% set ucImages = {
-						"recruitment": "/assets/2026/02/avatar-recruitment-2.jpg",
-						"sales": "/assets/2026/02/avatar-sales-2.png",
-						"tutoring": "/assets/2026/02/avatar-tutoring-2.jpg",
-						"coaching": "/assets/2026/02/avatar-coaching.jpg",
-						"onboarding": "/assets/2026/02/avatar-onboarding-2.jpg",
-						"meetingbot": "/assets/2026/02/avatar-sales.jpg",
-						"sdr": "/assets/2026/02/avatar-sales-2.png"
-					} %}
-
-					{% set ucFeatures = {
-						"recruitment": [
-							["Hire in days, not weeks", "Hiring cycles cut from 42 days to under a week. Time to first interview down 90%."],
-							["Live in 1–2 weeks", "High-impact, light-lift. Live in under two weeks."],
-							["Consistent. Fair. Always on.", "Same experience for every candidate. No qualified person left behind."],
-							["Free your recruiters", "Less admin. More judgment, persuasion, and human connection."],
-							["Built-in fraud detection", "Tab-switch alerts, camera checks, and voice-dupe detection on every session."],
-							["Scales with your ATS", "Connects to your ATS and turns pipeline data into real-time insights."]
-						],
-						"sales": [
-							["ICP-qualified only", "Avatar screens against your criteria before any lead reaches your team."],
-							["Handles objections 24/7", "Trained on your product and messaging. Answers questions around the clock."],
-							["Books meetings automatically", "Qualifies and drops straight into your team's calendar. No rep needed."],
-							["CRM-synced", "Every conversation scored and pushed to your CRM in real time."],
-							["Always on", "Qualifies inbound leads at any hour, in any time zone."],
-							["Live in days", "Connect your CRM, configure your ICP, deploy in under a week."]
-						],
-						"tutoring": [
-							["Adapts in real time", "Pace and depth adjust based on what the learner actually says."],
-							["Surfaces knowledge gaps", "Probes understanding with follow-up questions, not just multiple choice."],
-							["LMS integration", "Session summaries and scores pushed to your LMS automatically."],
-							["24/7 access", "Always available on any device, at any time."],
-							["Per-learner analytics", "Detailed progress tracking to guide human intervention where it matters."],
-							["Deploy fast", "Connect your content, go live in under two weeks."]
-						],
-						"coaching": [
-							["Structured sessions at scale", "Deliver consistent, high-quality coaching to every employee — without the overhead."],
-							["Performance-linked", "Coaching scores and outcomes written back to your CRM or HRIS automatically."],
-							["Always available", "On-demand coaching any time, on any device."],
-							["Progress tracking", "Full session history and analytics per coachee."],
-							["Manager visibility", "Summaries sent to the manager or HR partner after every session."],
-							["Live in days", "Connect your system, configure your coaching flow, deploy fast."]
-						],
-						"onboarding": [
-							["No coordinator needed", "Deploy once, runs for every hire. No scheduling, no hand-holding."],
-							["Role-adaptive", "Content adjusts automatically based on role, team, and start date."],
-							["Always consistent", "Every new hire gets the same quality experience, every time."],
-							["Auto-logged", "All responses captured and pushed to your HRIS automatically."],
-							["Live in under a week", "Configure once, deploy fast. High-impact and light lift."],
-							["Scales instantly", "Handle 1 or 1,000 new starters simultaneously, with zero extra effort."]
-						],
-						"meetingbot": [
-							["Joins any meeting", "Works with Zoom, Teams, Google Meet and more. No downloads needed."],
-							["Real-time notes", "Captures decisions, action items, and key moments as they happen."],
-							["CRM-synced", "Every meeting summary pushed to the right record automatically."],
-							["Action item tracking", "AI detects and creates tasks from conversation in real time."],
-							["Full transcript", "Searchable, timestamped transcript attached to every meeting record."],
-							["Live in minutes", "Authorise your calendar, connect your CRM, done."]
-						],
-						"sdr": [
-							["Outbound at scale", "Run hundreds of personalised outreach conversations simultaneously."],
-							["ICP-qualified leads only", "Only qualified prospects reach your AEs. No time wasted."],
-							["Books discovery calls", "Qualifies and books directly into your AE's calendar."],
-							["CRM-synced", "Every call scored and logged to your CRM in real time."],
-							["24/7 outreach", "Reaches prospects in any time zone, at any hour."],
-							["Live in days", "Connect your CRM, configure your ICP, deploy in under a week."]
-						]
-					} %}
-
-					{% for uc in stackone.useCases %}
-					<div class="tabs__panel{% if loop.first %} is-active{% endif %}" data-tab-panel="{{ uc.id }}">
-						<div class="marketplace-usecase">
-							<img src="{{ ucImages[uc.id] }}" alt="{{ uc.label }} Avatar" class="marketplace-usecase__img" />
-							<div class="marketplace-usecase__body">
-								<div class="usecase-features">
-									{% for feature in ucFeatures[uc.id] %}
-									<div class="usecase-feature">
-										<p class="usecase-feature__title">{{ feature[0] }}</p>
-										<p class="usecase-feature__desc">{{ feature[1] }}</p>
-									</div>
-									{% endfor %}
+				<div class="marketplace-tabs-card">
+					{% set uc = stackone.useCases | selectattr("id", "equalto", "recruitment") | first %}
+					<div class="marketplace-usecase">
+						<img src="/assets/2026/02/avatar-recruitment-2.jpg" alt="Recruitment Avatar" class="marketplace-usecase__img" />
+						<div class="marketplace-usecase__body">
+							<div class="usecase-features">
+								<div class="usecase-feature">
+									<p class="usecase-feature__title">Hire in days, not weeks</p>
+									<p class="usecase-feature__desc">Hiring cycles cut from 42 days to under a week. Time to first interview down 90%.</p>
 								</div>
+								<div class="usecase-feature">
+									<p class="usecase-feature__title">Live in 1–2 weeks</p>
+									<p class="usecase-feature__desc">High-impact, light-lift. Live in under two weeks.</p>
+								</div>
+								<div class="usecase-feature">
+									<p class="usecase-feature__title">Consistent. Fair. Always on.</p>
+									<p class="usecase-feature__desc">Same experience for every candidate. No qualified person left behind.</p>
+								</div>
+								<div class="usecase-feature">
+									<p class="usecase-feature__title">Free your recruiters</p>
+									<p class="usecase-feature__desc">Less admin. More judgment, persuasion, and human connection.</p>
+								</div>
+								<div class="usecase-feature">
+									<p class="usecase-feature__title">Built-in fraud detection</p>
+									<p class="usecase-feature__desc">Tab-switch alerts, camera checks, and voice-dupe detection on every session.</p>
+								</div>
+								<div class="usecase-feature">
+									<p class="usecase-feature__title">Scales with your ATS</p>
+									<p class="usecase-feature__desc">Connects to your ATS and turns pipeline data into real-time insights.</p>
+								</div>
+							</div>
 
-								<!-- StackOne Integration Workflow -->
-								<div class="usecase-integration">
-									<div class="usecase-integration__section">
-										<p class="usecase-integration__heading">Trigger events</p>
-										<div class="usecase-integration__triggers">
-											{% for trigger in uc.triggerEvents %}
-											<span class="integration-badge">{{ trigger.badge }}</span>
-											{% endfor %}
-										</div>
+							<!-- StackOne Integration Workflow -->
+							<div class="usecase-integration">
+								<div class="usecase-integration__section">
+									<p class="usecase-integration__heading">Trigger events</p>
+									<div class="usecase-integration__triggers">
+										{% for trigger in uc.triggerEvents %}
+										<span class="integration-badge">{{ trigger.badge }}</span>
+										{% endfor %}
 									</div>
-									<div class="usecase-integration__section">
-										<p class="usecase-integration__heading">Post-session workflow</p>
-										<ol class="usecase-integration__actions">
-											{% for action in uc.postMeetingActions %}
-											<li>{{ action.label }}</li>
-											{% endfor %}
-										</ol>
-									</div>
-									<div class="usecase-integration__section">
-										<p class="usecase-integration__heading">Output destinations</p>
-										<ul class="usecase-integration__outputs">
-											<li><span class="output-label">Transcript</span> {{ uc.outputs.transcript }}</li>
-											<li><span class="output-label">Video</span> {{ uc.outputs.video }}</li>
-											<li><span class="output-label">Summary</span> {{ uc.outputs.summary }}</li>
-										</ul>
-									</div>
+								</div>
+								<div class="usecase-integration__section">
+									<p class="usecase-integration__heading">Post-session workflow</p>
+									<ol class="usecase-integration__actions">
+										{% for action in uc.postMeetingActions %}
+										<li>{{ action.label }}</li>
+										{% endfor %}
+									</ol>
+								</div>
+								<div class="usecase-integration__section">
+									<p class="usecase-integration__heading">Output destinations</p>
+									<ul class="usecase-integration__outputs">
+										<li><span class="output-label">Transcript</span> {{ uc.outputs.transcript }}</li>
+										<li><span class="output-label">Video</span> {{ uc.outputs.video }}</li>
+										<li><span class="output-label">Summary</span> {{ uc.outputs.summary }}</li>
+									</ul>
 								</div>
 							</div>
 						</div>
 					</div>
-					{% endfor %}
-
 				</div>
 			</div>
 
