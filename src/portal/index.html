@@ -3130,14 +3130,14 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
             </div>
             {(() => {
               const personaMeta = {
-                "Interviewer":            { desc: "A professional digital interviewer that conducts structured screening interviews with candidates.", tags: ["Recruitment", "Screening"] },
-                "Customer Support":       { desc: "A friendly customer success specialist for live video support calls.", tags: ["Support", "Video"] },
-                "Sales Coach":            { desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"] },
-                "Sales Coaching":         { desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"] },
-                "Sales Development Rep":  { desc: "An AI sales development representative that qualifies leads and books meetings.", tags: ["Sales", "SDR"] },
-                "Product Discovery":      { desc: "Guides users through product discovery conversations to uncover needs.", tags: ["Product", "Discovery"] },
+                "Interviewer":            { desc: "A professional digital interviewer that conducts structured screening interviews with candidates.", tags: ["Recruitment", "Screening"], thumb: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=faces,center" },
+                "Customer Support":       { desc: "A friendly customer success specialist for live video support calls.", tags: ["Support", "Video"], thumb: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop&crop=faces,center" },
+                "Sales Coach":            { desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"], thumb: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=500&fit=crop&crop=faces,center" },
+                "Sales Coaching":         { desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"], thumb: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=500&fit=crop&crop=faces,center" },
+                "Sales Development Rep":  { desc: "An AI sales development representative that qualifies leads and books meetings.", tags: ["Sales", "SDR"], thumb: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop&crop=faces,center" },
+                "Product Discovery":      { desc: "Guides users through product discovery conversations to uncover needs.", tags: ["Product", "Discovery"], thumb: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=500&fit=crop&crop=faces,center" },
               };
-              const defaultMeta = { desc: "Pre-built Tavus avatar ready to deploy.", tags: ["Pre-built"] };
+              const defaultMeta = { desc: "Pre-built Tavus avatar ready to deploy.", tags: ["Pre-built"], thumb: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=faces,center" };
               return (
                 <div style={{ display: "grid", gap: 16 }}>
                   {personas.length > 0 ? personas.map(p => {
@@ -3149,7 +3149,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
                         desc={meta.desc}
                         personaId={p.persona_id}
                         replicaId={p.replica_id}
-                        thumb={p.thumb}
+                        thumb={p.thumb || (p.thumbVid ? "" : meta.thumb)}
                         thumbVid={p.thumbVid}
                         tags={[...meta.tags, "Pre-built"]}
                         onUse={onNewExperience}
@@ -3161,6 +3161,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
                       desc="A professional digital interviewer that conducts structured screening interviews with candidates."
                       personaId="pdac61133ac5"
                       replicaId="r5f0577fc829"
+                      thumb="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=faces,center"
                       tags={["Recruitment", "Screening", "Pre-built"]}
                       onUse={onNewExperience}
                     />
