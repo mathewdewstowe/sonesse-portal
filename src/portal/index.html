@@ -2125,11 +2125,11 @@ function StepPersona({ data, onChange }) {
       {/* Two-column: goals + guardrails */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
         <div>
-          <label style={styles.label}>Goals — what should the avatar achieve?</label>
+          <label style={styles.label}>Goals - What Outcome Should the Avatar Deliver?</label>
           <textarea value={data.goals || ""} onChange={(e) => onChange({ ...data, goals: e.target.value })} placeholder="e.g. Screen candidates for technical fit, assess communication skills, determine culture alignment." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
         <div>
-          <label style={styles.label}>Guardrails — what should it NOT do?</label>
+          <label style={styles.label}>Guardrails - What Should it Not Do?</label>
           <textarea value={data.guardrails || ""} onChange={(e) => onChange({ ...data, guardrails: e.target.value })} placeholder="e.g. Do not ask about salary expectations, age, or personal circumstances. Do not make hiring decisions." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
       </div>
@@ -2152,11 +2152,7 @@ function StepPersona({ data, onChange }) {
         </div>
       </div>
 
-      {/* System prompt */}
-      <div>
-        <label style={styles.label}>System prompt <span style={{ fontWeight: 400, color: theme.textDim }}>(advanced)</span></label>
-        <textarea value={data.systemPrompt || ""} onChange={(e) => onChange({ ...data, systemPrompt: e.target.value })} placeholder="Optional: provide a full system prompt to override the generated persona. Leave blank to auto-generate from the fields above." style={{ ...styles.textarea, minHeight: 80, fontFamily: "'SF Mono', 'Fira Code', monospace", fontSize: 12 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
-      </div>
+      {/* System prompt removed — auto-generated from fields above */}
     </div>
   );
 }
