@@ -246,7 +246,7 @@ const WIZARD_STEPS = [
   { id: "chooseavatar",   label: "Choose avatar" },
   { id: "avatarsettings", label: "Avatar settings" },
   { id: "persona",        label: "Experience name" },
-  { id: "knowledgebase",  label: "Knowledge base" },
+  { id: "knowledgebase",  label: "Knowledge Base" },
   { id: "integration",    label: "Connect your ATS" },
   { id: "trigger",        label: "Trigger workflow" },
   { id: "datasources",    label: "Data sources" },
@@ -611,7 +611,7 @@ const DATA_SOURCE_FIELDS = {
     { id: "ds_candidate_name",  label: "Candidate name",       field: "first_name + last_name",          endpoint: "GET /unified/ats/candidates/{id}",             required: true  },
     { id: "ds_candidate_email", label: "Candidate email",      field: "email_addresses[0].value",         endpoint: "GET /unified/ats/candidates/{id}",             required: true  },
     { id: "ds_resume",          label: "Resume / CV",          field: "attachments (type: resume)",       endpoint: "GET /unified/ats/applications/{id}/attachments", required: false },
-    { id: "ds_job_description", label: "Job description",      field: "content.html",                    endpoint: "GET /unified/ats/jobs/{id}",                   required: true  },
+    { id: "ds_job_description", label: "Job Description",      field: "content.html",                    endpoint: "GET /unified/ats/jobs/{id}",                   required: true  },
     { id: "ds_current_stage",   label: "Current stage",        field: "current_stage.name",              endpoint: "GET /unified/ats/applications/{id}",           required: false },
   ],
   crm: [
@@ -2160,8 +2160,8 @@ function StepPersona({ data, onChange }) {
 // Step 7: Knowledge Base — job description + resume PDFs only
 function StepKnowledgeBase({ data, onChange }) {
   const docs = [
-    { key: "kbJobDesc",  label: "Job description",    hint: "Upload the job description for this role (PDF)" },
-    { key: "kbResume",   label: "Candidate resume",   hint: "Upload a sample candidate resume for calibration (PDF)" },
+    { key: "kbJobDesc",  label: "Job Description",    hint: "Upload the job description for this role (PDF)" },
+    { key: "kbResume",   label: "Candidate Resume",   hint: "Upload a sample candidate resume for calibration (PDF)" },
   ];
 
   const handleUpload = async (key, e) => {
@@ -2188,7 +2188,7 @@ function StepKnowledgeBase({ data, onChange }) {
 
   return (
     <div>
-      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Knowledge base</h2>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Knowledge Base</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Upload the job description and a sample resume so your avatar understands the role context.</p>
 
       <div style={{ display: "grid", gap: 20 }}>
@@ -2886,16 +2886,67 @@ function StepPreview({ data, onSaved }) {
   const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
 
   const platforms = [
-    { id: "zoom",  label: "Zoom",            color: "#2D8CFF", desc: "Coming soon", comingSoon: true, icon: (
-      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#9ca3af"/><path d="M8 14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V14z" fill="white"/><path d="M26 17l6-4v14l-6-4V17z" fill="white"/></svg>
+    { id: "web",   label: "Web",             color: theme.primary, desc: "Open in browser", comingSoon: false, icon: (
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill={theme.primary}/><circle cx="20" cy="20" r="10" stroke="white" strokeWidth="2" fill="none"/><line x1="10" y1="20" x2="30" y2="20" stroke="white" strokeWidth="2"/><path d="M20 10a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="white" strokeWidth="2" fill="none"/></svg>
     )},
     { id: "teams", label: "Microsoft Teams", color: "#5059C9", desc: "Start a Teams meeting", comingSoon: false, icon: (
       <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#5059C9"/><text x="50%" y="56%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="18" fontWeight="700">T</text></svg>
+    )},
+    { id: "zoom",  label: "Zoom",            color: "#2D8CFF", desc: "Coming soon", comingSoon: true, icon: (
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#9ca3af"/><path d="M8 14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V14z" fill="white"/><path d="M26 17l6-4v14l-6-4V17z" fill="white"/></svg>
     )},
     { id: "meet",  label: "Google Meet",     color: "#00AC47", desc: "Coming soon", comingSoon: true, icon: (
       <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#9ca3af"/><path d="M10 15h12v10H10z" fill="white"/><path d="M22 18l8-4v12l-8-4V18z" fill="#6b7280"/></svg>
     )},
   ];
+
+  const handleWeb = async () => {
+    if (deploying || launched) return;
+    setDeploying(true);
+    setError("");
+    try {
+      // 1 — Save experience to DB
+      const session = (await sb.auth.getSession()).data.session;
+      if (!session) throw new Error("Not logged in");
+      const payload = {
+        user_id: session.user.id,
+        name: data.name || "Untitled",
+        use_case: data.useCase || "recruitment",
+        vendor: data.avatar || null,
+        status: "draft",
+        config: data,
+        logo_url: data.logoPreview || null,
+        updated_at: new Date().toISOString(),
+      };
+      const { data: inserted, error: dbErr } = await sb.from("experiences").insert(payload).select().single();
+      if (dbErr) throw dbErr;
+      if (onSaved) onSaved();
+
+      // 2 — Create Tavus conversation
+      const replicaId = data.tavusReplicaId || "r5f0577fc829";
+      const personaId = data.tavusPersonaId || "pdac61133ac5";
+      const resp = await fetch("/api/tavus/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          replica_id: replicaId,
+          persona_id: personaId,
+          conversation_name: data.name || "Sonesse Experience",
+          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+        }),
+      });
+      const result = await resp.json();
+      const url = result.conversation_url || result.data?.conversation_url;
+      if (!url) throw new Error(result.error || "No conversation URL returned");
+      setMeetingUrl(url);
+      setLaunched("web");
+      window.open(url, "_blank");
+    } catch (e) {
+      setError(e.message || "Failed to launch web session. Please try again.");
+    } finally {
+      setDeploying(false);
+    }
+  };
 
   const handleTeams = async () => {
     if (deploying || launched) return;
@@ -2986,14 +3037,18 @@ function StepPreview({ data, onSaved }) {
       {error && <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, fontSize: 13, color: theme.danger }}>{error}</div>}
       <div style={{ marginBottom: 8 }}>
         <label style={{ ...styles.label, marginBottom: 14 }}>Launch a test session in</label>
-        <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <div className="portal-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
           {platforms.map((platform) => {
             const isTeams = platform.id === "teams";
             const isActive = !platform.comingSoon;
             const isLaunched = launched === platform.id;
             return (
               <button key={platform.id}
-                onClick={() => isTeams && !deploying && !launched ? handleTeams() : undefined}
+                onClick={() => {
+                  if (deploying || launched) return;
+                  if (platform.id === "web") handleWeb();
+                  else if (platform.id === "teams") handleTeams();
+                }}
                 disabled={platform.comingSoon || deploying || (launched && !isLaunched)}
                 style={{
                   padding: "18px 12px", borderRadius: 12, position: "relative",
