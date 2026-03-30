@@ -84,7 +84,6 @@ extraCss: "/css/marketplace-v2.css"
 			<!-- RIGHT COLUMN: Recruitment Only -->
 			<div class="marketplace-layout__right">
 				<div class="marketplace-tabs-card">
-					{% set uc = stackone.useCases | selectattr("id", "equalto", "recruitment") | first %}
 					<div class="marketplace-usecase">
 						<img src="/assets/2026/02/avatar-recruitment-2.jpg" alt="Recruitment Avatar" class="marketplace-usecase__img" />
 						<div class="marketplace-usecase__body">
@@ -94,8 +93,8 @@ extraCss: "/css/marketplace-v2.css"
 									<p class="usecase-feature__desc">Hiring cycles cut from 42 days to under a week. Time to first interview down 90%.</p>
 								</div>
 								<div class="usecase-feature">
-									<p class="usecase-feature__title">Live in 1–2 weeks</p>
-									<p class="usecase-feature__desc">High-impact, light-lift. Live in under two weeks.</p>
+									<p class="usecase-feature__title">Live in less than one hour</p>
+									<p class="usecase-feature__desc">High-impact, light-lift. Go live in under an hour.</p>
 								</div>
 								<div class="usecase-feature">
 									<p class="usecase-feature__title">Consistent. Fair. Always on.</p>
@@ -115,33 +114,6 @@ extraCss: "/css/marketplace-v2.css"
 								</div>
 							</div>
 
-							<!-- StackOne Integration Workflow -->
-							<div class="usecase-integration">
-								<div class="usecase-integration__section">
-									<p class="usecase-integration__heading">Trigger events</p>
-									<div class="usecase-integration__triggers">
-										{% for trigger in uc.triggerEvents %}
-										<span class="integration-badge">{{ trigger.badge }}</span>
-										{% endfor %}
-									</div>
-								</div>
-								<div class="usecase-integration__section">
-									<p class="usecase-integration__heading">Post-session workflow</p>
-									<ol class="usecase-integration__actions">
-										{% for action in uc.postMeetingActions %}
-										<li>{{ action.label }}</li>
-										{% endfor %}
-									</ol>
-								</div>
-								<div class="usecase-integration__section">
-									<p class="usecase-integration__heading">Output destinations</p>
-									<ul class="usecase-integration__outputs">
-										<li><span class="output-label">Transcript</span> {{ uc.outputs.transcript }}</li>
-										<li><span class="output-label">Video</span> {{ uc.outputs.video }}</li>
-										<li><span class="output-label">Summary</span> {{ uc.outputs.summary }}</li>
-									</ul>
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
