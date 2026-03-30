@@ -18,7 +18,8 @@ export async function onRequestGet({ env }) {
   }
 
   try {
-    const resp = await fetch("https://tavusapi.com/v2/replicas?limit=10", {
+    // replica_type=system returns Tavus stock replicas only (not user-trained replicas)
+    const resp = await fetch("https://tavusapi.com/v2/replicas?limit=100&replica_type=system", {
       headers: {
         "x-api-key": apiKey,
         "Content-Type": "application/json",

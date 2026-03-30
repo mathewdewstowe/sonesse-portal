@@ -947,7 +947,7 @@ function ComingSoonStep({ title, desc }) {
 }
 
 // Pre-built avatar card shown on the dashboard
-function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thumb }) {
+function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thumb, thumbVid }) {
   const [webState, setWeb]        = useState("idle"); // idle | loading | done | error
   const [webUrl, setWebUrl]       = useState("");
   const [webError, setWebErr]     = useState("");
@@ -1038,7 +1038,9 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
         {/* Avatar photo */}
         <div style={{ width: 64, height: 64, borderRadius: 14, overflow: "hidden", border: `2px solid ${theme.primary}30`, flexShrink: 0 }}>
           {thumb ? (
-            <img src={thumb} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            <img src={thumb} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
+          ) : thumbVid ? (
+            <video src={thumbVid} autoPlay muted loop playsInline style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800, color: `${theme.primary}60` }}>
               {name.split(" ").map(w => w[0]).join("").slice(0, 2)}
@@ -1397,6 +1399,7 @@ function StepChooseTavusAvatar({ data, onChange }) {
   const [loading, setLoading] = useState(true);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [previewIsVideo, setPreviewIsVideo] = useState(false); // true = pre-recorded clip
   const [previewing, setPreviewing] = useState(null);
   const [error, setError] = useState("");
 
@@ -1410,23 +1413,46 @@ function StepChooseTavusAvatar({ data, onChange }) {
   ];
 
   useEffect(() => {
+    const CACHE_KEY = "tavus_replicas_cache";
+    const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+    try {
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+      if (cached && Date.now() - cached.ts < CACHE_TTL && cached.list?.length > 0) {
+        setReplicas(cached.list);
+        setLoading(false);
+        return;
+      }
+    } catch (_) {}
+
     fetch("/api/tavus/replicas")
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(d => {
         const raw = d.data || d.replicas || d || [];
-        // Filter out deprecated replicas and those with no name
         const list = raw.filter(r =>
           r.replica_name &&
           !r.replica_name.toLowerCase().includes("deprecated") &&
-          r.status !== "deprecated"
+          r.status !== "deprecated" &&
+          // Keep only stock/system replicas — exclude user-trained ones
+          (r.replica_type === "system" || r.replica_type === "stock" || !r.replica_type)
         );
-        setReplicas(list.length > 0 ? list : PLACEHOLDER_REPLICAS);
+        const result = list.length > 0 ? list : PLACEHOLDER_REPLICAS;
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), list: result })); } catch (_) {}
+        setReplicas(result);
       })
       .catch(() => setReplicas(PLACEHOLDER_REPLICAS))
       .finally(() => setLoading(false));
   }, []);
 
   const handlePreview = async (replica) => {
+    // Use pre-recorded thumbnail video clip if available — instant and free
+    const clipUrl = replica.thumbnail_video_url || replica.preview_video_url;
+    if (clipUrl) {
+      setPreviewUrl(clipUrl);
+      setPreviewIsVideo(true);
+      setPreviewOpen(true);
+      return;
+    }
+    // No clip available — fall back to starting a live Tavus conversation
     setPreviewing(replica.replica_id);
     try {
       const resp = await fetch("/api/tavus/conversations", {
@@ -1436,17 +1462,16 @@ function StepChooseTavusAvatar({ data, onChange }) {
           replica_id: replica.replica_id,
           conversation_name: `Preview — ${replica.replica_name}`,
           conversational_context: "You are a friendly AI assistant. This is a brief 60-second preview. Greet the user warmly and briefly describe how you can help with recruitment screening interviews.",
-          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+          properties: { max_call_duration: 120, enable_recording: false, apply_greenscreen: false },
         }),
       });
       const res = await resp.json();
-      // Tavus may return conversation_url directly or nested
       const url = res.conversation_url || res.data?.conversation_url;
       if (url) {
         setPreviewUrl(url);
+        setPreviewIsVideo(false);
         setPreviewOpen(true);
       } else {
-        // Show the actual API error so we know what's wrong
         const msg = res.message || res.error || res.detail || JSON.stringify(res);
         setError(`Preview failed: ${msg}`);
       }
@@ -1461,7 +1486,7 @@ function StepChooseTavusAvatar({ data, onChange }) {
 
   return (
     <div>
-      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Choose your avatar</h2>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Choose your Avatar</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select a Tavus avatar. Click Preview to see them in action before choosing.</p>
 
       {error && (
@@ -1493,8 +1518,8 @@ function StepChooseTavusAvatar({ data, onChange }) {
                 <div style={{ position: "relative", height: 170, background: "#f0f0f2", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {rep.thumbnail_image_url ? (
                     <img src={rep.thumbnail_image_url} alt={rep.replica_name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} onError={(e) => { e.target.style.display = "none"; }} />
-                  ) : (rep.thumbnail_video_url || rep.preview_video_url) ? (
-                    <video src={rep.thumbnail_video_url || rep.preview_video_url} muted playsInline preload="metadata" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} onLoadedMetadata={e => { e.target.currentTime = 0.5; }} onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0.5; }} />
+                  ) : rep.thumbnail_video_url ? (
+                    <video src={rep.thumbnail_video_url} autoPlay muted loop playsInline style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} />
                   ) : null}
                   <div style={{ display: (rep.thumbnail_image_url || rep.thumbnail_video_url || rep.preview_video_url) ? "none" : "flex", position: "absolute", inset: 0, alignItems: "center", justifyContent: "center", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, fontSize: 36, fontWeight: 800, color: `${theme.primary}60` }}>
                     {(rep.replica_name || "?").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
@@ -1531,9 +1556,18 @@ function StepChooseTavusAvatar({ data, onChange }) {
 
       {/* Preview modal */}
       {previewOpen && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-          <div style={{ background: "#000", borderRadius: 16, overflow: "hidden", width: "100%", maxWidth: 720, aspectRatio: "16/9", position: "relative" }}>
-            <iframe src={previewUrl} style={{ width: "100%", height: "100%", border: "none" }} allow="camera; microphone; autoplay" />
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => { setPreviewOpen(false); setPreviewUrl(""); }}>
+          <div style={{ background: "#000", borderRadius: 16, overflow: "hidden", width: "100%", maxWidth: previewIsVideo ? 480 : 720, aspectRatio: previewIsVideo ? "9/16" : "16/9", position: "relative" }} onClick={e => e.stopPropagation()}>
+            {previewIsVideo ? (
+              <>
+                <video src={previewUrl} autoPlay loop muted={false} controls style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <div style={{ position: "absolute", bottom: 50, left: 0, right: 0, textAlign: "center", pointerEvents: "none" }}>
+                  <span style={{ background: "rgba(0,0,0,0.55)", color: "#fff", fontSize: 11, padding: "4px 12px", borderRadius: 20, backdropFilter: "blur(4px)" }}>Sample clip — click Preview for a live interactive session</span>
+                </div>
+              </>
+            ) : (
+              <iframe src={previewUrl} style={{ width: "100%", height: "100%", border: "none" }} allow="camera; microphone; autoplay" />
+            )}
             <button onClick={() => { setPreviewOpen(false); setPreviewUrl(""); }} style={{ position: "absolute", top: 12, right: 12, background: "rgba(0,0,0,0.6)", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
           </div>
         </div>
@@ -1645,8 +1679,8 @@ function StepAvatarSettings({ data, onChange }) {
                   style={{ padding: 0, border: `2.5px solid ${isSel ? theme.primary : "transparent"}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", background: "none", position: "relative", transition: "border-color 0.15s", boxShadow: isSel ? `0 0 0 1px ${theme.primary}` : "none" }}>
                   {r.thumbnail_image_url ? (
                     <img src={r.thumbnail_image_url} alt={r.replica_name} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
-                  ) : (r.thumbnail_video_url || r.preview_video_url) ? (
-                    <video src={r.thumbnail_video_url || r.preview_video_url} muted playsInline preload="metadata" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} onLoadedMetadata={e => { e.target.currentTime = 0.5; }} />
+                  ) : r.thumbnail_video_url ? (
+                    <video src={r.thumbnail_video_url} autoPlay muted loop playsInline style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} />
                   ) : (
                     <div style={{ width: "100%", aspectRatio: "1", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: `${theme.primary}60` }}>{(r.replica_name || "?")[0]}</div>
                   )}
@@ -3428,11 +3462,13 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
     ]).then(async ([personaRes, replicaRes]) => {
       const personaList = personaRes.data || personaRes || [];
       const replicaList = replicaRes.data || replicaRes || [];
-      // Build a map of replica_id → thumbnail from the bulk list
+      // Build a map of replica_id → { img, vid } thumbnail URLs
       const replicaThumbs = {};
       replicaList.forEach(r => {
-        const thumb = r.thumbnail_image_url || r.thumbnail_video_url || r.preview_video_url || r.thumbnail_url || r.image_url || "";
-        if (thumb) replicaThumbs[r.replica_id] = thumb;
+        replicaThumbs[r.replica_id] = {
+          img: r.thumbnail_image_url || r.thumbnail_url || r.image_url || "",
+          vid: r.thumbnail_video_url || r.preview_video_url || "",
+        };
       });
       // For personas whose replica_id wasn't in the bulk list (e.g. stock replicas),
       // fetch the individual replica to get the thumbnail.
@@ -3448,18 +3484,24 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
               .then(r => r.ok ? r.json() : null)
               .then(d => {
                 if (!d) return;
-                const thumb = d.thumbnail_image_url || d.thumbnail_video_url || d.preview_video_url || d.thumbnail_url || d.image_url || "";
-                if (thumb) replicaThumbs[id] = thumb;
+                replicaThumbs[id] = {
+                  img: d.thumbnail_image_url || d.thumbnail_url || d.image_url || "",
+                  vid: d.thumbnail_video_url || d.preview_video_url || "",
+                };
               })
               .catch(() => {})
           )
         );
       }
-      // Attach thumbnail to each persona — check persona itself first, then replica map
-      const enriched = personaList.map(p => ({
-        ...p,
-        thumb: p.thumbnail_image_url || p.default_replica_thumbnail || replicaThumbs[p.replica_id] || "",
-      }));
+      // Attach thumbnail to each persona — image preferred, video fallback
+      const enriched = personaList.map(p => {
+        const rt = replicaThumbs[p.replica_id] || {};
+        return {
+          ...p,
+          thumb:    p.thumbnail_image_url || p.default_replica_thumbnail || rt.img || "",
+          thumbVid: rt.vid || "",
+        };
+      });
       setPersonas(enriched);
     }).catch(e => console.error("[Portal] Persona load error:", e));
   }, []);
@@ -3480,6 +3522,21 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
             <button onClick={onNewExperience} style={{ ...styles.btnPrimary, padding: "10px 18px", gap: 8 }}>
               {Icons.sparkle} <span>Create Your Own</span>
             </button>
+          </div>
+
+          {/* Stats row */}
+          <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+            {[
+              { label: "Total Sessions",        value: "—", sub: "All time" },
+              { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "—", sub: "Currently live" },
+              { label: "Average Session Time", value: "—", sub: "Last 30 days" },
+            ].map((stat) => (
+              <div key={stat.label} style={{ ...styles.card, padding: "20px 24px" }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: theme.heading, marginBottom: 4 }}>{stat.value}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: theme.heading, marginBottom: 2 }}>{stat.label}</div>
+                <div style={{ fontSize: 12, color: theme.textMuted }}>{stat.sub}</div>
+              </div>
+            ))}
           </div>
 
           {/* Pre-built avatars */}
@@ -3510,6 +3567,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
                         personaId={p.persona_id}
                         replicaId={p.replica_id}
                         thumb={p.thumb}
+                        thumbVid={p.thumbVid}
                         tags={[...meta.tags, "Pre-built"]}
                         onUse={onNewExperience}
                       />
@@ -3573,21 +3631,6 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Stats row */}
-          <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
-            {[
-              { label: "Total Sessions",        value: "—", sub: "All time" },
-              { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "—", sub: "Currently live" },
-              { label: "Average Session Time", value: "—", sub: "Last 30 days" },
-            ].map((stat) => (
-              <div key={stat.label} style={{ ...styles.card, padding: "20px 24px" }}>
-                <div style={{ fontSize: 28, fontWeight: 800, color: theme.heading, marginBottom: 4 }}>{stat.value}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: theme.heading, marginBottom: 2 }}>{stat.label}</div>
-                <div style={{ fontSize: 12, color: theme.textMuted }}>{stat.sub}</div>
-              </div>
-            ))}
           </div>
 
           {/* Recent sessions preview */}
