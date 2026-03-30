@@ -268,9 +268,6 @@ const USE_CASE_DEFAULTS = {
 // Use portrait-oriented images with faces properly framed
 const AVATAR_VENDORS = [
   { id: "tavus", name: "Tavus", type: "video", desc: "Real-time conversational video avatars with lip sync", color: "#1e40af", logo: "T", previewImg: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=300&fit=crop&crop=faces,center" },
-  { id: "anam", name: "Anam", type: "video", desc: "Low-latency photorealistic AI avatars for live interaction", color: "#7c3aed", logo: "A", previewImg: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=300&fit=crop&crop=faces,center", disabled: true },
-  { id: "heygen", name: "HeyGen", type: "video", desc: "Hyper-realistic video avatars for business communication", color: "#0891b2", logo: "H", previewImg: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=300&fit=crop&crop=faces,center", disabled: true },
-  { id: "synthesia", name: "Synthesia", type: "video", desc: "Enterprise AI video avatars for training and presentations", color: "#db2777", logo: "S", previewImg: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=300&fit=crop&crop=faces,center", disabled: true },
   { id: "elevenlabs", name: "ElevenLabs", type: "voice", desc: "Ultra-realistic voice synthesis and cloning", color: "#d97706", logo: "XI", previewImg: null },
   { id: "deepgram", name: "Deepgram", type: "voice", desc: "Fast, accurate voice agents for enterprise scale", color: "#16a34a", logo: "D", previewImg: null },
 ];
@@ -1487,7 +1484,7 @@ function StepChooseTavusAvatar({ data, onChange }) {
   return (
     <div>
       <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Choose your Avatar</h2>
-      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select a Tavus avatar. Click Preview to see them in action before choosing.</p>
+      <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select a Tavus avatar to use for your experience.</p>
 
       {error && (
         <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, fontSize: 12, color: theme.danger }}>
@@ -1530,12 +1527,9 @@ function StepChooseTavusAvatar({ data, onChange }) {
                     </div>
                   )}
                 </div>
-                {/* Info + preview button */}
-                <div style={{ padding: "12px 14px 14px" }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: 10 }}>{rep.replica_name}</div>
-                  <button onClick={(e) => { e.stopPropagation(); handlePreview(rep); }} disabled={previewing === rep.replica_id} style={{ ...styles.btnSecondary, width: "100%", justifyContent: "center", fontSize: 12, padding: "7px 12px", opacity: previewing === rep.replica_id ? 0.6 : 1 }}>
-                    {previewing === rep.replica_id ? "Starting…" : "▶ Preview"}
-                  </button>
+                {/* Info */}
+                <div style={{ padding: "10px 14px 12px" }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading }}>{rep.replica_name}</div>
                 </div>
               </div>
             );
@@ -1577,562 +1571,151 @@ function StepChooseTavusAvatar({ data, onChange }) {
 }
 
 function StepAvatarSettings({ data, onChange }) {
-  const [mode, setMode]         = useState(data.avatarSettingsMode || "default");
-  const [tab, setTab]           = useState(data.avatarConfigTab || "voice");
-  const [moreOpen, setMoreOpen] = useState(false);
-  const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
+  const [mode, setMode] = useState(data.avatarSettingsMode || "default");
 
-  const setTabAndSave = (t) => { setTab(t); setMoreOpen(false); onChange({ ...data, avatarConfigTab: t }); };
-
-  const toggleTool = (id) => {
-    const cur = data.avatarTools || [];
-    const next = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
-    onChange({ ...data, avatarTools: next });
-  };
-
-  // Shared layer helpers — available to all inner tab components via closure
+  // All Tavus persona layer config lives in data.tavusLayers
   const layers   = data.tavusLayers || {};
   const setLayer = (key, val) => onChange({ ...data, tavusLayers: { ...layers, [key]: val } });
 
-  // ── Shared UI primitives ──────────────────────────────────────────────────
-  const Row = ({ label, hint, children }) => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, gap: 12 }}>
-      <div>
-        <div style={{ fontSize: 13, color: theme.textMuted, fontWeight: 500 }}>{label}</div>
-        {hint && <div style={{ fontSize: 11, color: theme.textDim, marginTop: 1 }}>{hint}</div>}
+  // Shared helpers
+  const Field = ({ label, hint, children }) => (
+    <div style={{ display: "grid", gap: 6 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: theme.heading }}>{label}</span>
+        {hint && <span style={{ fontSize: 11, color: theme.textDim }}>ⓘ</span>}
       </div>
       {children}
     </div>
   );
 
-  const Toggle = ({ stateKey, defaultVal }) => {
-    const val = layers[stateKey] !== undefined ? layers[stateKey] : (defaultVal || false);
-    return (
-      <div onClick={() => setLayer(stateKey, !val)}
-        style={{ width: 38, height: 22, borderRadius: 11, background: val ? theme.primary : "#d1d5db", position: "relative", cursor: "pointer", transition: "background 0.2s", flexShrink: 0 }}>
-        <div style={{ position: "absolute", top: 3, left: val ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
-      </div>
-    );
-  };
-
-  const Sel = ({ stateKey, options, defaultId, width }) => {
+  const LayerSelect = ({ stateKey, options, defaultId }) => {
     const val = layers[stateKey] || defaultId;
     return (
       <select value={val} onChange={e => setLayer(stateKey, e.target.value)}
-        style={{ ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px", minWidth: width || 160 }}>
+        style={{ ...styles.select, fontSize: 13, padding: "9px 14px", width: "100%" }}>
         {options.map(o => (
           <option key={o.id} value={o.id}>
-            {o.name}{o.badge === "recommended" ? " \u2605" : o.badge === "default" ? " (default)" : o.badge ? ` (${o.badge})` : ""}
+            {o.name}{o.badge === "recommended" ? " ★" : o.badge ? ` (${o.badge})` : ""}
           </option>
         ))}
       </select>
     );
   };
 
-  const SectionLabel = ({ children }) => (
-    <div style={{ fontSize: 11, fontWeight: 700, color: theme.textDim, textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 12, marginBottom: 6 }}>{children}</div>
-  );
-
-  const ToggleRow = ({ label, hint, stateKey, defaultVal }) => (
-    <Row label={label} hint={hint}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 12, color: theme.textMuted }}>
-          {(layers[stateKey] !== undefined ? layers[stateKey] : (defaultVal || false)) ? "On" : "Off"}
-        </span>
-        <Toggle stateKey={stateKey} defaultVal={defaultVal} />
-      </div>
-    </Row>
-  );
-
-  // ── Avatar tab ────────────────────────────────────────────────────────────
-  const AvatarTab = () => {
-    const [replicas, setReplicas]         = useState(null);
-    const [replicaError, setReplicaError] = useState("");
-
-    useEffect(() => {
-      fetch("/api/tavus/replicas")
-        .then(r => r.json())
-        .then(d => {
-          const list = Array.isArray(d) ? d : (d.data || d.replicas || []);
-          if (list.length === 0 && d.error) setReplicaError(d.error);
-          setReplicas(list.slice(0, 12));
-        })
-        .catch(err => { setReplicaError(err.message); setReplicas([]); });
-    }, []);
-
+  const TagList = ({ stateKey, placeholder }) => {
+    const [input, setInput] = useState("");
+    const items = layers[stateKey] || [];
+    const add = () => { const v = input.trim(); if (v) { setLayer(stateKey, [...items, v]); setInput(""); } };
     return (
-      <div style={{ display: "grid", gap: 8 }}>
-        <SectionLabel>Choose avatar</SectionLabel>
-        {replicas === null ? (
-          <div style={{ fontSize: 13, color: theme.textMuted, padding: "12px 0" }}>Loading avatars\u2026</div>
-        ) : replicas.length === 0 ? (
-          <div style={{ fontSize: 13, color: theme.textMuted, padding: "12px 0" }}>
-            {replicaError ? `Error: ${replicaError}` : "No replicas found in your Tavus account."}
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))", gap: 8, marginBottom: 8 }}>
-            {replicas.map(r => {
-              const isSel = data.tavusReplicaId === r.replica_id;
-              return (
-                <button key={r.replica_id}
-                  onClick={() => onChange({ ...data, tavusReplicaId: r.replica_id, tavusReplicaName: r.replica_name, tavusReplicaImg: r.thumbnail_image_url || r.thumbnail_video_url || r.preview_video_url || r.thumbnail_url || r.image_url || "" })}
-                  style={{ padding: 0, border: `2.5px solid ${isSel ? theme.primary : "transparent"}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", background: "none", position: "relative", transition: "border-color 0.15s", boxShadow: isSel ? `0 0 0 1px ${theme.primary}` : "none" }}>
-                  {r.thumbnail_image_url ? (
-                    <img src={r.thumbnail_image_url} alt={r.replica_name} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
-                  ) : r.thumbnail_video_url ? (
-                    <video src={r.thumbnail_video_url} autoPlay muted loop playsInline style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} />
-                  ) : (
-                    <div style={{ width: "100%", aspectRatio: "1", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: `${theme.primary}60` }}>{(r.replica_name || "?")[0]}</div>
-                  )}
-                  <div style={{ padding: "4px 6px", background: isSel ? theme.primary : theme.surface, borderTop: `1px solid ${isSel ? theme.primary : theme.border}` }}>
-                    <div style={{ fontSize: 10, fontWeight: 600, color: isSel ? "#fff" : theme.heading, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.replica_name}</div>
-                  </div>
-                  {isSel && <div style={{ position: "absolute", top: 5, right: 5, width: 16, height: 16, borderRadius: "50%", background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 9, fontWeight: 700 }}>&#10003;</div>}
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Conversation */}
-        <SectionLabel>Conversation context</SectionLabel>
-        <Row label="Pipeline mode" hint="Full duplex allows interruptions; half duplex is turn-based">
-          <Sel stateKey="pipelineMode" options={TAVUS_PIPELINE_MODES} defaultId="full_duplex" width={250} />
-        </Row>
-        <Row label="Language">
-          <select value={layers.language || "English"} onChange={e => setLayer("language", e.target.value)}
-            style={{ ...styles.select, width: "auto", fontSize: 13, padding: "5px 12px", minWidth: 160 }}>
-            {TAVUS_LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-          </select>
-        </Row>
-        <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted, marginBottom: 6 }}>Custom greeting <span style={{ fontSize: 11, color: theme.textDim }}>— avatar&apos;s opening message</span></div>
-          <textarea value={layers.customGreeting || ""} onChange={e => setLayer("customGreeting", e.target.value)} rows={2}
-            placeholder="Hi! I'm your AI assistant. How can I help you today?"
-            style={{ ...styles.input, marginBottom: 0, resize: "vertical", fontSize: 13, fontFamily: "inherit", lineHeight: 1.5 }}
-            onFocus={e => e.target.style.borderColor = theme.borderFocus} onBlur={e => e.target.style.borderColor = theme.border} />
-        </div>
-        <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted, marginBottom: 6 }}>Conversational context <span style={{ fontSize: 11, color: theme.textDim }}>— per-session extra context injected at call start</span></div>
-          <textarea value={layers.conversationalContext || ""} onChange={e => setLayer("conversationalContext", e.target.value)} rows={3}
-            placeholder="Add context specific to this session, e.g. caller name, account info..."
-            style={{ ...styles.input, marginBottom: 0, resize: "vertical", fontSize: 13, fontFamily: "inherit", lineHeight: 1.5 }}
-            onFocus={e => e.target.style.borderColor = theme.borderFocus} onBlur={e => e.target.style.borderColor = theme.border} />
-        </div>
-
-        {/* Call settings */}
-        <SectionLabel>Call settings</SectionLabel>
-        <ToggleRow label="Audio only" hint="Disable video stream" stateKey="audioOnly" />
-        <ToggleRow label="Apply greenscreen" stateKey="applyGreenscreen" />
-        <ToggleRow label="Closed captions" stateKey="enableClosedCaptions" />
-        <ToggleRow label="Enable recording" stateKey="enableRecording" />
-        <ToggleRow label="Private room" hint="Require authentication to join" stateKey="requireAuth" />
-        <Row label="Enable transcription">
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 12, color: theme.textMuted }}>{layers.enableTranscription !== false ? "On" : "Off"}</span>
-            <div onClick={() => setLayer("enableTranscription", layers.enableTranscription === false ? true : false)}
-              style={{ width: 38, height: 22, borderRadius: 11, background: layers.enableTranscription !== false ? theme.primary : "#d1d5db", position: "relative", cursor: "pointer", transition: "background 0.2s", flexShrink: 0 }}>
-              <div style={{ position: "absolute", top: 3, left: layers.enableTranscription !== false ? 19 : 3, width: 16, height: 16, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
-            </div>
-          </div>
-        </Row>
-        <Row label="Maximum session time" hint="Fixed at 300 s — configurable in a future release">
-          <input type="number" disabled value={300}
-            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px", opacity: 0.45, cursor: "not-allowed", background: theme.surface }} />
-        </Row>
-        <Row label="Max participants">
-          <input type="number" min={2} max={10} value={layers.maxParticipants || 2}
-            onChange={e => setLayer("maxParticipants", parseInt(e.target.value) || 2)}
-            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
-        </Row>
-        <Row label="Participant left timeout" hint="seconds (0 = end call immediately)">
-          <input type="number" min={0} max={3600} value={layers.participantLeftTimeout != null ? layers.participantLeftTimeout : 0}
-            onChange={e => setLayer("participantLeftTimeout", parseInt(e.target.value) || 0)}
-            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
-        </Row>
-        <Row label="Participant absent timeout" hint="seconds">
-          <input type="number" min={0} max={600} value={layers.participantAbsentTimeout != null ? layers.participantAbsentTimeout : 300}
-            onChange={e => setLayer("participantAbsentTimeout", parseInt(e.target.value) || 300)}
-            style={{ ...styles.select, width: 80, textAlign: "right", fontSize: 13, padding: "5px 10px" }} />
-        </Row>
-        <Row label="Callback URL" hint="Webhook for conversation events">
-          <input type="url" value={layers.callbackUrl || ""} onChange={e => setLayer("callbackUrl", e.target.value)}
-            placeholder="https://..."
-            style={{ ...styles.select, width: 220, fontSize: 12, padding: "5px 10px" }} />
-        </Row>
-      </div>
-    );
-  };
-
-  // ── Voice tab ─────────────────────────────────────────────────────────────
-  const VoiceTab = () => {
-    const [search, setSearch] = useState("");
-    const [playing, setPlaying] = useState(null);
-    const filtered = TAVUS_VOICES.filter(v => v.name.toLowerCase().includes(search.toLowerCase()));
-    const ttsEngine = layers.ttsEngine || "cartesia";
-    const isExternal = ttsEngine !== "cartesia";
-
-    const playPreview = (e, v) => {
-      e.stopPropagation();
-      if (!('speechSynthesis' in window)) return;
-      if (playing === v.id) {
-        window.speechSynthesis.cancel();
-        setPlaying(null);
-        return;
-      }
-      window.speechSynthesis.cancel();
-      const text = `Hi, I'm ${v.name.split("–")[0].trim()}. I'm your AI interview assistant, and I'm here to help you find the right candidate today.`;
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = v.lang || "en-US";
-      utt.rate = 1.0;
-      // Try to pick a matching browser voice
-      const voices = window.speechSynthesis.getVoices();
-      const match = voices.find(bv => bv.lang.startsWith(utt.lang.split("-")[0]));
-      if (match) utt.voice = match;
-      utt.onend = () => setPlaying(null);
-      utt.onerror = () => setPlaying(null);
-      setPlaying(v.id);
-      window.speechSynthesis.speak(utt);
-    };
-
-    return (
-      <div>
-        <SectionLabel>Select voice</SectionLabel>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", border: `1px solid ${theme.border}`, borderRadius: 10, marginBottom: 10, background: theme.surface }}>
-          <span style={{ color: theme.textDim, fontSize: 13, fontWeight: 600, flexShrink: 0 }}>+ Add</span>
-          <span style={{ color: theme.border, margin: "0 4px" }}>|</span>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search voices..."
-            style={{ border: "none", outline: "none", background: "transparent", flex: 1, fontSize: 12, color: theme.textMuted }} />
-        </div>
-        <div style={{ display: "grid", gap: 6, marginBottom: 16 }}>
-          {filtered.map(v => {
-            const isSel = data.avatarVoice === v.id;
-            const isPlaying = playing === v.id;
-            return (
-              <div key={v.id} onClick={() => onChange({ ...data, avatarVoice: v.id })}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${isSel ? theme.primary : theme.border}`, background: isSel ? theme.selectedBg : theme.surface, cursor: "pointer", transition: "all 0.15s" }}>
-                <button title={isPlaying ? "Stop preview" : "Preview voice"} onClick={e => playPreview(e, v)}
-                  style={{ width: 28, height: 28, borderRadius: "50%", border: `1.5px solid ${isPlaying ? theme.primary : theme.border}`, background: isPlaying ? `${theme.primary}15` : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: isPlaying ? theme.primary : theme.textMuted, cursor: "pointer", transition: "all 0.15s" }}>
-                  {isPlaying
-                    ? <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="4" width="4" height="16"/><rect x="15" y="4" width="4" height="16"/></svg>
-                    : <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  }
-                </button>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-                    <span style={{ fontSize: 14 }}>{v.flag}</span>
-                    <span style={{ fontWeight: 600, fontSize: 13, color: theme.heading }}>{v.name}</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 10, background: "#e8f5e9", color: "#2e7d32" }}>{v.speed}</span>
-                  </div>
-                  <div style={{ fontSize: 11, color: theme.textMuted, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.desc}</div>
-                </div>
-                <button onClick={e => e.stopPropagation()} style={{ background: "none", border: "none", color: theme.textDim, cursor: "pointer", padding: "0 4px", fontSize: 18, lineHeight: 1 }}>&#8942;</button>
-              </div>
-            );
-          })}
-        </div>
-
-        <SectionLabel>TTS configuration</SectionLabel>
-        <div style={{ display: "grid", gap: 8 }}>
-          <Row label="TTS engine">
-            <Sel stateKey="ttsEngine" options={TAVUS_TTS_ENGINES} defaultId="cartesia" width={140} />
-          </Row>
-          {isExternal && (
-            <Row label="External voice ID" hint="Voice ID from the selected TTS provider">
-              <input type="text" value={layers.externalVoiceId || ""} onChange={e => setLayer("externalVoiceId", e.target.value)}
-                placeholder="voice-id-from-provider"
-                style={{ ...styles.select, width: 210, fontSize: 12, padding: "5px 10px" }} />
-            </Row>
-          )}
-          {isExternal && (
-            <Row label="TTS API key" hint="Provider API key (stored securely)">
-              <input type="password" value={layers.ttsApiKey || ""} onChange={e => setLayer("ttsApiKey", e.target.value)}
-                placeholder="sk-..."
-                style={{ ...styles.select, width: 210, fontSize: 12, padding: "5px 10px" }} />
-            </Row>
-          )}
-          {ttsEngine === "playai" && (
-            <Row label="PlayHT user ID" hint="Required for PlayAI engine">
-              <input type="text" value={layers.playhtUserId || ""} onChange={e => setLayer("playhtUserId", e.target.value)}
-                placeholder="user-id"
-                style={{ ...styles.select, width: 210, fontSize: 12, padding: "5px 10px" }} />
-            </Row>
-          )}
-          <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 14px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted }}>TTS speed</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: theme.heading }}>{(layers.ttsSpeed || 1.0).toFixed(1)}&#215;</span>
-            </div>
-            <input type="range" min={0.5} max={2.0} step={0.1} value={layers.ttsSpeed || 1.0}
-              onChange={e => setLayer("ttsSpeed", parseFloat(e.target.value))}
-              style={{ width: "100%", accentColor: theme.primary }} />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: theme.textDim, marginTop: 2 }}>
-              <span>0.5&#215;</span><span>1.0&#215;</span><span>2.0&#215;</span>
-            </div>
-          </div>
-          <ToggleRow label="Emotion control" hint="Allow TTS engine to express emotion dynamically" stateKey="ttsEmotionControl" />
-          <ToggleRow label="Passthrough audio" hint="Stream raw audio without post-processing" stateKey="passthroughAudio" />
-        </div>
-      </div>
-    );
-  };
-
-  // ── LLM tab ───────────────────────────────────────────────────────────────
-  const LLMTab = () => {
-    const useCustom = !!(layers.llmBaseUrl);
-    return (
-      <div>
-        <SectionLabel>Select model</SectionLabel>
-        <div style={{ display: "grid", gap: 6, marginBottom: 16 }}>
-          {TAVUS_LLMS.map(llm => {
-            const isSel = (data.avatarLLM || "tavus-gpt-oss") === llm.id;
-            return (
-              <div key={llm.id} onClick={() => onChange({ ...data, avatarLLM: llm.id })}
-                style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 10, border: `1.5px solid ${isSel ? theme.primary : theme.border}`, background: isSel ? theme.selectedBg : theme.surface, cursor: "pointer", transition: "all 0.15s" }}>
-                <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${isSel ? theme.primary : theme.border}`, background: isSel ? theme.primary : "transparent", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
-                  {isSel && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontWeight: 600, fontSize: 13, color: theme.heading }}>{llm.name}</span>
-                    {llm.badge && <span style={{ fontSize: 10, fontWeight: 700, padding: "1px 7px", borderRadius: 10, background: "#f3f4f6", color: theme.textMuted, textTransform: "capitalize" }}>{llm.badge.charAt(0).toUpperCase() + llm.badge.slice(1)}</span>}
-                  </div>
-                  <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 1 }}>{llm.desc}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        {/* Model parameters and custom endpoint removed — defaults are applied automatically */}
-      </div>
-    );
-  };
-
-  // ── Perception tab ────────────────────────────────────────────────────────
-  const PerceptionTab = () => {
-    const [queryInput, setQueryInput] = useState("");
-    const queries = layers.ambientAwarenessQueries || [];
-    const addQuery = () => {
-      const v = queryInput.trim();
-      if (v && !queries.includes(v)) setLayer("ambientAwarenessQueries", [...queries, v]);
-      setQueryInput("");
-    };
-
-    return (
-      <div style={{ display: "grid", gap: 8 }}>
-        <SectionLabel>Perception model</SectionLabel>
-        <Row label="Perception model" hint="Controls visual + audio environment awareness">
-          <Sel stateKey="perception" options={TAVUS_PERCEPTION_MODELS} defaultId="raven-1" width={140} />
-        </Row>
-        <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted, marginBottom: 6 }}>
-            Perception tool prompt <span style={{ fontSize: 11, color: theme.textDim }}>— instructions for the perception layer</span>
-          </div>
-          <textarea value={layers.perceptionToolPrompt || ""} onChange={e => setLayer("perceptionToolPrompt", e.target.value)} rows={3}
-            placeholder="Describe what the perception model should focus on..."
-            style={{ ...styles.input, marginBottom: 0, resize: "vertical", fontSize: 13, fontFamily: "inherit", lineHeight: 1.5 }}
-            onFocus={e => e.target.style.borderColor = theme.borderFocus}
-            onBlur={e => e.target.style.borderColor = theme.border} />
-        </div>
-        <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted, marginBottom: 8 }}>
-            Ambient awareness queries <span style={{ fontSize: 11, color: theme.textDim }}>— questions answered continuously by the perception model</span>
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
-            {queries.map(q => (
-              <span key={q} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 20, background: theme.primaryLight, color: theme.primary, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                {q}
-                <span onClick={() => setLayer("ambientAwarenessQueries", queries.filter(x => x !== q))}
-                  style={{ cursor: "pointer", fontSize: 14, lineHeight: 1, color: theme.primary, fontWeight: 700 }}>&#215;</span>
-              </span>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            <input value={queryInput} onChange={e => setQueryInput(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && addQuery()}
-              placeholder="e.g. Is the user showing a document?"
-              style={{ ...styles.input, marginBottom: 0, fontSize: 12, padding: "5px 10px", flex: 1 }}
-              onFocus={e => e.target.style.borderColor = theme.borderFocus}
-              onBlur={e => e.target.style.borderColor = theme.border} />
-            <button onClick={addQuery} style={{ ...styles.btnSecondary, padding: "5px 12px", fontSize: 12 }}>+ Add</button>
-          </div>
-        </div>
-
-        <SectionLabel>Turn &amp; interrupt sensitivity</SectionLabel>
-        <Row label="Turn detection model">
-          <Sel stateKey="turnDetection" options={TAVUS_TURN_DETECTION_MODELS} defaultId="sparrow-1" width={140} />
-        </Row>
-        <Row label="Turn end sensitivity" hint="How quickly the avatar detects end of turn">
-          <Sel stateKey="turnEndSensitivity" options={TAVUS_SENSITIVITY_LEVELS} defaultId="medium" width={110} />
-        </Row>
-        <Row label="Interrupt sensitivity" hint="How readily the avatar can be interrupted">
-          <Sel stateKey="interruptSensitivity" options={TAVUS_SENSITIVITY_LEVELS} defaultId="medium" width={110} />
-        </Row>
-
-        <SectionLabel>Voice activity detection (VAD)</SectionLabel>
-        <Row label="VAD engine">
-          <Sel stateKey="vadEngine" options={TAVUS_VAD_ENGINES} defaultId="default" width={110} />
-        </Row>
-        <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 14px" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted }}>VAD sensitivity</div>
-              <div style={{ fontSize: 11, color: theme.textDim }}>Higher = more sensitive to speech detection</div>
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 700, color: theme.heading }}>
-              {(layers.vadSensitivity !== undefined ? layers.vadSensitivity : 0.5).toFixed(2)}
+      <div style={{ border: `1px solid ${theme.border}`, borderRadius: 8, padding: "10px 14px", background: theme.surface }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: items.length ? 8 : 0 }}>
+          {items.map(t => (
+            <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 20, background: theme.primaryLight, color: theme.primary, fontWeight: 600, display: "flex", alignItems: "center", gap: 5 }}>
+              {t} <span onClick={() => setLayer(stateKey, items.filter(x => x !== t))} style={{ cursor: "pointer", fontWeight: 700 }}>×</span>
             </span>
-          </div>
-          <input type="range" min={0} max={1} step={0.05}
-            value={layers.vadSensitivity !== undefined ? layers.vadSensitivity : 0.5}
-            onChange={e => setLayer("vadSensitivity", parseFloat(e.target.value))}
-            style={{ width: "100%", accentColor: theme.primary }} />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: theme.textDim, marginTop: 2 }}>
-            <span>0.0 (low)</span><span>0.5</span><span>1.0 (high)</span>
-          </div>
+          ))}
         </div>
-      </div>
-    );
-  };
-
-  // ── STT tab ───────────────────────────────────────────────────────────────
-  const STTTab = () => {
-    const [visualInput, setVisualInput] = useState("");
-    const [audioInput,  setAudioInput]  = useState("");
-    const visualTools = layers.visualTools || [];
-    const audioTools  = layers.audioTools  || [];
-    const addVisual = () => { const v = visualInput.trim(); if (v && !visualTools.includes(v)) setLayer("visualTools", [...visualTools, v]); setVisualInput(""); };
-    const addAudio  = () => { const v = audioInput.trim();  if (v && !audioTools.includes(v))  setLayer("audioTools",  [...audioTools,  v]); setAudioInput(""); };
-
-    return (
-      <div style={{ display: "grid", gap: 8 }}>
-        <SectionLabel>Speech-to-text engine</SectionLabel>
-        <Row label="STT engine">
-          <Sel stateKey="stt" options={TAVUS_STT_ENGINES} defaultId="tavus-auto" width={180} />
-        </Row>
-        <Row label="Participant pause sensitivity" hint="How long a pause before the avatar takes its turn">
-          <Sel stateKey="participantPauseSensitivity" options={TAVUS_SENSITIVITY_LEVELS} defaultId="medium" width={110} />
-        </Row>
-        <div style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 14px" }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted, marginBottom: 6 }}>
-            Hotwords <span style={{ fontSize: 11, color: theme.textDim }}>— comma-separated words to boost STT recognition accuracy</span>
-          </div>
-          <input value={layers.hotwords || ""} onChange={e => setLayer("hotwords", e.target.value)}
-            placeholder="e.g. Sonesse, StackOne, demo"
-            style={{ ...styles.input, marginBottom: 0, fontSize: 13 }}
+        <div style={{ display: "flex", gap: 6 }}>
+          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && add()}
+            placeholder={placeholder || "Add item..."}
+            style={{ ...styles.input, marginBottom: 0, fontSize: 12, padding: "5px 10px", flex: 1 }}
             onFocus={e => e.target.style.borderColor = theme.borderFocus}
             onBlur={e => e.target.style.borderColor = theme.border} />
+          <button onClick={add} style={{ ...styles.btnSecondary, padding: "5px 14px", fontSize: 12 }}>+ Add</button>
         </div>
-
-        <SectionLabel>Visual &amp; audio tools</SectionLabel>
-        {[
-          { label: "Visual tools", key: "visualTools", items: visualTools, input: visualInput, setInput: setVisualInput, add: addVisual },
-          { label: "Audio tools",  key: "audioTools",  items: audioTools,  input: audioInput,  setInput: setAudioInput,  add: addAudio  },
-        ].map(({ label, key, items, input, setInput, add }) => (
-          <div key={key} style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 14px" }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: theme.textMuted, marginBottom: 8 }}>{label}</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
-              {items.map(t => (
-                <span key={t} style={{ fontSize: 12, padding: "3px 10px", borderRadius: 20, background: theme.primaryLight, color: theme.primary, fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                  {t}
-                  <span onClick={() => setLayer(key, items.filter(x => x !== t))}
-                    style={{ cursor: "pointer", fontSize: 14, lineHeight: 1, color: theme.primary, fontWeight: 700 }}>&#215;</span>
-                </span>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: 6 }}>
-              <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && add()}
-                placeholder="Tool name..."
-                style={{ ...styles.input, marginBottom: 0, fontSize: 12, padding: "4px 10px", flex: 1 }}
-                onFocus={e => e.target.style.borderColor = theme.borderFocus}
-                onBlur={e => e.target.style.borderColor = theme.border} />
-              <button onClick={add} style={{ ...styles.btnSecondary, padding: "4px 12px", fontSize: 12 }}>+ Add</button>
-            </div>
-          </div>
-        ))}
       </div>
     );
   };
 
-  // ── Tools tab ─────────────────────────────────────────────────────────────
-  const ToolsTab = () => (
-    <div>
-      <div style={{ marginBottom: 12, fontSize: 12, fontWeight: 700, color: theme.textMuted, display: "flex", alignItems: "center", gap: 6 }}>
-        System <span style={{ color: theme.textDim, fontWeight: 400, cursor: "pointer" }}>&#9432;</span>
-      </div>
-      <div style={{ display: "grid", gap: 8 }}>
-        {TAVUS_SYSTEM_TOOLS.map(tool => {
-          const enabled = (data.avatarTools || []).includes(tool.id);
-          return (
-            <div key={tool.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", border: `1px solid ${theme.border}`, borderRadius: 10, background: theme.surface }}>
-              <div onClick={() => toggleTool(tool.id)}
-                style={{ width: 40, height: 22, borderRadius: 11, background: enabled ? theme.primary : theme.border, position: "relative", cursor: "pointer", transition: "background 0.2s", flexShrink: 0 }}>
-                <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 3, left: enabled ? 20 : 3, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 13, color: theme.heading, fontFamily: "monospace" }}>{tool.label}</div>
-                <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>{tool.desc}</div>
-              </div>
-              <button style={{ background: "none", border: "none", color: theme.textDim, cursor: "pointer", padding: "0 4px", fontSize: 18, lineHeight: 1 }}>&#8942;</button>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  // ── Tab structure ─────────────────────────────────────────────────────────
-  const ALL_TABS = ["voice", "llm", "perception", "stt"];
-  const tabLabels = { voice: "Voice", llm: "LLM", perception: "Perception", stt: "STT" };
+  const sep = <div style={{ borderTop: `1px solid ${theme.border}`, margin: "4px 0" }} />;
 
   return (
     <div>
-      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Avatar settings</h2>
-      <p style={{ color: theme.textMuted, margin: "0 0 20px", fontSize: 14 }}>Configure how your avatar thinks, speaks and perceives the conversation.</p>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Avatar Layers</h2>
+      <p style={{ color: theme.textMuted, margin: "0 0 20px", fontSize: 14 }}>Configure the Tavus persona layers — exactly the same settings as the Tavus dashboard.</p>
 
-      {vendor && (
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, padding: "10px 14px", background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 10 }}>
-          {vendor.previewImg ? (
-            <img src={vendor.previewImg} alt={vendor.name} style={{ width: 36, height: 36, borderRadius: 8, objectFit: "cover", objectPosition: "center 15%", border: `1px solid ${theme.border}` }} />
-          ) : (
-            <div style={{ width: 36, height: 36, borderRadius: 8, background: vendor.color, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 13, color: "#fff", flexShrink: 0 }}>{vendor.logo}</div>
-          )}
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: 13, color: theme.heading }}>{vendor.name}</div>
-            <div style={{ fontSize: 11, color: theme.textMuted }}>{vendor.type === "video" ? "Video Avatar" : "Voice Bot"}</div>
-          </div>
-          <div style={{ display: "flex", borderRadius: 8, border: `1px solid ${theme.border}`, overflow: "hidden" }}>
-            {["default", "advanced"].map(m => (
-              <button key={m} onClick={() => { setMode(m); onChange({ ...data, avatarSettingsMode: m }); }}
-                style={{ padding: "5px 14px", fontSize: 12, fontWeight: 600, border: "none", cursor: "pointer", background: mode === m ? theme.primary : "transparent", color: mode === m ? "#fff" : theme.textMuted, transition: "all 0.15s" }}>
-                {m.charAt(0).toUpperCase() + m.slice(1)}
-              </button>
-            ))}
-          </div>
+      <div style={{ display: "flex", borderRadius: 8, border: `1px solid ${theme.border}`, overflow: "hidden", marginBottom: 20, width: "fit-content" }}>
+        {["default", "advanced"].map(m => (
+          <button key={m} onClick={() => { setMode(m); onChange({ ...data, avatarSettingsMode: m }); }}
+            style={{ padding: "7px 18px", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer", background: mode === m ? theme.primary : "transparent", color: mode === m ? "#fff" : theme.textMuted, transition: "all 0.15s" }}>
+            {m === "default" ? "Defaults" : "Advanced"}
+          </button>
+        ))}
+      </div>
+
+      {mode === "default" ? (
+        <div style={{ padding: "16px 20px", background: theme.primaryLight, borderRadius: 10, border: `1px solid ${theme.primaryMed}`, fontSize: 13, color: theme.textMuted }}>
+          <span style={{ fontWeight: 700, color: theme.primary }}>Defaults applied. </span>Sonesse uses best-in-class settings for your use case automatically. Switch to Advanced to customise each layer.
         </div>
-      )}
+      ) : (
+        <div style={{ display: "grid", gap: 20 }}>
 
-      {mode === "default" && (
-        <div style={{ padding: "16px 20px", background: theme.primaryLight, borderRadius: 10, border: `1px solid ${theme.primaryMed}`, fontSize: 13, color: theme.textMuted, lineHeight: 1.5 }}>
-          <span style={{ fontWeight: 700, color: theme.primary }}>Defaults applied. </span>Sonesse will automatically select the best model settings for your use case. Switch to Advanced to customise.
-        </div>
-      )}
-
-      {mode === "advanced" && (
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 2, borderBottom: `1px solid ${theme.border}`, marginBottom: 20, flexWrap: "wrap" }}>
-            {ALL_TABS.map(t => (
-              <button key={t} onClick={() => setTabAndSave(t)}
-                style={{ padding: "8px 18px", fontSize: 14, fontWeight: tab === t ? 600 : 400, color: tab === t ? theme.heading : theme.textMuted, background: "none", border: "none", borderBottom: `2px solid ${tab === t ? theme.heading : "transparent"}`, cursor: "pointer", marginBottom: -1, transition: "all 0.15s" }}>
-                {tabLabels[t]}
-              </button>
-            ))}
+          {/* LLM */}
+          <div style={{ ...styles.card, padding: "20px 24px", display: "grid", gap: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: theme.heading }}>Language Model (LLM)</div>
+            <Field label="Model">
+              <LayerSelect stateKey="llmModel" options={TAVUS_LLMS} defaultId="tavus-gpt-oss" />
+            </Field>
+            <Field label="Tools" hint="Function tools the LLM can call">
+              <TagList stateKey="llmTools" placeholder="Tool name..." />
+            </Field>
           </div>
-          {tab === "voice"      && <VoiceTab />}
-          {tab === "llm"        && <LLMTab />}
-          {tab === "perception" && <PerceptionTab />}
-          {tab === "stt"        && <STTTab />}
-          {/* Tools tab removed */}
+
+          {sep}
+
+          {/* Turn Detection */}
+          <div style={{ ...styles.card, padding: "20px 24px", display: "grid", gap: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: theme.heading }}>Turn Detection Model</div>
+            <Field label="Model">
+              <LayerSelect stateKey="turnDetection" options={TAVUS_TURN_DETECTION_MODELS} defaultId="sparrow-1" />
+            </Field>
+          </div>
+
+          {sep}
+
+          {/* Perception */}
+          <div style={{ ...styles.card, padding: "20px 24px", display: "grid", gap: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: theme.heading }}>Perception Model</div>
+            <Field label="Model">
+              <LayerSelect stateKey="perceptionModel" options={TAVUS_PERCEPTION_MODELS} defaultId="raven-1" />
+            </Field>
+            <Field label="Visual Tools" hint="Tools triggered by visual perception">
+              <TagList stateKey="visualTools" placeholder="Visual tool name..." />
+            </Field>
+            <Field label="Audio Tools" hint="Tools triggered by audio perception">
+              <TagList stateKey="audioTools" placeholder="Audio tool name..." />
+            </Field>
+          </div>
+
+          {sep}
+
+          {/* STT */}
+          <div style={{ ...styles.card, padding: "20px 24px", display: "grid", gap: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: theme.heading }}>Speech-to-Text (STT)</div>
+            <Field label="Engine">
+              <LayerSelect stateKey="sttEngine" options={TAVUS_STT_ENGINES} defaultId="tavus-advanced" />
+            </Field>
+            <Field label="Hotwords (STT)" hint="Comma-separated words to boost recognition accuracy">
+              <input value={layers.hotwords || ""} onChange={e => setLayer("hotwords", e.target.value)}
+                placeholder="e.g. Sonesse, StackOne, demo"
+                style={{ ...styles.input, marginBottom: 0, fontSize: 13 }}
+                onFocus={e => e.target.style.borderColor = theme.borderFocus}
+                onBlur={e => e.target.style.borderColor = theme.border} />
+            </Field>
+          </div>
+
+          {sep}
+
+          {/* Knowledge Base */}
+          <div style={{ ...styles.card, padding: "20px 24px", display: "flex", alignItems: "flex-start", gap: 16 }}>
+            <div style={{ fontSize: 22, lineHeight: 1 }}>📖</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: theme.heading, marginBottom: 4 }}>Knowledge Base</div>
+              <div style={{ fontSize: 13, color: theme.textMuted, marginBottom: 12 }}>Enable your persona to reference information from documents uploaded during conversations.</div>
+              <TagList stateKey="knowledgeBaseIds" placeholder="Document ID..." />
+            </div>
+          </div>
+
         </div>
       )}
     </div>
@@ -3524,17 +3107,17 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
             </button>
           </div>
 
-          {/* Stats row */}
-          <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+          {/* Stats row — single line */}
+          <div style={{ display: "flex", border: `1px solid ${theme.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 32, background: theme.surface }}>
             {[
               { label: "Total Sessions",        value: "—", sub: "All time" },
               { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "—", sub: "Currently live" },
               { label: "Average Session Time", value: "—", sub: "Last 30 days" },
-            ].map((stat) => (
-              <div key={stat.label} style={{ ...styles.card, padding: "20px 24px" }}>
-                <div style={{ fontSize: 28, fontWeight: 800, color: theme.heading, marginBottom: 4 }}>{stat.value}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: theme.heading, marginBottom: 2 }}>{stat.label}</div>
-                <div style={{ fontSize: 12, color: theme.textMuted }}>{stat.sub}</div>
+            ].map((stat, i) => (
+              <div key={stat.label} style={{ flex: 1, padding: "16px 20px", borderLeft: i > 0 ? `1px solid ${theme.border}` : "none" }}>
+                <div style={{ fontSize: 24, fontWeight: 800, color: theme.heading, marginBottom: 2 }}>{stat.value}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: theme.heading }}>{stat.label}</div>
+                <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 1 }}>{stat.sub}</div>
               </div>
             ))}
           </div>
