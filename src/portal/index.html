@@ -1305,15 +1305,15 @@ const TAVUS_PERSONAS = [
 ];
 
 const TAVUS_VOICES = [
-  { id: "lucy",      name: "Lucy",              flag: "🇬🇧", speed: "Fast", desc: "Energetic and youthful British, perfect for narrations and storytelling." },
-  { id: "lourenco",  name: "Lourenço",           flag: "🇵🇹", speed: "Fast", desc: "Comfortably pitched man from Lisbon, blending a warm, naturally..." },
-  { id: "frederick", name: "Frederick Surrey",   flag: "🇬🇧", speed: "Fast", desc: "Professional, well spoken, conversational British. Suitable for agents..." },
-  { id: "michael",   name: "Michael",            flag: "🇨🇦", speed: "Fast", desc: "Clear, confident, and versatile — perfect for narration, a..." },
-  { id: "julia",     name: "Julia",              flag: "🇩🇪", speed: "Fast", desc: "Top German — calm, confident, and friendly" },
-  { id: "sael",      name: "Sael",               flag: "🇬🇧", speed: "Fast", desc: "Sael's tone is gentle, dryly amused, and endlessly composed no matte..." },
-  { id: "harini",    name: "Harini",             flag: "🇮🇳", speed: "Fast", desc: "Tamil Customer Care Agent, Warm, Professional & Friendly" },
-  { id: "lauren",    name: "Lauren",             flag: "🇺🇸", speed: "Fast", desc: "Lauren B – Warm, Humanlike, Friendly Conversational, Chatbots" },
-  { id: "ava",       name: "Ava – Eager and Understanding", flag: "🇺🇸", speed: "Fast", desc: "Natural AI – Clear, helpful for AI agents, support flows, guided a..." },
+  { id: "lucy",      name: "Lucy",              flag: "🇬🇧", lang: "en-GB", speed: "Fast", desc: "Energetic and youthful British, perfect for narrations and storytelling." },
+  { id: "lourenco",  name: "Lourenço",           flag: "🇵🇹", lang: "pt-PT", speed: "Fast", desc: "Comfortably pitched man from Lisbon, blending a warm, naturally conversational tone." },
+  { id: "frederick", name: "Frederick Surrey",   flag: "🇬🇧", lang: "en-GB", speed: "Fast", desc: "Professional, well spoken, conversational British. Suitable for agents." },
+  { id: "michael",   name: "Michael",            flag: "🇨🇦", lang: "en-CA", speed: "Fast", desc: "Clear, confident, and versatile — perfect for narration and agents." },
+  { id: "julia",     name: "Julia",              flag: "🇩🇪", lang: "de-DE", speed: "Fast", desc: "Top German — calm, confident, and friendly." },
+  { id: "sael",      name: "Sael",               flag: "🇬🇧", lang: "en-GB", speed: "Fast", desc: "Sael's tone is gentle, dryly amused, and endlessly composed." },
+  { id: "harini",    name: "Harini",             flag: "🇮🇳", lang: "en-IN", speed: "Fast", desc: "Tamil Customer Care Agent, Warm, Professional & Friendly." },
+  { id: "lauren",    name: "Lauren",             flag: "🇺🇸", lang: "en-US", speed: "Fast", desc: "Lauren B – Warm, Humanlike, Friendly Conversational, Chatbots." },
+  { id: "ava",       name: "Ava – Eager and Understanding", flag: "🇺🇸", lang: "en-US", speed: "Fast", desc: "Natural AI – Clear, helpful for AI agents, support flows, guided assistants." },
 ];
 
 // Tavus-hosted model names — used as the `model` field in the persona's llm layer
@@ -1491,8 +1491,10 @@ function StepChooseTavusAvatar({ data, onChange }) {
                 onClick={() => onChange({ ...data, tavusReplicaId: rep.replica_id, tavusReplicaName: rep.replica_name })}>
                 {/* Thumbnail */}
                 <div style={{ position: "relative", height: 170, background: "#f0f0f2", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {(rep.thumbnail_image_url || rep.thumbnail_video_url || rep.preview_video_url) ? (
-                    <img src={rep.thumbnail_image_url || rep.thumbnail_video_url || rep.preview_video_url} alt={rep.replica_name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} onError={(e) => { e.target.style.display = "none"; e.target.nextSibling && (e.target.nextSibling.style.display = "flex"); }} />
+                  {rep.thumbnail_image_url ? (
+                    <img src={rep.thumbnail_image_url} alt={rep.replica_name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} onError={(e) => { e.target.style.display = "none"; }} />
+                  ) : (rep.thumbnail_video_url || rep.preview_video_url) ? (
+                    <video src={rep.thumbnail_video_url || rep.preview_video_url} muted playsInline preload="metadata" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} onLoadedMetadata={e => { e.target.currentTime = 0.5; }} onMouseEnter={e => e.target.play()} onMouseLeave={e => { e.target.pause(); e.target.currentTime = 0.5; }} />
                   ) : null}
                   <div style={{ display: (rep.thumbnail_image_url || rep.thumbnail_video_url || rep.preview_video_url) ? "none" : "flex", position: "absolute", inset: 0, alignItems: "center", justifyContent: "center", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, fontSize: 36, fontWeight: 800, color: `${theme.primary}60` }}>
                     {(rep.replica_name || "?").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
@@ -1639,9 +1641,15 @@ function StepAvatarSettings({ data, onChange }) {
               const isSel = data.tavusReplicaId === r.replica_id;
               return (
                 <button key={r.replica_id}
-                  onClick={() => onChange({ ...data, tavusReplicaId: r.replica_id, tavusReplicaName: r.replica_name, tavusReplicaImg: r.thumbnail_image_url })}
+                  onClick={() => onChange({ ...data, tavusReplicaId: r.replica_id, tavusReplicaName: r.replica_name, tavusReplicaImg: r.thumbnail_image_url || r.thumbnail_video_url || r.preview_video_url || r.thumbnail_url || r.image_url || "" })}
                   style={{ padding: 0, border: `2.5px solid ${isSel ? theme.primary : "transparent"}`, borderRadius: 10, overflow: "hidden", cursor: "pointer", background: "none", position: "relative", transition: "border-color 0.15s", boxShadow: isSel ? `0 0 0 1px ${theme.primary}` : "none" }}>
-                  <img src={r.thumbnail_image_url} alt={r.replica_name} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} onError={e => { e.target.style.background = "#eee"; e.target.style.minHeight = "90px"; }} />
+                  {r.thumbnail_image_url ? (
+                    <img src={r.thumbnail_image_url} alt={r.replica_name} style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
+                  ) : (r.thumbnail_video_url || r.preview_video_url) ? (
+                    <video src={r.thumbnail_video_url || r.preview_video_url} muted playsInline preload="metadata" style={{ width: "100%", aspectRatio: "1", objectFit: "cover", objectPosition: "top", display: "block" }} onLoadedMetadata={e => { e.target.currentTime = 0.5; }} />
+                  ) : (
+                    <div style={{ width: "100%", aspectRatio: "1", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: `${theme.primary}60` }}>{(r.replica_name || "?")[0]}</div>
+                  )}
                   <div style={{ padding: "4px 6px", background: isSel ? theme.primary : theme.surface, borderTop: `1px solid ${isSel ? theme.primary : theme.border}` }}>
                     <div style={{ fontSize: 10, fontWeight: 600, color: isSel ? "#fff" : theme.heading, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.replica_name}</div>
                   </div>
@@ -1730,6 +1738,29 @@ function StepAvatarSettings({ data, onChange }) {
     const ttsEngine = layers.ttsEngine || "cartesia";
     const isExternal = ttsEngine !== "cartesia";
 
+    const playPreview = (e, v) => {
+      e.stopPropagation();
+      if (!('speechSynthesis' in window)) return;
+      if (playing === v.id) {
+        window.speechSynthesis.cancel();
+        setPlaying(null);
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const text = `Hi, I'm ${v.name.split("–")[0].trim()}. I'm your AI interview assistant, and I'm here to help you find the right candidate today.`;
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = v.lang || "en-US";
+      utt.rate = 1.0;
+      // Try to pick a matching browser voice
+      const voices = window.speechSynthesis.getVoices();
+      const match = voices.find(bv => bv.lang.startsWith(utt.lang.split("-")[0]));
+      if (match) utt.voice = match;
+      utt.onend = () => setPlaying(null);
+      utt.onerror = () => setPlaying(null);
+      setPlaying(v.id);
+      window.speechSynthesis.speak(utt);
+    };
+
     return (
       <div>
         <SectionLabel>Select voice</SectionLabel>
@@ -1746,10 +1777,13 @@ function StepAvatarSettings({ data, onChange }) {
             return (
               <div key={v.id} onClick={() => onChange({ ...data, avatarVoice: v.id })}
                 style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${isSel ? theme.primary : theme.border}`, background: isSel ? theme.selectedBg : theme.surface, cursor: "pointer", transition: "all 0.15s" }}>
-                <div title="Voice preview coming soon"
-                  style={{ width: 28, height: 28, borderRadius: "50%", border: `1.5px solid ${theme.border}`, background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: theme.textDim, opacity: 0.4 }}>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </div>
+                <button title={isPlaying ? "Stop preview" : "Preview voice"} onClick={e => playPreview(e, v)}
+                  style={{ width: 28, height: 28, borderRadius: "50%", border: `1.5px solid ${isPlaying ? theme.primary : theme.border}`, background: isPlaying ? `${theme.primary}15` : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: isPlaying ? theme.primary : theme.textMuted, cursor: "pointer", transition: "all 0.15s" }}>
+                  {isPlaying
+                    ? <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="4" width="4" height="16"/><rect x="15" y="4" width="4" height="16"/></svg>
+                    : <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  }
+                </button>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
                     <span style={{ fontSize: 14 }}>{v.flag}</span>
@@ -2955,26 +2989,41 @@ function StepPreview({ data, onSaved }) {
     )},
   ];
 
+  const saveExperience = async (session) => {
+    const payload = {
+      user_id: session.user.id,
+      name: data.name || "Untitled",
+      use_case: data.useCase || "recruitment",
+      vendor: data.avatar || null,
+      status: "draft",
+      config: data,
+      logo_url: data.logoPreview || null,
+      updated_at: new Date().toISOString(),
+    };
+    if (data._dbId) {
+      // Update existing record
+      const { data: updated, error: dbErr } = await sb.from("experiences")
+        .update(payload).eq("id", data._dbId).select().single();
+      if (dbErr) throw dbErr;
+      return updated;
+    } else {
+      // Insert new record
+      const { data: inserted, error: dbErr } = await sb.from("experiences")
+        .insert(payload).select().single();
+      if (dbErr) throw dbErr;
+      return inserted;
+    }
+  };
+
   const handleWeb = async () => {
     if (deploying || launched) return;
     setDeploying(true);
     setError("");
     try {
-      // 1 — Save experience to DB
+      // 1 — Save / update experience in DB
       const session = (await sb.auth.getSession()).data.session;
       if (!session) throw new Error("Not logged in");
-      const payload = {
-        user_id: session.user.id,
-        name: data.name || "Untitled",
-        use_case: data.useCase || "recruitment",
-        vendor: data.avatar || null,
-        status: "draft",
-        config: data,
-        logo_url: data.logoPreview || null,
-        updated_at: new Date().toISOString(),
-      };
-      const { data: inserted, error: dbErr } = await sb.from("experiences").insert(payload).select().single();
-      if (dbErr) throw dbErr;
+      await saveExperience(session);
       if (onSaved) onSaved();
 
       // 2 — Create Tavus conversation
@@ -3008,22 +3057,11 @@ function StepPreview({ data, onSaved }) {
     setDeploying(true);
     setError("");
     try {
-      // 1 — Save experience to DB
+      // 1 — Save / update experience in DB
       const session = (await sb.auth.getSession()).data.session;
       if (!session) throw new Error("Not logged in");
-      const payload = {
-        user_id: session.user.id,
-        name: data.name || "Untitled",
-        use_case: data.useCase || "recruitment",
-        vendor: data.avatar || null,
-        status: "draft",
-        config: data,
-        logo_url: data.logoPreview || null,
-        updated_at: new Date().toISOString(),
-      };
-      const { data: inserted, error: dbErr } = await sb.from("experiences").insert(payload).select().single();
-      if (dbErr) throw dbErr;
-      const expId = inserted.id;
+      const saved = await saveExperience(session);
+      const expId = saved.id || data._dbId;
       if (onSaved) onSaved();
 
       // 2 — Create Teams meeting
@@ -3382,26 +3420,48 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
     setMenuOpen(null);
   };
 
-  // Load pre-built personas from Tavus API
+  // Load pre-built personas from Tavus API, then fetch each replica's thumbnail
   useEffect(() => {
     Promise.all([
       fetch("/api/tavus/personas").then(r => r.ok ? r.json() : { data: [] }),
       fetch("/api/tavus/replicas").then(r => r.ok ? r.json() : { data: [] }),
-    ]).then(([personaRes, replicaRes]) => {
+    ]).then(async ([personaRes, replicaRes]) => {
       const personaList = personaRes.data || personaRes || [];
       const replicaList = replicaRes.data || replicaRes || [];
-      // Build a map of replica_id → thumbnail
+      // Build a map of replica_id → thumbnail from the bulk list
       const replicaThumbs = {};
       replicaList.forEach(r => {
-        replicaThumbs[r.replica_id] = r.thumbnail_image_url || r.thumbnail_video_url || r.preview_video_url || "";
+        const thumb = r.thumbnail_image_url || r.thumbnail_video_url || r.preview_video_url || r.thumbnail_url || r.image_url || "";
+        if (thumb) replicaThumbs[r.replica_id] = thumb;
       });
-      // Attach thumbnail to each persona
+      // For personas whose replica_id wasn't in the bulk list (e.g. stock replicas),
+      // fetch the individual replica to get the thumbnail.
+      const missingIds = [...new Set(
+        personaList
+          .map(p => p.replica_id)
+          .filter(id => id && !replicaThumbs[id])
+      )];
+      if (missingIds.length > 0) {
+        await Promise.allSettled(
+          missingIds.map(id =>
+            fetch(`/api/tavus/replicas/${id}`)
+              .then(r => r.ok ? r.json() : null)
+              .then(d => {
+                if (!d) return;
+                const thumb = d.thumbnail_image_url || d.thumbnail_video_url || d.preview_video_url || d.thumbnail_url || d.image_url || "";
+                if (thumb) replicaThumbs[id] = thumb;
+              })
+              .catch(() => {})
+          )
+        );
+      }
+      // Attach thumbnail to each persona — check persona itself first, then replica map
       const enriched = personaList.map(p => ({
         ...p,
-        thumb: replicaThumbs[p.replica_id] || "",
+        thumb: p.thumbnail_image_url || p.default_replica_thumbnail || replicaThumbs[p.replica_id] || "",
       }));
       setPersonas(enriched);
-    }).catch(() => {});
+    }).catch(e => console.error("[Portal] Persona load error:", e));
   }, []);
 
   useEffect(() => { loadExperiences(); }, []);
@@ -3420,21 +3480,6 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
             <button onClick={onNewExperience} style={{ ...styles.btnPrimary, padding: "10px 18px", gap: 8 }}>
               {Icons.sparkle} <span>Create Your Own</span>
             </button>
-          </div>
-
-          {/* Stats row */}
-          <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
-            {[
-              { label: "Total Sessions",        value: "—", sub: "All time" },
-              { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "—", sub: "Currently live" },
-              { label: "Average Session Time", value: "—", sub: "Last 30 days" },
-            ].map((stat) => (
-              <div key={stat.label} style={{ ...styles.card, padding: "20px 24px" }}>
-                <div style={{ fontSize: 28, fontWeight: 800, color: theme.heading, marginBottom: 4 }}>{stat.value}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: theme.heading, marginBottom: 2 }}>{stat.label}</div>
-                <div style={{ fontSize: 12, color: theme.textMuted }}>{stat.sub}</div>
-              </div>
-            ))}
           </div>
 
           {/* Pre-built avatars */}
@@ -3528,6 +3573,21 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Stats row */}
+          <div className="portal-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+            {[
+              { label: "Total Sessions",        value: "—", sub: "All time" },
+              { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "—", sub: "Currently live" },
+              { label: "Average Session Time", value: "—", sub: "Last 30 days" },
+            ].map((stat) => (
+              <div key={stat.label} style={{ ...styles.card, padding: "20px 24px" }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: theme.heading, marginBottom: 4 }}>{stat.value}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: theme.heading, marginBottom: 2 }}>{stat.label}</div>
+                <div style={{ fontSize: 12, color: theme.textMuted }}>{stat.sub}</div>
+              </div>
+            ))}
           </div>
 
           {/* Recent sessions preview */}
@@ -4001,8 +4061,16 @@ export default function App() {
   const goHome       = (subview) => setView(subview || "home");
 
   const handleEdit = (exp) => {
-    // Map DB columns back to wizard data shape
-    setEditExp({ id: exp.id, useCase: exp.use_case, name: exp.name, avatar: exp.vendor, ...exp });
+    // Restore the full wizard state from the saved config blob,
+    // then overlay the DB-level fields so they're correct.
+    const wizardData = {
+      ...(exp.config || {}),   // unpack all saved wizard fields (JD, candidate, voice, etc.)
+      _dbId: exp.id,           // track the DB row for upsert on re-save
+      name:    exp.name     || exp.config?.name,
+      useCase: exp.use_case || exp.config?.useCase,
+      avatar:  exp.vendor   || exp.config?.avatar,
+    };
+    setEditExp(wizardData);
     setView("wizard");
   };
 
