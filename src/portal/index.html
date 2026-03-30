@@ -3951,25 +3951,21 @@ export default function App() {
         setUser(session.user.email);
         setView("home");
         // Check if profile exists
-        const { data: prof } = await sb.from("profiles").select("id").eq("id", session.user.id).single();
-        if (!prof) setShowProfile(true);
+        try {
+          const { data: prof } = await sb.from("profiles").select("id").eq("id", session.user.id).single();
+          if (!prof) setShowProfile(true);
+        } catch (e) { console.warn("Profile check failed:", e); }
         setProfileChecked(true);
       }
       setAuthReady(true);
-    });
+    }).catch(() => setAuthReady(true));
 
     // 3. Listen for auth changes (sign in / sign out / token refresh)
-    const { data: { subscription } } = sb.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = sb.auth.onAuthStateChange((_event, session) => {
       if (session) {
         setUser(session.user.email);
         if (view === "login" || view === "signup" || view === "reset-password") {
           setView("home");
-        }
-        // Check if profile exists (covers fresh sign-up / sign-in)
-        if (!profileChecked) {
-          const { data: prof } = await sb.from("profiles").select("id").eq("id", session.user.id).single();
-          if (!prof) setShowProfile(true);
-          setProfileChecked(true);
         }
       } else {
         setUser("");
