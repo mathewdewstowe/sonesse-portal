@@ -947,7 +947,7 @@ function ComingSoonStep({ title, desc }) {
 }
 
 // Pre-built avatar card shown on the dashboard
-function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
+function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thumb }) {
   const [webState, setWeb]        = useState("idle"); // idle | loading | done | error
   const [webUrl, setWebUrl]       = useState("");
   const [webError, setWebErr]     = useState("");
@@ -1037,7 +1037,13 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse }) {
       <div style={{ padding: "20px 24px", display: "flex", gap: 20, alignItems: "flex-start" }}>
         {/* Avatar photo */}
         <div style={{ width: 64, height: 64, borderRadius: 14, overflow: "hidden", border: `2px solid ${theme.primary}30`, flexShrink: 0 }}>
-          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=128&h=128&fit=crop&crop=faces,center" alt="AI Interview Assistant" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          {thumb ? (
+            <img src={thumb} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          ) : (
+            <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800, color: `${theme.primary}60` }}>
+              {name.split(" ").map(w => w[0]).join("").slice(0, 2)}
+            </div>
+          )}
         </div>
         {/* Content */}
         <div style={{ flex: 1 }}>
@@ -3356,6 +3362,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null); // experience id with open menu
+  const [personas, setPersonas] = useState([]);
 
   const ucColors = { recruitment: "#6d28d9", sales: "#0891b2", tutoring: "#16a34a", coaching: "#d97706", lms: "#db2777", onboarding: "#4f46e5", meetingbot: "#0f766e", sdr: "#b45309" };
 
@@ -3374,6 +3381,28 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
     setExperiences(experiences.filter(e => e.id !== id));
     setMenuOpen(null);
   };
+
+  // Load pre-built personas from Tavus API
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/tavus/personas").then(r => r.ok ? r.json() : { data: [] }),
+      fetch("/api/tavus/replicas").then(r => r.ok ? r.json() : { data: [] }),
+    ]).then(([personaRes, replicaRes]) => {
+      const personaList = personaRes.data || personaRes || [];
+      const replicaList = replicaRes.data || replicaRes || [];
+      // Build a map of replica_id → thumbnail
+      const replicaThumbs = {};
+      replicaList.forEach(r => {
+        replicaThumbs[r.replica_id] = r.thumbnail_image_url || r.thumbnail_video_url || r.preview_video_url || "";
+      });
+      // Attach thumbnail to each persona
+      const enriched = personaList.map(p => ({
+        ...p,
+        thumb: replicaThumbs[p.replica_id] || "",
+      }));
+      setPersonas(enriched);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => { loadExperiences(); }, []);
 
@@ -3414,14 +3443,29 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
               <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Pre-built avatars</h2>
               <p style={{ fontSize: 12, color: theme.textMuted, margin: "3px 0 0" }}>Ready-to-use templates you can launch immediately.</p>
             </div>
-            <PreBuiltAvatarCard
-              name="AI Interview Assistant"
-              desc="A professional digital interviewer that conducts structured screening interviews with candidates."
-              personaId="pdac61133ac5"
-              replicaId="r5f0577fc829"
-              tags={["Recruitment", "Screening", "Pre-built"]}
-              onUse={onNewExperience}
-            />
+            <div style={{ display: "grid", gap: 16 }}>
+              {personas.length > 0 ? personas.map(p => (
+                <PreBuiltAvatarCard
+                  key={p.persona_id}
+                  name={p.persona_name || "Untitled"}
+                  desc={p.system_prompt ? p.system_prompt.slice(0, 120) + (p.system_prompt.length > 120 ? "…" : "") : "Pre-built Tavus persona."}
+                  personaId={p.persona_id}
+                  replicaId={p.replica_id}
+                  thumb={p.thumb}
+                  tags={["Pre-built"]}
+                  onUse={onNewExperience}
+                />
+              )) : (
+                <PreBuiltAvatarCard
+                  name="AI Interview Assistant"
+                  desc="A professional digital interviewer that conducts structured screening interviews with candidates."
+                  personaId="pdac61133ac5"
+                  replicaId="r5f0577fc829"
+                  tags={["Recruitment", "Screening", "Pre-built"]}
+                  onUse={onNewExperience}
+                />
+              )}
+            </div>
           </div>
 
           {/* Experiences */}
