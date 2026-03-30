@@ -251,7 +251,6 @@ const WIZARD_STEPS = [
   { id: "trigger",        label: "Trigger workflow" },
   { id: "datasources",    label: "Data sources" },
   { id: "postmeeting",    label: "Post-meeting" },
-  { id: "notifications",  label: "Notifications" },
   { id: "preview",        label: "Preview" },
   { id: "deploy",         label: "Save" },
 ];
@@ -1408,7 +1407,13 @@ function StepChooseTavusAvatar({ data, onChange }) {
     fetch("/api/tavus/replicas")
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(d => {
-        const list = (d.data || d.replicas || d || []).slice(0, 5);
+        const raw = d.data || d.replicas || d || [];
+        // Filter out deprecated replicas and those with no name
+        const list = raw.filter(r =>
+          r.replica_name &&
+          !r.replica_name.toLowerCase().includes("deprecated") &&
+          r.status !== "deprecated"
+        );
         setReplicas(list.length > 0 ? list : PLACEHOLDER_REPLICAS);
       })
       .catch(() => setReplicas(PLACEHOLDER_REPLICAS))
@@ -2152,13 +2157,18 @@ function StepPersona({ data, onChange }) {
         </div>
       </div>
 
-      {/* System prompt removed — auto-generated from fields above */}
+      {/* System prompt */}
+      <div>
+        <label style={styles.label}>System Prompt <span style={{ fontWeight: 400, color: theme.textDim }}>(advanced)</span></label>
+        <textarea value={data.systemPrompt || ""} onChange={(e) => onChange({ ...data, systemPrompt: e.target.value })} placeholder="Optional: provide a full system prompt to override the generated persona. Leave blank to auto-generate from the fields above." style={{ ...styles.textarea, minHeight: 80, fontFamily: "'SF Mono', 'Fira Code', monospace", fontSize: 12 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+      </div>
     </div>
   );
 }
 
 // Step 7: Knowledge Base — job description + resume PDFs only
 function StepKnowledgeBase({ data, onChange }) {
+  const [uploading, setUploading] = useState({});
   const docs = [
     { key: "kbJobDesc",  label: "Job Description",    hint: "Upload the job description for this role (PDF)" },
     { key: "kbResume",   label: "Candidate Resume",   hint: "Upload a sample candidate resume for calibration (PDF)" },
@@ -2167,22 +2177,60 @@ function StepKnowledgeBase({ data, onChange }) {
   const handleUpload = async (key, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const session = (await sb.auth.getSession()).data.session;
-    if (session) {
-      const path = `${session.user.id}/kb/${key}-${Date.now()}.pdf`;
-      const { error } = await sb.storage.from("logos").upload(path, file, { upsert: true });
-      if (!error) {
-        const { data: { publicUrl } } = sb.storage.from("logos").getPublicUrl(path);
-        onChange({ ...data, [key]: { name: file.name, size: `${Math.round(file.size/1024)}KB`, url: publicUrl } });
-        return;
+    setUploading(prev => ({ ...prev, [key]: true }));
+    try {
+      const session = (await sb.auth.getSession()).data.session;
+      let publicUrl = null;
+      if (session) {
+        const path = `${session.user.id}/kb/${key}-${Date.now()}.pdf`;
+        const { error } = await sb.storage.from("logos").upload(path, file, { upsert: true });
+        if (!error) {
+          publicUrl = sb.storage.from("logos").getPublicUrl(path).data.publicUrl;
+        }
       }
+
+      // Send to Tavus Knowledge Base if we have a public URL
+      let documentId = null;
+      if (publicUrl) {
+        try {
+          const resp = await fetch("/api/tavus/documents", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              document_name: `${key}-${file.name}`,
+              document_url: publicUrl,
+              tags: [key, data.useCase || "recruitment"],
+            }),
+          });
+          const result = await resp.json();
+          documentId = result.document_id || null;
+        } catch (err) {
+          console.warn("Tavus KB upload failed:", err);
+        }
+      }
+
+      onChange({
+        ...data,
+        [key]: { name: file.name, size: `${Math.round(file.size/1024)}KB`, url: publicUrl, documentId },
+        // Maintain a flat list of all Tavus document IDs for easy access
+        kbDocumentIds: [
+          ...(data.kbDocumentIds || []).filter(id => id !== data[key]?.documentId),
+          ...(documentId ? [documentId] : []),
+        ],
+      });
+    } finally {
+      setUploading(prev => ({ ...prev, [key]: false }));
     }
-    onChange({ ...data, [key]: { name: file.name, size: `${Math.round(file.size/1024)}KB` } });
   };
 
   const removeDoc = (key) => {
+    const removedDocId = data[key]?.documentId;
     const next = { ...data };
     delete next[key];
+    // Remove from document IDs list
+    if (removedDocId) {
+      next.kbDocumentIds = (next.kbDocumentIds || []).filter(id => id !== removedDocId);
+    }
     onChange(next);
   };
 
@@ -3384,8 +3432,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
               <div style={{ padding: "32px", textAlign: "center", color: theme.textMuted, fontSize: 13 }}>Loading experiences…</div>
             ) : experiences.length === 0 ? (
               <div style={{ ...styles.card, padding: "36px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 13, color: theme.textMuted, marginBottom: 8 }}>No experiences yet.</div>
-                <button onClick={onNewExperience} style={{ ...styles.btnPrimary, display: "inline-flex" }}>{Icons.sparkle} <span style={{ marginLeft: 6 }}>Create your first experience</span></button>
+                <div style={{ fontSize: 13, color: theme.textMuted }}>No experiences yet.</div>
               </div>
             ) : (
               <div style={{ display: "grid", gap: 12 }}>
@@ -3721,9 +3768,8 @@ function Wizard({ user, onLogout, onHome, onSaved, initialData }) {
           {step === 9  && <LockedStep><StepTriggerWorkflow data={data} onChange={setData} /></LockedStep>}
           {step === 10 && <LockedStep><StepDataSources data={data} onChange={setData} /></LockedStep>}
           {step === 11 && <LockedStep><StepPostMeeting data={data} onChange={setData} /></LockedStep>}
-          {step === 12 && <ComingSoonStep title="Notifications" desc="Slack, email and webhook notifications are coming soon." />}
-          {step === 13 && <StepPreview data={data} />}
-          {step === 14 && <StepDeploy data={data} onSaved={onSaved} user={user} />}
+          {step === 12 && <StepPreview data={data} />}
+          {step === 13 && <StepDeploy data={data} onSaved={onSaved} user={user} />}
 
           {/* Navigation */}
           <div className="portal-wizard-nav" style={styles.wizardNav}>
