@@ -750,7 +750,7 @@ function ForgotPasswordPage({ onBack }) {
     const redirectTo = window.location.origin + window.location.pathname;
     const { error: err } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
     setLoading(false);
-    if (err) { setError(err.message); return; }
+    if (err) { setError(err.message === "Error sending recovery email" ? "Unable to send reset email right now. Please try again in a few minutes or contact support." : err.message); return; }
     setSent(true);
   };
 
