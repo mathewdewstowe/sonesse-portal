@@ -1069,7 +1069,7 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <span style={{ fontWeight: 700, fontSize: 15, color: theme.heading }}>{name}</span>
-            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: `${theme.primary}15`, color: theme.primary, letterSpacing: "0.05em", textTransform: "uppercase" }}>Sonesse</span>
+            <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 20, background: "#1e40af15", color: "#1e40af", letterSpacing: "0.05em", textTransform: "uppercase" }}>Tavus</span>
           </div>
           <p style={{ fontSize: 13, color: theme.textMuted, margin: "0 0 14px", lineHeight: 1.5 }}>{desc}</p>
           {/* Tags */}
@@ -1501,6 +1501,22 @@ function StepChooseTavusAvatar({ data, onChange }) {
   };
 
   const selected = data.tavusReplicaId;
+  const [playing, setPlaying] = useState(null); // replica_id of the card currently playing
+
+  const togglePreview = (e, repId) => {
+    e.stopPropagation();
+    const card = e.currentTarget.closest("[data-rep-id]");
+    const video = card?.querySelector("video");
+    if (!video) return;
+    if (video.paused) {
+      document.querySelectorAll(".avatar-chooser-video").forEach(v => { if (v !== video) { v.pause(); } });
+      video.play();
+      setPlaying(repId);
+    } else {
+      video.pause();
+      setPlaying(null);
+    }
+  };
 
   return (
     <div>
@@ -1515,42 +1531,60 @@ function StepChooseTavusAvatar({ data, onChange }) {
 
       {loading ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
-          {[1,2,3,4,5].map(i => (
+          {[1,2,3,4,5,6,7,8].map(i => (
             <div key={i} style={{ ...styles.card, padding: 0, overflow: "hidden", opacity: 0.5 }}>
               <div style={{ height: 160, background: "#f0f0f2", borderRadius: "10px 10px 0 0" }} />
               <div style={{ padding: "14px 16px 16px" }}>
-                <div style={{ height: 12, width: "60%", background: "#e5e5e7", borderRadius: 4, marginBottom: 8 }} />
-                <div style={{ height: 10, width: "80%", background: "#ebebed", borderRadius: 4 }} />
+                <div style={{ height: 12, width: "60%", background: "#e5e5e7", borderRadius: 4 }} />
               </div>
             </div>
           ))}
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
-          {replicas.map((rep) => {
+          {replicas.slice(0, 8).map((rep) => {
             const isSelected = selected === rep.replica_id;
+            const isPlaying = playing === rep.replica_id;
+            const hasVideo = !!(rep.thumbnail_video_url || rep.preview_video_url);
             return (
-              <div key={rep.replica_id} style={{ ...styles.card, padding: 0, overflow: "hidden", borderColor: isSelected ? theme.selectedBorder : theme.border, boxShadow: isSelected ? `0 0 0 1px ${theme.selectedBorder}` : "none", cursor: "pointer", transition: "all 0.15s" }}
+              <div key={rep.replica_id} data-rep-id={rep.replica_id}
+                style={{ ...styles.card, padding: 0, overflow: "hidden", borderColor: isSelected ? theme.selectedBorder : theme.border, boxShadow: isSelected ? `0 0 0 1px ${theme.selectedBorder}` : "none", cursor: "pointer", transition: "all 0.15s" }}
                 onClick={() => onChange({ ...data, tavusReplicaId: rep.replica_id, tavusReplicaName: rep.replica_name })}>
                 {/* Thumbnail */}
-                <div style={{ position: "relative", height: 170, background: "#f0f0f2", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ position: "relative", height: 200, background: "#111", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {rep.thumbnail_image_url ? (
                     <img src={rep.thumbnail_image_url} alt={rep.replica_name} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} onError={(e) => { e.target.style.display = "none"; }} />
-                  ) : rep.thumbnail_video_url ? (
-                    <video src={rep.thumbnail_video_url} autoPlay muted loop playsInline style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }} />
-                  ) : null}
-                  <div style={{ display: (rep.thumbnail_image_url || rep.thumbnail_video_url || rep.preview_video_url) ? "none" : "flex", position: "absolute", inset: 0, alignItems: "center", justifyContent: "center", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, fontSize: 36, fontWeight: 800, color: `${theme.primary}60` }}>
-                    {(rep.replica_name || "?").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
-                  </div>
+                  ) : hasVideo ? (
+                    <video
+                      className="avatar-chooser-video"
+                      src={rep.thumbnail_video_url || rep.preview_video_url}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      onLoadedMetadata={e => { e.target.currentTime = 0.5; }}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 15%", display: "block" }}
+                    />
+                  ) : (
+                    <div style={{ fontSize: 36, fontWeight: 800, color: `${theme.primary}60` }}>
+                      {(rep.replica_name || "?").split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
                   {isSelected && (
                     <div style={{ position: "absolute", top: 8, right: 8, width: 24, height: 24, borderRadius: "50%", background: theme.primary, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
                   )}
                 </div>
-                {/* Info */}
+                {/* Info + preview */}
                 <div style={{ padding: "10px 14px 12px" }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading }}>{rep.replica_name}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: hasVideo ? 8 : 0 }}>{rep.replica_name}</div>
+                  {hasVideo && (
+                    <button
+                      onClick={e => togglePreview(e, rep.replica_id)}
+                      style={{ ...styles.btnSecondary, width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 10px" }}>
+                      {isPlaying ? "⏸ Pause" : "▶ Preview"}
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -3040,7 +3074,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null); // experience id with open menu
-  const [personas, setPersonas] = useState([]);
+  const [stockReplicas, setStockReplicas] = useState([]);
   const { conversations: sessionsData } = useConversations();
 
   const ucColors = { recruitment: "#6d28d9", sales: "#0891b2", tutoring: "#16a34a", coaching: "#d97706", lms: "#db2777", onboarding: "#4f46e5", meetingbot: "#0f766e", sdr: "#b45309" };
@@ -3061,56 +3095,29 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
     setMenuOpen(null);
   };
 
-  // Load pre-built personas from Tavus API, then fetch each replica's thumbnail
+  // Load stock Tavus replicas for the Pre-Built Avatars section
   useEffect(() => {
-    Promise.all([
-      fetch("/api/tavus/personas").then(r => r.ok ? r.json() : { data: [] }),
-      fetch("/api/tavus/replicas").then(r => r.ok ? r.json() : { data: [] }),
-    ]).then(async ([personaRes, replicaRes]) => {
-      const personaList = personaRes.data || personaRes || [];
-      const replicaList = replicaRes.data || replicaRes || [];
-      // Build a map of replica_id → { img, vid } thumbnail URLs
-      const replicaThumbs = {};
-      replicaList.forEach(r => {
-        replicaThumbs[r.replica_id] = {
-          img: r.thumbnail_image_url || r.thumbnail_url || r.image_url || "",
-          vid: r.thumbnail_video_url || r.preview_video_url || "",
-        };
-      });
-      // For personas whose replica_id wasn't in the bulk list (e.g. stock replicas),
-      // fetch the individual replica to get the thumbnail.
-      const missingIds = [...new Set(
-        personaList
-          .map(p => p.replica_id)
-          .filter(id => id && !replicaThumbs[id])
-      )];
-      if (missingIds.length > 0) {
-        await Promise.allSettled(
-          missingIds.map(id =>
-            fetch(`/api/tavus/replicas/${id}`)
-              .then(r => r.ok ? r.json() : null)
-              .then(d => {
-                if (!d) return;
-                replicaThumbs[id] = {
-                  img: d.thumbnail_image_url || d.thumbnail_url || d.image_url || "",
-                  vid: d.thumbnail_video_url || d.preview_video_url || "",
-                };
-              })
-              .catch(() => {})
-          )
-        );
+    // Try localStorage cache first (shared with avatar chooser, 1hr TTL)
+    try {
+      const cached = JSON.parse(localStorage.getItem("tavus_replicas_cache") || "null");
+      if (cached && Date.now() - cached.ts < 60 * 60 * 1000 && cached.list?.length > 0) {
+        setStockReplicas(cached.list.slice(0, 4));
+        return;
       }
-      // Attach thumbnail to each persona — image preferred, video fallback
-      const enriched = personaList.map(p => {
-        const rt = replicaThumbs[p.replica_id] || {};
-        return {
-          ...p,
-          thumb:    p.thumbnail_image_url || p.default_replica_thumbnail || rt.img || "",
-          thumbVid: rt.vid || "",
-        };
-      });
-      setPersonas(enriched);
-    }).catch(e => console.error("[Portal] Persona load error:", e));
+    } catch (_) {}
+    fetch("/api/tavus/replicas")
+      .then(r => r.ok ? r.json() : { data: [] })
+      .then(res => {
+        const raw = res.data || res || [];
+        const list = raw.filter(r =>
+          r.replica_name &&
+          !r.replica_name.toLowerCase().includes("deprecated") &&
+          r.status !== "deprecated" &&
+          (r.replica_type === "system" || r.replica_type === "stock" || !r.replica_type)
+        );
+        setStockReplicas(list.slice(0, 4));
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => { loadExperiences(); }, []);
@@ -3146,53 +3153,30 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
             ))}
           </div>
 
-          {/* Pre-built avatars */}
+          {/* Pre-built avatars — stock Tavus replicas */}
           <div style={{ marginBottom: 36 }}>
             <div style={{ marginBottom: 14 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Pre-Built Avatars</h2>
-              <p style={{ fontSize: 12, color: theme.textMuted, margin: "3px 0 0" }}>Ready-to-use templates you can launch immediately.</p>
+              <p style={{ fontSize: 12, color: theme.textMuted, margin: "3px 0 0" }}>Ready-to-use Tavus avatars you can launch immediately.</p>
             </div>
-            {(() => {
-              const personaMeta = {
-                "Interviewer":            { desc: "A professional digital interviewer that conducts structured screening interviews with candidates.", tags: ["Recruitment", "Screening"], thumb: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=faces,center" },
-                "Customer Support":       { desc: "A friendly customer success specialist for live video support calls.", tags: ["Support", "Video"], thumb: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop&crop=faces,center" },
-                "Sales Coach":            { desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"], thumb: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=500&fit=crop&crop=faces,center" },
-                "Sales Coaching":         { desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"], thumb: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=500&fit=crop&crop=faces,center" },
-                "Sales Development Rep":  { desc: "An AI sales development representative that qualifies leads and books meetings.", tags: ["Sales", "SDR"], thumb: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=500&fit=crop&crop=faces,center" },
-                "Product Discovery":      { desc: "Guides users through product discovery conversations to uncover needs.", tags: ["Product", "Discovery"], thumb: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=500&fit=crop&crop=faces,center" },
-              };
-              const defaultMeta = { desc: "Pre-built Tavus avatar ready to deploy.", tags: ["Pre-built"], thumb: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=faces,center" };
-              return (
-                <div style={{ display: "grid", gap: 16 }}>
-                  {personas.length > 0 ? personas.map(p => {
-                    const meta = personaMeta[p.persona_name] || defaultMeta;
-                    return (
-                      <PreBuiltAvatarCard
-                        key={p.persona_id}
-                        name={p.persona_name || "Untitled"}
-                        desc={meta.desc}
-                        personaId={p.persona_id}
-                        replicaId={p.replica_id}
-                        thumb={p.thumb || (p.thumbVid ? "" : meta.thumb)}
-                        thumbVid={p.thumbVid}
-                        tags={[...meta.tags, "Pre-built"]}
-                        onUse={onNewExperience}
-                      />
-                    );
-                  }) : (
-                    <PreBuiltAvatarCard
-                      name="AI Interview Assistant"
-                      desc="A professional digital interviewer that conducts structured screening interviews with candidates."
-                      personaId="pdac61133ac5"
-                      replicaId="r5f0577fc829"
-                      thumb="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=faces,center"
-                      tags={["Recruitment", "Screening", "Pre-built"]}
-                      onUse={onNewExperience}
-                    />
-                  )}
+            <div style={{ display: "grid", gap: 16 }}>
+              {stockReplicas.length > 0 ? stockReplicas.map(r => (
+                <PreBuiltAvatarCard
+                  key={r.replica_id}
+                  name={r.replica_name}
+                  desc="A real-time conversational video avatar powered by Tavus CVI."
+                  replicaId={r.replica_id}
+                  thumb={r.thumbnail_image_url || r.thumbnail_url || ""}
+                  thumbVid={r.thumbnail_video_url || r.preview_video_url || ""}
+                  tags={["Tavus", "Video"]}
+                  onUse={onNewExperience}
+                />
+              )) : (
+                <div style={{ ...styles.card, padding: "24px", textAlign: "center", color: theme.textMuted, fontSize: 13 }}>
+                  Loading avatars…
                 </div>
-              );
-            })()}
+              )}
+            </div>
           </div>
 
           {/* Experiences */}
