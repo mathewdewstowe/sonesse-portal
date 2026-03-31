@@ -14,7 +14,7 @@
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, X-Persona-Id, X-Replica-Id",
 };
 
 async function getAccessToken(tenantId, clientId, clientSecret) {
@@ -58,7 +58,9 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const { experienceId, experienceName = "Sonesse Experience", startTime, endTime, botEmail: customBotEmail, userEmail, personaId, replicaId } = body;
+  const { experienceId, experienceName = "Sonesse Experience", startTime, endTime, botEmail: customBotEmail, userEmail } = body;
+  const personaId = request.headers.get("X-Persona-Id") || "";
+  const replicaId = request.headers.get("X-Replica-Id") || "";
   if (!experienceId) {
     return new Response(
       JSON.stringify({ ok: false, error: "experienceId is required" }),

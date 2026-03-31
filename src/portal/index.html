@@ -1048,8 +1048,8 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
       const userEmail = authSession?.user?.email || "";
       const resp = await fetch("/api/teams/create-meeting", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ experienceId: personaId, experienceName: name, botEmail: "tavus.demo@my-meeting-bot.com", userEmail, personaId, replicaId }),
+        headers: { "Content-Type": "application/json", "X-Persona-Id": personaId || "", "X-Replica-Id": replicaId || "" },
+        body: JSON.stringify({ experienceId: personaId, experienceName: name, botEmail: "tavus.demo@my-meeting-bot.com", userEmail }),
       });
       const result = await resp.json();
       if (!result.ok) throw new Error(result.error || "Failed to create Teams meeting");
@@ -2821,8 +2821,8 @@ function StepPreview({ data, onSaved }) {
       const userEmail = authSession?.user?.email || "";
       const resp = await fetch("/api/teams/create-meeting", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ experienceId: expId, experienceName: data.name || "Sonesse Experience", userEmail, personaId: data.tavusPersonaId || "", replicaId: data.tavusReplicaId || "" }),
+        headers: { "Content-Type": "application/json", "X-Persona-Id": data.tavusPersonaId || "", "X-Replica-Id": data.tavusReplicaId || "" },
+        body: JSON.stringify({ experienceId: expId, experienceName: data.name || "Sonesse Experience", userEmail }),
       });
       const result = await resp.json();
       if (!result.ok) throw new Error(result.error || "Failed to create Teams meeting");
@@ -2988,13 +2988,11 @@ function StepDeploy({ data, onSaved, user }) {
       const userEmail = authSession?.user?.email || "";
       const resp = await fetch("/api/teams/create-meeting", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Persona-Id": data.tavusPersonaId || "", "X-Replica-Id": data.tavusReplicaId || "" },
         body: JSON.stringify({
           experienceId,
           experienceName: data.name || "Sonesse Experience",
           userEmail,
-          personaId: data.tavusPersonaId || "",
-          replicaId: data.tavusReplicaId || "",
         }),
       });
       const result = await resp.json();
