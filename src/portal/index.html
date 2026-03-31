@@ -3197,7 +3197,6 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
         fetch(`/api/tavus/personas/${p.personaId}`)
           .then(r => r.json())
           .then(async persona => {
-            console.log("[Sonesse] persona", p.personaId, persona);
             if (!persona || persona.error) return { ...p };
             const replicaId = persona.replica_id || persona.default_replica_id
               || persona.data?.replica_id || persona.data?.default_replica_id || "";
@@ -3208,7 +3207,6 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
             if (!thumbVid && replicaId) {
               const rep = await fetch(`/api/tavus/replicas/${replicaId}`)
                 .then(r => r.json()).catch(() => null);
-              console.log("[Sonesse] replica", replicaId, rep);
               if (rep && !rep.error) {
                 thumbVid = rep.thumbnail_video_url || rep.preview_video_url
                   || rep.thumbnail_url || rep.video_url || rep.preview_url || "";
@@ -3216,7 +3214,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
             }
             return { ...p, replicaId, thumb: thumbImg, thumbVid };
           })
-          .catch(e => { console.warn("[Sonesse] persona fetch error", p.personaId, e); return { ...p }; })
+          .catch(() => ({ ...p }))
       )
     ).then(results => {
       setPrebuiltPersonas(results.map(r => r.value || r.reason || {}));
