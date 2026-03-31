@@ -58,7 +58,7 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const { experienceId, experienceName = "Sonesse Experience", startTime, endTime, botEmail: customBotEmail, userEmail } = body;
+  const { experienceId, experienceName = "Sonesse Experience", startTime, endTime, botEmail: customBotEmail, userEmail, personaId, replicaId } = body;
   if (!experienceId) {
     return new Response(
       JSON.stringify({ ok: false, error: "experienceId is required" }),
@@ -93,7 +93,7 @@ export async function onRequestPost({ request, env }) {
       ],
       body: {
         contentType: "HTML",
-        content: `<p>This Teams meeting was created automatically by <strong>Sonesse</strong>.</p><p>Experience: <strong>${experienceName}</strong></p><p>Experience ID: <code>${experienceId}</code></p>`,
+        content: `<p>This Teams meeting was created automatically by <strong>Sonesse</strong>.</p><p>Experience: <strong>${experienceName}</strong></p><p>Experience ID: <code>${experienceId}</code></p>${personaId ? `<p>Persona ID: <code>${personaId}</code></p>` : ""}${replicaId ? `<p>Replica ID: <code>${replicaId}</code></p>` : ""}`,
       },
     };
 

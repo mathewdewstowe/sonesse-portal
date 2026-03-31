@@ -1049,7 +1049,7 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
       const resp = await fetch("/api/teams/create-meeting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ experienceId: personaId, experienceName: name, botEmail: "tavus.demo@my-meeting-bot.com", userEmail }),
+        body: JSON.stringify({ experienceId: personaId, experienceName: name, botEmail: "tavus.demo@my-meeting-bot.com", userEmail, personaId, replicaId }),
       });
       const result = await resp.json();
       if (!result.ok) throw new Error(result.error || "Failed to create Teams meeting");
@@ -2822,7 +2822,7 @@ function StepPreview({ data, onSaved }) {
       const resp = await fetch("/api/teams/create-meeting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ experienceId: expId, experienceName: data.name || "Sonesse Experience", userEmail }),
+        body: JSON.stringify({ experienceId: expId, experienceName: data.name || "Sonesse Experience", userEmail, personaId: data.tavusPersonaId || "", replicaId: data.tavusReplicaId || "" }),
       });
       const result = await resp.json();
       if (!result.ok) throw new Error(result.error || "Failed to create Teams meeting");
@@ -2993,6 +2993,8 @@ function StepDeploy({ data, onSaved, user }) {
           experienceId,
           experienceName: data.name || "Sonesse Experience",
           userEmail,
+          personaId: data.tavusPersonaId || "",
+          replicaId: data.tavusReplicaId || "",
         }),
       });
       const result = await resp.json();
