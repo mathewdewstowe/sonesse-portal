@@ -3363,6 +3363,8 @@ async function trackConversation(conversationId, name) {
   } catch (_) {}
 }
 
+const PRESET_PERSONA_NAMES = new Set(["Interviewer", "Customer Support", "Sales Coach", "Sales Development Rep"]);
+
 function useConversations() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -3371,7 +3373,6 @@ function useConversations() {
   useEffect(() => {
     sb.auth.getSession().then(({ data: { session } }) => {
       const userId = session?.user?.id;
-      // Build a set of conversation IDs this user has created
       let myIds = null;
       if (userId) {
         try {
@@ -3384,9 +3385,13 @@ function useConversations() {
         .then((r) => r.json())
         .then((d) => {
           const list = Array.isArray(d) ? d : (d.data || d.conversations || []);
-          // Only show sessions created by this user (if we have tracking data)
-          const filtered = (myIds && myIds.size > 0) ? list.filter(c => myIds.has(c.conversation_id)) : list;
-          setConversations(filtered);
+          // Show sessions either tracked in localStorage OR matching a pre-built persona name
+          const filtered = list.filter(c =>
+            (myIds && myIds.has(c.conversation_id)) ||
+            PRESET_PERSONA_NAMES.has(c.conversation_name)
+          );
+          // If nothing matched at all, show everything (fallback for first-time users)
+          setConversations(filtered.length > 0 ? filtered : list);
         })
         .catch((e) => setError(e.message || "Failed to load sessions"))
         .finally(() => setLoading(false));
