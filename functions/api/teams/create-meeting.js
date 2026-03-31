@@ -58,7 +58,7 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const { experienceId, experienceName = "Sonesse Experience", startTime, endTime, botEmail: customBotEmail } = body;
+  const { experienceId, experienceName = "Sonesse Experience", startTime, endTime, botEmail: customBotEmail, userEmail } = body;
   if (!experienceId) {
     return new Response(
       JSON.stringify({ ok: false, error: "experienceId is required" }),
@@ -83,12 +83,13 @@ export async function onRequestPost({ request, env }) {
       end:   { dateTime: end.toISOString().replace("Z", ""),   timeZone: "UTC" },
       attendees: [
         {
-          emailAddress: {
-            address: botEmail,
-            name: "Sonesse Meeting Bot",
-          },
+          emailAddress: { address: botEmail, name: "Sonesse Meeting Bot" },
           type: "required",
         },
+        ...(userEmail ? [{
+          emailAddress: { address: userEmail, name: userEmail },
+          type: "required",
+        }] : []),
       ],
       body: {
         contentType: "HTML",
