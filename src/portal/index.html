@@ -3126,20 +3126,28 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
     Promise.allSettled(
       PRESET_PERSONAS.map(p =>
         fetch(`/api/tavus/personas/${p.personaId}`)
-          .then(r => r.ok ? r.json() : null)
+          .then(r => r.json())
           .then(async persona => {
-            if (!persona) return { ...p };
-            const replicaId = persona.replica_id || persona.data?.replica_id;
-            const thumbImg = persona.thumbnail_image_url || persona.thumbnail_url || "";
-            let thumbVid = "";
-            if (replicaId) {
+            console.log("[Sonesse] persona", p.personaId, persona);
+            if (!persona || persona.error) return { ...p };
+            const replicaId = persona.replica_id || persona.default_replica_id
+              || persona.data?.replica_id || persona.data?.default_replica_id || "";
+            const thumbImg = persona.thumbnail_image_url || persona.thumbnail_url
+              || persona.thumbnail || "";
+            // Also check if the persona itself has a video URL
+            let thumbVid = persona.thumbnail_video_url || persona.preview_video_url || "";
+            if (!thumbVid && replicaId) {
               const rep = await fetch(`/api/tavus/replicas/${replicaId}`)
-                .then(r => r.ok ? r.json() : null).catch(() => null);
-              if (rep) thumbVid = rep.thumbnail_video_url || rep.preview_video_url || "";
+                .then(r => r.json()).catch(() => null);
+              console.log("[Sonesse] replica", replicaId, rep);
+              if (rep && !rep.error) {
+                thumbVid = rep.thumbnail_video_url || rep.preview_video_url
+                  || rep.thumbnail_url || rep.video_url || rep.preview_url || "";
+              }
             }
             return { ...p, replicaId, thumb: thumbImg, thumbVid };
           })
-          .catch(() => ({ ...p }))
+          .catch(e => { console.warn("[Sonesse] persona fetch error", p.personaId, e); return { ...p }; })
       )
     ).then(results => {
       setPrebuiltPersonas(results.map(r => r.value || r.reason || {}));
