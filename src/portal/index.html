@@ -1436,7 +1436,7 @@ function StepChooseTavusAvatar({ data, onChange }) {
     try {
       const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
       if (cached && Date.now() - cached.ts < CACHE_TTL && cached.list?.length > 0) {
-        setReplicas(cached.list);
+        setReplicas(cached.list.slice(0, 8));
         setLoading(false);
         return;
       }
@@ -1453,7 +1453,7 @@ function StepChooseTavusAvatar({ data, onChange }) {
           // Keep only stock/system replicas — exclude user-trained ones
           (r.replica_type === "system" || r.replica_type === "stock" || !r.replica_type)
         );
-        const result = list.length > 0 ? list : PLACEHOLDER_REPLICAS;
+        const result = (list.length > 0 ? list : PLACEHOLDER_REPLICAS).slice(0, 8);
         try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), list: result })); } catch (_) {}
         setReplicas(result);
       })
@@ -1577,14 +1577,13 @@ function StepChooseTavusAvatar({ data, onChange }) {
                 </div>
                 {/* Info + preview */}
                 <div style={{ padding: "10px 14px 12px" }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: hasVideo ? 8 : 0 }}>{rep.replica_name}</div>
-                  {hasVideo && (
-                    <button
-                      onClick={e => togglePreview(e, rep.replica_id)}
-                      style={{ ...styles.btnSecondary, width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 10px" }}>
-                      {isPlaying ? "⏸ Pause" : "▶ Preview"}
-                    </button>
-                  )}
+                  <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: 8 }}>{rep.replica_name}</div>
+                  <button
+                    onClick={e => togglePreview(e, rep.replica_id)}
+                    disabled={!hasVideo}
+                    style={{ ...styles.btnSecondary, width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 10px", opacity: hasVideo ? 1 : 0.35, cursor: hasVideo ? "pointer" : "default" }}>
+                    {isPlaying ? "⏸ Pause" : "▶ Preview"}
+                  </button>
                 </div>
               </div>
             );
