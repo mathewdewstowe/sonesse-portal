@@ -957,24 +957,45 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
   const deployWeb = () => {
     if (webState === "loading") return;
     if (webUrl) { window.open(webUrl, "_blank"); return; }
-    // retry if errored
     setWeb("loading");
     setWebErr("");
-    fetch("/api/tavus/conversations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        replica_id: replicaId, persona_id: personaId, conversation_name: name,
-        properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
-      }),
-    })
-      .then(r => r.json())
-      .then(res => {
-        const url = res.conversation_url || res.data?.conversation_url;
-        if (!url) throw new Error(res.error || "No URL");
-        setWebUrl(url); setWeb("done"); window.open(url, "_blank");
+
+    const doCreate = (rId) => {
+      fetch("/api/tavus/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          replica_id: rId, persona_id: personaId, conversation_name: name,
+          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+        }),
       })
-      .catch(e => { setWebErr(e.message); setWeb("error"); });
+        .then(r => r.json())
+        .then(res => {
+          const url = res.conversation_url || res.data?.conversation_url;
+          const cid = res.conversation_id || res.data?.conversation_id;
+          if (!url) throw new Error(res.error || res.message || "No URL returned");
+          if (cid) trackConversation(cid, name);
+          setWebUrl(url); setWeb("done"); window.open(url, "_blank");
+        })
+        .catch(e => { setWebErr(e.message); setWeb("error"); });
+    };
+
+    if (replicaId) {
+      doCreate(replicaId);
+    } else if (personaId) {
+      // Fetch the persona to get its replica_id
+      fetch(`/api/tavus/personas/${personaId}`)
+        .then(r => r.json())
+        .then(p => {
+          const rId = p.replica_id || p.data?.replica_id;
+          if (!rId) throw new Error("No replica_id found on persona");
+          doCreate(rId);
+        })
+        .catch(e => { setWebErr(e.message); setWeb("error"); });
+    } else {
+      setWebErr("No avatar configured for this experience.");
+      setWeb("error");
+    }
   };
 
   // Reset deploy state to create a fresh session
@@ -2658,7 +2679,9 @@ function StepPreview({ data, onSaved }) {
       });
       const result = await resp.json();
       const url = result.conversation_url || result.data?.conversation_url;
+      const cid = result.conversation_id || result.data?.conversation_id;
       if (!url) throw new Error(result.error || "No conversation URL returned");
+      if (cid) trackConversation(cid, data.name || "Sonesse Experience");
       setMeetingUrl(url);
       setLaunched("web");
       window.open(url, "_blank");
@@ -3018,6 +3041,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(null); // experience id with open menu
   const [personas, setPersonas] = useState([]);
+  const { conversations: sessionsData } = useConversations();
 
   const ucColors = { recruitment: "#6d28d9", sales: "#0891b2", tutoring: "#16a34a", coaching: "#d97706", lms: "#db2777", onboarding: "#4f46e5", meetingbot: "#0f766e", sdr: "#b45309" };
 
@@ -3110,8 +3134,8 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
           {/* Stats row — single line */}
           <div style={{ display: "flex", border: `1px solid ${theme.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 32, background: theme.surface }}>
             {[
-              { label: "Total Sessions",        value: "—", sub: "All time" },
-              { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "—", sub: "Currently live" },
+              { label: "Total Sessions",        value: sessionsData.length || "0", sub: "All time" },
+              { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "0", sub: "Currently live" },
               { label: "Average Session Time", value: "—", sub: "Last 30 days" },
             ].map((stat, i) => (
               <div key={stat.label} style={{ flex: 1, padding: "16px 20px", borderLeft: i > 0 ? `1px solid ${theme.border}` : "none" }}>
@@ -3223,7 +3247,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
               <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Recent Sessions</h2>
               <button onClick={onSessions} style={styles.btnLink}>View all →</button>
             </div>
-            <SessionsTable preview={true} />
+            <SessionsTable preview={true} conversations={sessionsData} />
           </div>
         </div>
       </div>
@@ -3234,21 +3258,48 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
 // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // SESSIONS TABLE (shared component)
 // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// Track a conversation against the current user in localStorage
+async function trackConversation(conversationId, name) {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session?.user?.id) return;
+    const key = `sonesse_sessions_${session.user.id}`;
+    const existing = JSON.parse(localStorage.getItem(key) || "[]");
+    if (!existing.find(s => s.conversation_id === conversationId)) {
+      existing.unshift({ conversation_id: conversationId, name, created_at: new Date().toISOString() });
+      localStorage.setItem(key, JSON.stringify(existing.slice(0, 500)));
+    }
+  } catch (_) {}
+}
+
 function useConversations() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/tavus/conversations")
-      .then((r) => r.json())
-      .then((d) => {
-        // Tavus returns { data: [...] } or an array directly
-        const list = Array.isArray(d) ? d : (d.data || d.conversations || []);
-        setConversations(list);
-      })
-      .catch((e) => setError(e.message || "Failed to load sessions"))
-      .finally(() => setLoading(false));
+    sb.auth.getSession().then(({ data: { session } }) => {
+      const userId = session?.user?.id;
+      // Build a set of conversation IDs this user has created
+      let myIds = null;
+      if (userId) {
+        try {
+          const stored = JSON.parse(localStorage.getItem(`sonesse_sessions_${userId}`) || "[]");
+          if (stored.length > 0) myIds = new Set(stored.map(s => s.conversation_id));
+        } catch (_) {}
+      }
+
+      fetch("/api/tavus/conversations")
+        .then((r) => r.json())
+        .then((d) => {
+          const list = Array.isArray(d) ? d : (d.data || d.conversations || []);
+          // Only show sessions created by this user (if we have tracking data)
+          const filtered = (myIds && myIds.size > 0) ? list.filter(c => myIds.has(c.conversation_id)) : list;
+          setConversations(filtered);
+        })
+        .catch((e) => setError(e.message || "Failed to load sessions"))
+        .finally(() => setLoading(false));
+    });
   }, []);
 
   return { conversations, loading, error };
@@ -3280,11 +3331,15 @@ function TranscriptModal({ transcript, name, onClose }) {
   );
 }
 
-function SessionsTable({ preview = false }) {
-  const { conversations, loading, error } = useConversations();
-  const [transcriptOpen, setTranscriptOpen] = useState(null); // { transcript, name }
-  const [recordingOpen, setRecordingOpen]   = useState(null); // { url, name }
-  const [fetching, setFetching]             = useState({}); // { [id]: "transcript"|"recording" }
+function SessionsTable({ preview = false, conversations: propConversations }) {
+  const hook = useConversations();
+  // Use passed conversations (already fetched by parent) or fetch our own
+  const conversations = propConversations !== undefined ? propConversations : hook.conversations;
+  const loading = propConversations !== undefined ? false : hook.loading;
+  const error   = propConversations !== undefined ? ""    : hook.error;
+  const [transcriptOpen, setTranscriptOpen] = useState(null);
+  const [recordingOpen, setRecordingOpen]   = useState(null);
+  const [fetching, setFetching]             = useState({});
   const rows = preview ? conversations.slice(0, 4) : conversations;
 
   const fmtDate = (iso) => {
