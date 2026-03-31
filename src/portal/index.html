@@ -1056,10 +1056,13 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
       <div style={{ padding: "20px 24px", display: "flex", gap: 20, alignItems: "flex-start" }}>
         {/* Avatar photo */}
         <div style={{ width: 64, height: 64, borderRadius: 14, overflow: "hidden", border: `2px solid ${theme.primary}30`, flexShrink: 0 }}>
-          {thumb ? (
+          {thumbVid ? (
+            <video src={thumbVid} muted playsInline preload="auto"
+              onLoadedMetadata={e => { try { e.target.currentTime = 1; } catch(_){} }}
+              onCanPlay={e => { if (e.target.paused) { try { e.target.currentTime = 1; } catch(_){} } }}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          ) : thumb ? (
             <img src={thumb} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} onError={e => { e.target.style.display = "none"; }} />
-          ) : thumbVid ? (
-            <video src={thumbVid} muted playsInline preload="metadata" onLoadedMetadata={e => { e.target.currentTime = 0.5; }} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg, ${theme.primary}20, ${theme.primary}08)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 800, color: `${theme.primary}60` }}>
               {name.split(" ").map(w => w[0]).join("").slice(0, 2)}
@@ -3112,10 +3115,10 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
 
   // Hardcoded stock Tavus personas for the Pre-Built Avatars section
   const PRESET_PERSONAS = [
-    { personaId: "paaee96e4f87", name: "Customer Support", desc: "A customer success specialist available for live video support calls.", tags: ["Support", "Video"] },
-    { personaId: "p1af207b8189", name: "Sales Coach",       desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"] },
+    { personaId: "pdac61133ac5", name: "Interviewer",           desc: "A professional digital interviewer conducting structured screening interviews.", tags: ["Recruitment", "Screening"] },
+    { personaId: "paaee96e4f87", name: "Customer Support",      desc: "A customer success specialist available for live video support calls.", tags: ["Support", "Video"] },
+    { personaId: "p1af207b8189", name: "Sales Coach",           desc: "A direct, no-nonsense B2B sales coach that gives blunt, practical feedback.", tags: ["Sales", "Coaching"] },
     { personaId: "pcb7a34da5fe", name: "Sales Development Rep", desc: "An AI SDR that qualifies leads and books meetings.", tags: ["Sales", "SDR"] },
-    { personaId: "pdac61133ac5", name: "Interviewer",       desc: "A professional digital interviewer conducting structured screening interviews.", tags: ["Recruitment", "Screening"] },
   ];
 
   useEffect(() => {
@@ -3259,7 +3262,10 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: theme.heading, margin: 0 }}>Recent Sessions</h2>
-              <button onClick={onSessions} style={styles.btnLink}>View all →</button>
+              <span style={{ fontSize: 13, color: "#d1d5db", cursor: "not-allowed", display: "inline-flex", alignItems: "center", gap: 5 }} title="Coming soon">
+                <span style={{ textDecoration: "line-through" }}>View all →</span>
+                <span style={{ fontSize: 9, fontWeight: 700, background: "#e5e7eb", color: "#9ca3af", borderRadius: 8, padding: "2px 6px", letterSpacing: "0.03em" }}>SOON</span>
+              </span>
             </div>
             <SessionsTable preview={true} conversations={sessionsData} />
           </div>
