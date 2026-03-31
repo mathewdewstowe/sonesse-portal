@@ -3363,39 +3363,22 @@ async function trackConversation(conversationId, name) {
   } catch (_) {}
 }
 
-const PRESET_PERSONA_NAMES = new Set(["Interviewer", "Customer Support", "Sales Coach", "Sales Development Rep"]);
-
 function useConversations() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    sb.auth.getSession().then(({ data: { session } }) => {
-      const userId = session?.user?.id;
-      let myIds = null;
-      if (userId) {
-        try {
-          const stored = JSON.parse(localStorage.getItem(`sonesse_sessions_${userId}`) || "[]");
-          if (stored.length > 0) myIds = new Set(stored.map(s => s.conversation_id));
-        } catch (_) {}
-      }
-
-      fetch("/api/tavus/conversations")
-        .then((r) => r.json())
-        .then((d) => {
-          const list = Array.isArray(d) ? d : (d.data || d.conversations || []);
-          // Show sessions either tracked in localStorage OR matching a pre-built persona name
-          const filtered = list.filter(c =>
-            (myIds && myIds.has(c.conversation_id)) ||
-            PRESET_PERSONA_NAMES.has(c.conversation_name)
-          );
-          // If nothing matched at all, show everything (fallback for first-time users)
-          setConversations(filtered.length > 0 ? filtered : list);
-        })
-        .catch((e) => setError(e.message || "Failed to load sessions"))
-        .finally(() => setLoading(false));
-    });
+    fetch("/api/tavus/conversations")
+      .then((r) => r.json())
+      .then((d) => {
+        const list = Array.isArray(d) ? d : (d.data || d.conversations || []);
+        // Sort newest first
+        const sorted = [...list].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        setConversations(sorted);
+      })
+      .catch((e) => setError(e.message || "Failed to load sessions"))
+      .finally(() => setLoading(false));
   }, []);
 
   return { conversations, loading, error };
