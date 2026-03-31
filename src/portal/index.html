@@ -3437,7 +3437,12 @@ function SessionsTable({ preview = false, conversations: propConversations }) {
           <thead>
             <tr style={{ background: theme.surface, borderBottom: `1px solid ${theme.border}` }}>
               {["Session", "Date & Time", "Duration", "Status", "Transcript", "Recording"].map((h) => (
-                <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 12, fontWeight: 600, color: theme.textMuted, whiteSpace: "nowrap" }}>{h}</th>
+                <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 12, fontWeight: 600, color: theme.textMuted, whiteSpace: "nowrap" }}>
+                  {h}
+                  {(h === "Transcript" || h === "Recording") && (
+                    <span style={{ marginLeft: 6, fontSize: 9, fontWeight: 700, background: "#e5e7eb", color: "#9ca3af", borderRadius: 8, padding: "2px 6px", verticalAlign: "middle", letterSpacing: "0.03em" }}>SOON</span>
+                  )}
+                </th>
               ))}
             </tr>
           </thead>
@@ -3461,22 +3466,14 @@ function SessionsTable({ preview = false, conversations: propConversations }) {
                     <span style={statusStyle(c.status)}>{c.status === "ended" ? "Completed" : c.status === "active" ? "Live" : c.status || "Unknown"}</span>
                   </td>
                   <td style={{ padding: "12px 16px" }}>
-                    <button
-                      onClick={() => openDetail(c, "transcript")}
-                      disabled={isFetchingThis && fetching[c.conversation_id] === "transcript"}
-                      style={{ ...styles.btnLink, fontSize: 12, display: "inline-flex", alignItems: "center", gap: 4, opacity: isFetchingThis ? 0.6 : 1 }}
-                    >
-                      {Icons.fileText} {isFetchingThis && fetching[c.conversation_id] === "transcript" ? "Loading…" : "View"}
-                    </button>
+                    <span style={{ fontSize: 12, color: "#d1d5db", display: "inline-flex", alignItems: "center", gap: 4, cursor: "not-allowed" }} title="Coming soon">
+                      {Icons.fileText} <span style={{ textDecoration: "line-through" }}>View</span>
+                    </span>
                   </td>
                   <td style={{ padding: "12px 16px" }}>
-                    <button
-                      onClick={() => openDetail(c, "recording")}
-                      disabled={isFetchingThis && fetching[c.conversation_id] === "recording"}
-                      style={{ ...styles.btnLink, fontSize: 12, display: "inline-flex", alignItems: "center", gap: 4, opacity: isFetchingThis ? 0.6 : 1 }}
-                    >
-                      {Icons.video} {isFetchingThis && fetching[c.conversation_id] === "recording" ? "Loading…" : "Watch"}
-                    </button>
+                    <span style={{ fontSize: 12, color: "#d1d5db", display: "inline-flex", alignItems: "center", gap: 4, cursor: "not-allowed" }} title="Coming soon">
+                      {Icons.video} <span style={{ textDecoration: "line-through" }}>Watch</span>
+                    </span>
                   </td>
                 </tr>
               );
