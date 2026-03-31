@@ -3636,10 +3636,10 @@ function Wizard({ user, onLogout, onHome, onSaved, initialData }) {
           {step === 5  && <StepAvatarSettings data={data} onChange={setData} />}
           {step === 6  && <StepPersona data={data} onChange={setData} />}
           {step === 7  && <StepKnowledgeBase data={data} onChange={setData} />}
-          {step === 8  && <LockedStep><StepIntegration data={data} onChange={setData} /></LockedStep>}
-          {step === 9  && <LockedStep><StepTriggerWorkflow data={data} onChange={setData} /></LockedStep>}
-          {step === 10 && <LockedStep><StepDataSources data={data} onChange={setData} /></LockedStep>}
-          {step === 11 && <LockedStep><StepPostMeeting data={data} onChange={setData} /></LockedStep>}
+          {step === 8  && <StepIntegration data={data} onChange={setData} />}
+          {step === 9  && <StepTriggerWorkflow data={data} onChange={setData} />}
+          {step === 10 && <StepDataSources data={data} onChange={setData} />}
+          {step === 11 && <StepPostMeeting data={data} onChange={setData} />}
           {step === 12 && <StepPreview data={data} />}
           {step === 13 && <StepDeploy data={data} onSaved={onSaved} user={user} />}
 
