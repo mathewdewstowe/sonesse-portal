@@ -86,7 +86,7 @@ export async function onRequestGet({ env }) {
   }
 
   try {
-    const resp = await fetch("https://tavusapi.com/v2/conversations?limit=100", {
+    const resp = await fetch("https://tavusapi.com/v2/conversations?limit=100&order=desc", {
       headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
     });
     const data = await resp.json();
