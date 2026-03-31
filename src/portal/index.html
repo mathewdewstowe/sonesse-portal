@@ -3379,7 +3379,9 @@ function useConversations() {
 }
 
 function TranscriptModal({ transcript, name, onClose }) {
+  // Tavus may return transcript as an array of {role,content} objects or as a plain string
   const lines = Array.isArray(transcript) ? transcript : [];
+  const rawText = typeof transcript === "string" ? transcript.trim() : "";
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={onClose}>
       <div style={{ background: "#fff", borderRadius: 14, width: "100%", maxWidth: 620, maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }} onClick={(e) => e.stopPropagation()}>
@@ -3388,8 +3390,10 @@ function TranscriptModal({ transcript, name, onClose }) {
           <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: theme.textMuted, lineHeight: 1, padding: "0 4px" }}>×</button>
         </div>
         <div style={{ overflowY: "auto", padding: "18px 22px", flex: 1 }}>
-          {lines.length === 0 ? (
-            <p style={{ color: theme.textMuted, fontSize: 13 }}>No transcript available for this session.</p>
+          {rawText ? (
+            <p style={{ fontSize: 13, color: theme.heading, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{rawText}</p>
+          ) : lines.length === 0 ? (
+            <p style={{ color: theme.textMuted, fontSize: 13 }}>No transcript available yet. Transcripts are generated after a session ends — check back once the session status shows Completed.</p>
           ) : (
             lines.map((line, i) => (
               <div key={i} style={{ marginBottom: 12 }}>
