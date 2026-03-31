@@ -86,12 +86,24 @@ export async function onRequestGet({ env }) {
   }
 
   try {
-    const resp = await fetch("https://tavusapi.com/v2/conversations?limit=100&order=desc", {
-      headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
-    });
-    const data = await resp.json();
-    return new Response(JSON.stringify(data), {
-      status: resp.status,
+    // Fetch up to 3 pages to get recent conversations
+    const headers = { "x-api-key": apiKey, "Content-Type": "application/json" };
+    const allConversations = [];
+    let page = 1;
+    while (page <= 3) {
+      const resp = await fetch(`https://tavusapi.com/v2/conversations?limit=100&page=${page}`, { headers });
+      if (!resp.ok) break;
+      const data = await resp.json();
+      const list = Array.isArray(data) ? data : (data.data || data.conversations || []);
+      if (list.length === 0) break;
+      allConversations.push(...list);
+      if (list.length < 100) break; // last page
+      page++;
+    }
+    // Sort newest first
+    allConversations.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    return new Response(JSON.stringify(allConversations), {
+      status: 200,
       headers: { "Content-Type": "application/json", ...CORS },
     });
   } catch (err) {
