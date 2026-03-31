@@ -76,7 +76,7 @@ export async function onRequestPost({ request, env }) {
     const token = await getAccessToken(AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET);
 
     const event = {
-      subject: `Sonesse: ${experienceName}`,
+      subject: `Sonesse: ${experienceName}${personaId ? ` | ${personaId}` : ""}${replicaId ? ` / ${replicaId}` : ""}`,
       isOnlineMeeting: true,
       onlineMeetingProvider: "teamsForBusiness",
       start: { dateTime: start.toISOString().replace("Z", ""), timeZone: "UTC" },
@@ -93,7 +93,7 @@ export async function onRequestPost({ request, env }) {
       ],
       body: {
         contentType: "HTML",
-        content: `<p>This Teams meeting was created automatically by <strong>Sonesse</strong>.</p><p>Experience: <strong>${experienceName}</strong></p><p>Experience ID: <code>${experienceId}</code></p>${personaId ? `<p>Persona ID: <code>${personaId}</code></p>` : ""}${replicaId ? `<p>Replica ID: <code>${replicaId}</code></p>` : ""}`,
+        content: `<p>This Teams meeting was created automatically by <strong>Sonesse</strong>.</p><p>Experience: <strong>${experienceName}</strong></p><p>Experience ID: <code>${experienceId}</code></p>`,
       },
     };
 
