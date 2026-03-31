@@ -1047,7 +1047,6 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
       setTeamsUrl(result.joinWebUrl || "");
       setTeams("done");
       setTeamsModalOpen(true);
-      if (result.joinWebUrl) window.open(result.joinWebUrl, "_blank");
     } catch (e) {
       setTeamsErr(e.message || "Failed to create Teams meeting");
       setTeams("error");
@@ -1102,8 +1101,8 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
             <p style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.6, margin: "0 0 24px", padding: "12px 14px", background: "#f9fafb", borderRadius: 8, border: "1px solid #e5e7eb" }}>
               In production, sessions are scheduled and hot-started in advance of any invites — so avatars join instantly.
             </p>
-            <button onClick={() => setTeamsModalOpen(false)} style={{ width: "100%", padding: "11px 0", borderRadius: 8, background: "#5059C9", color: "#fff", border: "none", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
-              Got it
+            <button onClick={() => { setTeamsModalOpen(false); if (teamsUrl) window.open(teamsUrl, "_blank"); }} style={{ width: "100%", padding: "11px 0", borderRadius: 8, background: "#5059C9", color: "#fff", border: "none", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
+              Continue — Open Microsoft Teams
             </button>
           </div>
         </div>
