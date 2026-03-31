@@ -81,6 +81,31 @@
 
       /* ── Page title size ── */
       .portal-page-title { font-size: 20px !important; }
+
+      /* ── Pre-built avatar card: stack on mobile ── */
+      .portal-prebuilt-card-inner { flex-direction: column !important; gap: 12px !important; }
+      .portal-prebuilt-card-inner > div:first-child { align-self: flex-start !important; }
+
+      /* ── Deploy buttons: wrap on mobile ── */
+      .portal-deploy-buttons { flex-wrap: wrap !important; }
+      .portal-deploy-buttons button { flex: 1 1 auto !important; justify-content: center !important; min-width: 0 !important; }
+
+      /* ── Avatar vendor grid: 1 col ── */
+      .portal-vendor-grid { grid-template-columns: 1fr !important; }
+
+      /* ── Avatar replica grid: 2 col ── */
+      .portal-replica-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+      /* ── Modals: full width ── */
+      .portal-modal-inner { max-width: 100% !important; padding: 20px !important; }
+
+      /* ── Stats row: stack ── */
+      .portal-stats-row { flex-direction: column !important; }
+      .portal-stats-row > div { border-left: none !important; border-top: 1px solid #e5e7eb !important; }
+      .portal-stats-row > div:first-child { border-top: none !important; }
+
+      /* ── Bot type grid: 1 col ── */
+      .portal-bot-type-grid { grid-template-columns: 1fr !important; }
     }
   </style>
 </head>
@@ -952,6 +977,7 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
   const [teamsState, setTeams]    = useState("idle");
   const [teamsUrl, setTeamsUrl]   = useState("");
   const [teamsError, setTeamsErr] = useState("");
+  const [teamsModalOpen, setTeamsModalOpen] = useState(false);
 
   // Session is created on-demand when user clicks "Deploy to Web"
 
@@ -1020,6 +1046,7 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
       if (!result.ok) throw new Error(result.error || "Failed to create Teams meeting");
       setTeamsUrl(result.joinWebUrl || "");
       setTeams("done");
+      setTeamsModalOpen(true);
       if (result.joinWebUrl) window.open(result.joinWebUrl, "_blank");
     } catch (e) {
       setTeamsErr(e.message || "Failed to create Teams meeting");
@@ -1051,9 +1078,39 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
 
   return (
     <div style={{ ...styles.card, padding: 0, overflow: "hidden", border: `1.5px solid ${theme.primary}30` }}>
+      {/* Teams boot modal */}
+      {teamsModalOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setTeamsModalOpen(false)}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: 32, maxWidth: 440, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "#5059C910", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13.5 5.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" fill="#5059C9"/>
+                  <path d="M20 8h-7a1 1 0 0 0-1 1v5.5a3.5 3.5 0 0 0 7 0V9a1 1 0 0 0-1-1z" fill="#5059C9" opacity="0.7"/>
+                  <path d="M9.5 7.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" fill="#5059C9"/>
+                  <path d="M4 10h7a1 1 0 0 1 1 1v4a3 3 0 0 1-6 0v-4a1 1 0 0 1 1-1H4z" fill="#5059C9"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 16, color: "#111827" }}>Your session is booting up</div>
+                <div style={{ fontSize: 12, color: "#6b7280", marginTop: 2 }}>Microsoft Teams</div>
+              </div>
+            </div>
+            <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.6, margin: "0 0 12px" }}>
+              This can take <strong>up to 10 minutes</strong>. Open Microsoft Teams and wait for your avatar to arrive in the meeting.
+            </p>
+            <p style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.6, margin: "0 0 24px", padding: "12px 14px", background: "#f9fafb", borderRadius: 8, border: "1px solid #e5e7eb" }}>
+              In production, sessions are scheduled and hot-started in advance of any invites — so avatars join instantly.
+            </p>
+            <button onClick={() => setTeamsModalOpen(false)} style={{ width: "100%", padding: "11px 0", borderRadius: 8, background: "#5059C9", color: "#fff", border: "none", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
       {/* Accent stripe */}
       <div style={{ height: 4, background: `linear-gradient(90deg, ${theme.primary}, #a855f7)` }} />
-      <div style={{ padding: "20px 24px", display: "flex", gap: 20, alignItems: "flex-start" }}>
+      <div className="portal-prebuilt-card-inner" style={{ padding: "20px 24px", display: "flex", gap: 20, alignItems: "flex-start" }}>
         {/* Avatar photo */}
         <div style={{ width: 64, height: 64, borderRadius: 14, overflow: "hidden", border: `2px solid ${theme.primary}30`, flexShrink: 0 }}>
           {thumbVid ? (
@@ -1093,7 +1150,7 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
           </div>
 
           {/* Deploy buttons */}
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <div className="portal-deploy-buttons" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
             {/* Preview */}
             {thumbVid && (
               <button onClick={() => setPreviewOpen(true)} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 8, fontSize: 13, fontWeight: 600, border: `1.5px solid ${theme.border}`, background: theme.surface, color: theme.heading, cursor: "pointer" }}>
@@ -3173,7 +3230,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
           </div>
 
           {/* Stats row — single line */}
-          <div style={{ display: "flex", border: `1px solid ${theme.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 32, background: theme.surface }}>
+          <div className="portal-stats-row" style={{ display: "flex", border: `1px solid ${theme.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 32, background: theme.surface }}>
             {[
               { label: "Total Sessions",        sub: "All time" },
               { label: "Active Experiences",    sub: "Currently live" },
