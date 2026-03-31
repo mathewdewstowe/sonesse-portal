@@ -3066,7 +3066,6 @@ function PortalNav({ user, onLogout, onHome, currentView }) {
         {/* Nav links */}
         {[
           { id: "home", label: "Home" },
-          { id: "sessions", label: "Sessions" },
         ].map((nav) => (
           <button key={nav.id} onClick={() => { if (nav.id === "home") onHome(); else onHome(nav.id); }} style={{
             background: "none", border: "none", cursor: "pointer", padding: "0 14px", height: 52, fontSize: 13, fontWeight: 600,
