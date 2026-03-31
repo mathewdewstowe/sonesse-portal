@@ -3175,14 +3175,14 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
           {/* Stats row — single line */}
           <div style={{ display: "flex", border: `1px solid ${theme.border}`, borderRadius: 12, overflow: "hidden", marginBottom: 32, background: theme.surface }}>
             {[
-              { label: "Total Sessions",        value: sessionsData.length || "0", sub: "All time" },
-              { label: "Active Experiences",   value: experiences.filter(e => e.status === "live").length || "0", sub: "Currently live" },
-              { label: "Average Session Time", value: "—", sub: "Last 30 days" },
+              { label: "Total Sessions",        sub: "All time" },
+              { label: "Active Experiences",    sub: "Currently live" },
+              { label: "Average Session Time",  sub: "Last 30 days" },
             ].map((stat, i) => (
               <div key={stat.label} style={{ flex: 1, padding: "16px 20px", borderLeft: i > 0 ? `1px solid ${theme.border}` : "none" }}>
-                <div style={{ fontSize: 24, fontWeight: 800, color: theme.heading, marginBottom: 2 }}>{stat.value}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: theme.heading }}>{stat.label}</div>
-                <div style={{ fontSize: 11, color: theme.textMuted, marginTop: 1 }}>{stat.sub}</div>
+                <div style={{ fontSize: 24, fontWeight: 800, color: "#d1d5db", marginBottom: 2 }}>—</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#9ca3af" }}>{stat.label}</div>
+                <div style={{ fontSize: 11, color: "#d1d5db", marginTop: 1 }}>{stat.sub}</div>
               </div>
             ))}
           </div>
