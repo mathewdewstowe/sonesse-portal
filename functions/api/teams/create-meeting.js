@@ -68,9 +68,9 @@ export async function onRequestPost({ request, env }) {
 
   const botEmail = customBotEmail || `${experienceId}@my-meeting-bot.com`;
 
-  // Default: start now, end in 1 hour
+  // Default: start now, end in 15 minutes
   const start = startTime ? new Date(startTime) : new Date();
-  const end   = endTime   ? new Date(endTime)   : new Date(start.getTime() + 60 * 60 * 1000);
+  const end   = endTime   ? new Date(endTime)   : new Date(start.getTime() + 15 * 60 * 1000);
 
   try {
     const token = await getAccessToken(AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET);
@@ -92,8 +92,15 @@ export async function onRequestPost({ request, env }) {
       ],
       body: {
         contentType: "HTML",
-        content: `<p>This Teams meeting was created automatically by <strong>Sonesse</strong>.</p><p>Experience: <strong>${experienceName}</strong></p><p>Experience ID: <code>${experienceId}</code></p>`,
+        content: `<p>This Teams meeting was created automatically by <strong>Sonesse</strong>.</p><p>Experience: <strong>${experienceName}</strong></p><p>Experience ID: <code>${experienceId}</code></p><p>Avatar session will auto-terminate after 20 minutes.</p>`,
       },
+      extensions: [
+        {
+          "@odata.type": "microsoft.graph.openTypeExtension",
+          extensionName: "com.sonesse.meetingConfig",
+          max_call_duration: 1200,
+        },
+      ],
     };
 
     const resp = await fetch(

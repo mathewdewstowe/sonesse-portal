@@ -43,7 +43,7 @@ export async function onRequestPost({ request, env }) {
     conversation_name: conversation_name || "Sonesse Preview",
     conversational_context: conversational_context || "You are a helpful AI assistant.",
     properties: {
-      max_call_duration: 120,
+      max_call_duration: 300,
       enable_recording: false,
       apply_greenscreen: false,
       ...(properties || {}),
