@@ -71,8 +71,8 @@ export async function onRequestPost({ request, env }) {
   const botEmail = customBotEmail || `${experienceId}@my-meeting-bot.com`;
 
   // Default: start now, end in 15 minutes
-  const start = startTime ? new Date(startTime) : new Date();
-  const end   = endTime   ? new Date(endTime)   : new Date(start.getTime() + 15 * 60 * 1000);
+  const start = new Date(start.getTime() + 9 * 60 * 1000);
+  const end   = new Date(start.getTime() + 19 * 60 * 1000);
 
   try {
     const token = await getAccessToken(AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET);
