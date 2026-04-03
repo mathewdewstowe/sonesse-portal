@@ -1241,12 +1241,12 @@ function LockedStep({ children }) {
 function StepUseCase({ data, onChange }) {
   const useCases = [
     { id: "recruitment", label: "Recruitment", desc: "Screen, interview and qualify candidates" },
-    { id: "sales", label: "Sales", desc: "Qualify leads and book meetings" },
-    { id: "tutoring", label: "Tutoring", desc: "Personalised learning and practice" },
-    { id: "coaching", label: "Coaching", desc: "Structured coaching at scale" },
-    { id: "onboarding", label: "Onboarding", desc: "Guide new hires or users through setup" },
-    { id: "meetingbot", label: "Meeting Bot", desc: "Join meetings to take notes and assist" },
-    { id: "sdr", label: "SDR", desc: "Automated outbound sales conversations" },
+    { id: "sales", label: "Sales", desc: "Qualify leads and book meetings", disabled: true },
+    { id: "tutoring", label: "Tutoring", desc: "Personalised learning and practice", disabled: true },
+    { id: "coaching", label: "Coaching", desc: "Structured coaching at scale", disabled: true },
+    { id: "onboarding", label: "Onboarding", desc: "Guide new hires or users through setup", disabled: true },
+    { id: "meetingbot", label: "Meeting Bot", desc: "Join meetings to take notes and assist", disabled: true },
+    { id: "sdr", label: "SDR", desc: "Automated outbound sales conversations", disabled: true },
   ];
 
   // Auto-select the only available option
@@ -1261,7 +1261,7 @@ function StepUseCase({ data, onChange }) {
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select the domain for your experience.</p>
       <div className="portal-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
         {useCases.map((uc) => (
-          <button key={uc.id} onClick={() => onChange({ ...data, useCase: uc.id, name: USE_CASE_DEFAULTS[uc.id] || "" })} style={{ ...selCard(data.useCase === uc.id, { padding: "16px 20px" }) }}>
+          <button key={uc.id} disabled={uc.disabled} onClick={() => !uc.disabled && onChange({ ...data, useCase: uc.id, name: USE_CASE_DEFAULTS[uc.id] || "" })} style={{ ...selCard(data.useCase === uc.id, { padding: "16px 20px" }), ...(uc.disabled ? { opacity: 0.45, cursor: "not-allowed" } : {}) }}>
             <div style={{ fontWeight: 600, fontSize: 14, color: data.useCase === uc.id ? theme.primary : theme.heading, marginBottom: 2 }}>{uc.label}</div>
             <div style={{ fontSize: 12, color: theme.textMuted }}>{uc.desc}</div>
           </button>
@@ -1275,7 +1275,7 @@ function StepUseCase({ data, onChange }) {
 function StepBotType({ data, onChange }) {
   const options = [
     { id: "video", label: "Video Avatar", desc: "A photorealistic visual avatar that appears on-screen during sessions. Lip-synced, expressive and fully interactive.", icon: Icons.videoLg },
-    { id: "voice", label: "Voice Bot", desc: "An intelligent voice-only agent that listens and responds in real time. No visual — just fast, natural conversation.", icon: Icons.micLg },
+    { id: "voice", label: "Voice Bot", desc: "An intelligent voice-only agent that listens and responds in real time. No visual — just fast, natural conversation.", icon: Icons.micLg, disabled: true },
   ];
 
   // Auto-select the only available option
@@ -1290,11 +1290,12 @@ function StepBotType({ data, onChange }) {
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Would you like a visual avatar or a voice-only agent?</p>
       <div className="portal-grid-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {options.map((opt) => (
-          <button key={opt.id} onClick={() => onChange({ ...data, botType: opt.id })} style={{
-            ...styles.card, cursor: "pointer", textAlign: "center", padding: "36px 24px",
+          <button key={opt.id} disabled={opt.disabled} onClick={() => !opt.disabled && onChange({ ...data, botType: opt.id })} style={{
+            ...styles.card, cursor: opt.disabled ? "not-allowed" : "pointer", textAlign: "center", padding: "36px 24px",
             borderColor: data.botType === opt.id ? theme.selectedBorder : theme.border,
             background: data.botType === opt.id ? theme.selectedBg : theme.surface,
             boxShadow: data.botType === opt.id ? `0 0 0 1px ${theme.selectedBorder}` : "none",
+            opacity: opt.disabled ? 0.45 : 1,
             transition: "all 0.15s",
           }}>
             <div style={{ color: data.botType === opt.id ? theme.primary : theme.textMuted, marginBottom: 16 }}>{opt.icon}</div>
@@ -1830,7 +1831,7 @@ function StepAvatarSettings({ data, onChange }) {
             </Field>
             <Field label="Hotwords (STT)" hint="Comma-separated words to boost recognition accuracy">
               <input value={layers.hotwords || ""} onChange={e => setLayer("hotwords", e.target.value)}
-                placeholder="e.g. Sonesse, StackOne, demo"
+                placeholder="Sonesse, StackOne, demo"
                 style={{ ...styles.input, marginBottom: 0, fontSize: 13 }}
                 onFocus={e => e.target.style.borderColor = theme.borderFocus}
                 onBlur={e => e.target.style.borderColor = theme.border} />
@@ -1899,7 +1900,7 @@ function StepPersona({ data, onChange }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 20, marginBottom: 24, alignItems: "end" }}>
         <div>
           <label style={styles.label}>Experience name</label>
-          <input value={data.name || ""} onChange={(e) => onChange({ ...data, name: e.target.value })} placeholder="e.g. Senior Engineer Screening Interview" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+          <input value={data.name || ""} onChange={(e) => onChange({ ...data, name: e.target.value })} placeholder="Senior Engineer Screening Interview" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
         <div>
           <label style={styles.label}>Brand logo</label>
@@ -1922,11 +1923,11 @@ function StepPersona({ data, onChange }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
         <div>
           <label style={styles.label}>Goals - What Outcome Should the Avatar Deliver?</label>
-          <textarea value={data.goals || ""} onChange={(e) => onChange({ ...data, goals: e.target.value })} placeholder="e.g. Screen candidates for technical fit, assess communication skills, determine culture alignment." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+          <textarea value={data.goals || ""} onChange={(e) => onChange({ ...data, goals: e.target.value })} placeholder="Screen candidates for technical fit, assess communication skills, determine culture alignment." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
         <div>
           <label style={styles.label}>Guardrails - What Should it Not Do?</label>
-          <textarea value={data.guardrails || ""} onChange={(e) => onChange({ ...data, guardrails: e.target.value })} placeholder="e.g. Do not ask about salary expectations, age, or personal circumstances. Do not make hiring decisions." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+          <textarea value={data.guardrails || ""} onChange={(e) => onChange({ ...data, guardrails: e.target.value })} placeholder="Do not ask about salary expectations, age, or personal circumstances. Do not make hiring decisions." style={{ ...styles.textarea, minHeight: 100 }} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
       </div>
 
@@ -2676,17 +2677,17 @@ function StepCustomEmail({ data, onChange }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
         <div>
           <label style={styles.label}>Sender name</label>
-          <input value={data.emailSenderName || ""} onChange={(e) => onChange({ ...data, emailSenderName: e.target.value })} placeholder="e.g. Sonesse Interviews" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+          <input value={data.emailSenderName || ""} onChange={(e) => onChange({ ...data, emailSenderName: e.target.value })} placeholder="Sonesse Interviews" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
         <div>
           <label style={styles.label}>Reply-to email</label>
-          <input type="email" value={data.emailReplyTo || ""} onChange={(e) => onChange({ ...data, emailReplyTo: e.target.value })} placeholder="e.g. interviews@yourcompany.com" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+          <input type="email" value={data.emailReplyTo || ""} onChange={(e) => onChange({ ...data, emailReplyTo: e.target.value })} placeholder="interviews@yourcompany.com" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
         </div>
       </div>
 
       <div style={{ marginBottom: 24 }}>
         <label style={styles.label}>Email subject line</label>
-        <input value={data.emailSubject || ""} onChange={(e) => onChange({ ...data, emailSubject: e.target.value })} placeholder="e.g. You're invited: AI Interview Session with {{company_name}}" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+        <input value={data.emailSubject || ""} onChange={(e) => onChange({ ...data, emailSubject: e.target.value })} placeholder="You're invited: AI Interview Session with {{company_name}}" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
       </div>
 
       <div style={{ marginBottom: 24 }}>
@@ -2731,10 +2732,10 @@ function StepPreview({ data, onSaved }) {
     { id: "teams", label: "Microsoft Teams", color: "#5059C9", desc: "Start a Teams meeting", comingSoon: false, icon: (
       <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#5059C9"/><text x="50%" y="56%" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="18" fontWeight="700">T</text></svg>
     )},
-    { id: "zoom",  label: "Zoom",            color: "#2D8CFF", desc: "Start a Zoom meeting", comingSoon: false, icon: (
+    { id: "zoom",  label: "Zoom",            color: "#2D8CFF", desc: "Start a Zoom meeting", comingSoon: true, icon: (
       <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#9ca3af"/><path d="M8 14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V14z" fill="white"/><path d="M26 17l6-4v14l-6-4V17z" fill="white"/></svg>
     )},
-    { id: "meet",  label: "Google Meet",     color: "#00AC47", desc: "Start a Google Meet", comingSoon: false, icon: (
+    { id: "meet",  label: "Google Meet",     color: "#00AC47", desc: "Start a Google Meet", comingSoon: true, icon: (
       <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#9ca3af"/><path d="M10 15h12v10H10z" fill="white"/><path d="M22 18l8-4v12l-8-4V18z" fill="#6b7280"/></svg>
     )},
   ];
@@ -3641,10 +3642,10 @@ function Wizard({ user, onLogout, onHome, onSaved, initialData }) {
           {step === 5  && <StepAvatarSettings data={data} onChange={setData} />}
           {step === 6  && <StepPersona data={data} onChange={setData} />}
           {step === 7  && <StepKnowledgeBase data={data} onChange={setData} />}
-          {step === 8  && <StepIntegration data={data} onChange={setData} />}
-          {step === 9  && <StepTriggerWorkflow data={data} onChange={setData} />}
-          {step === 10 && <StepDataSources data={data} onChange={setData} />}
-          {step === 11 && <StepPostMeeting data={data} onChange={setData} />}
+          {step === 8  && <LockedStep><StepIntegration data={data} onChange={setData} /></LockedStep>}
+          {step === 9  && <LockedStep><StepTriggerWorkflow data={data} onChange={setData} /></LockedStep>}
+          {step === 10 && <LockedStep><StepDataSources data={data} onChange={setData} /></LockedStep>}
+          {step === 11 && <LockedStep><StepPostMeeting data={data} onChange={setData} /></LockedStep>}
           {step === 12 && <StepPreview data={data} />}
           {step === 13 && <StepDeploy data={data} onSaved={onSaved} user={user} />}
 
