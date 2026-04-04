@@ -46,7 +46,7 @@ export async function onRequestPost({ request, env }) {
 
   const payload = {
     persona_name,
-    replica_id,
+    default_replica_id: replica_id,
     system_prompt: system_prompt || "You are a helpful AI assistant.",
     ...(context ? { context } : {}),
     ...(layers ? { layers } : {}),
