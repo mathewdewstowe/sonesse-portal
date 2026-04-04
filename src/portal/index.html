@@ -2752,6 +2752,32 @@ function StepPreview({ data, onSaved }) {
   ];
 
   const saveExperience = async (session) => {
+    // Create Tavus persona first if we don't have one yet
+    if (!data.tavusPersonaId && data.tavusReplicaId) {
+      const personaPayload = {
+        persona_name: data.name || "Untitled",
+        replica_id: data.tavusReplicaId,
+        system_prompt: buildSystemPrompt(data),
+      };
+      if (data.kbDocumentIds && data.kbDocumentIds.length > 0) {
+        personaPayload.context = data.kbDocumentIds.join(",");
+      }
+      if (data.tavusLayers?.llmModel) {
+        personaPayload.layers = { llm: { model: data.tavusLayers.llmModel } };
+      }
+      const pResp = await fetch("/api/tavus/personas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(personaPayload),
+      });
+      const pResult = await pResp.json();
+      if (pResult.persona_id) {
+        data.tavusPersonaId = pResult.persona_id;
+      } else {
+        throw new Error("Failed to create persona in Tavus. Please fill in experience name, goals, and select a replica before launching.");
+      }
+    }
+
     const payload = {
       user_id: session.user.id,
       name: data.name || "Untitled",
@@ -2763,13 +2789,11 @@ function StepPreview({ data, onSaved }) {
       updated_at: new Date().toISOString(),
     };
     if (data._dbId) {
-      // Update existing record
       const { data: updated, error: dbErr } = await sb.from("experiences")
         .update(payload).eq("id", data._dbId).select().single();
       if (dbErr) throw dbErr;
       return updated;
     } else {
-      // Insert new record
       const { data: inserted, error: dbErr } = await sb.from("experiences")
         .insert(payload).select().single();
       if (dbErr) throw dbErr;
