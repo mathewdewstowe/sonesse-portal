@@ -3086,7 +3086,7 @@ function StepDeploy({ data, onSaved, user }) {
       setMeetingUrl(result.joinWebUrl || "");
       setBotEmail(result.botEmail || "");
       setDeployed(true);
-      if (onSaved) onSaved();
+      // Don't call onSaved() here — stay on page so user can see Teams URL
     } catch (e) {
       setDeployError(e.message || "Failed to create Teams meeting. Please try again.");
     } finally {
