@@ -287,6 +287,17 @@ const WIZARD_STEPS = [
   { id: "deploy",         label: "Save" },
 ];
 
+function buildSystemPrompt(data) {
+  if (data.systemPrompt) return data.systemPrompt;
+  const uc = data.useCase ? data.useCase.charAt(0).toUpperCase() + data.useCase.slice(1) : "Interview";
+  const tone = data.tone || "Professional";
+  const name = data.name || "AI Assistant";
+  let prompt = `You are a ${tone.toLowerCase()} AI ${uc.toLowerCase()} assistant called ${name}.`;
+  if (data.goals) prompt += `\n\nGoals:\n${data.goals}`;
+  if (data.guardrails) prompt += `\n\nGuardrails:\n${data.guardrails}`;
+  return prompt;
+}
+
 const USE_CASE_DEFAULTS = {
   recruitment: "AI Screening Interview",
   sales: "AI Sales Qualifier",
@@ -2960,6 +2971,40 @@ function StepDeploy({ data, onSaved, user }) {
     try {
       const session = (await sb.auth.getSession()).data.session;
       if (!session) throw new Error("Not logged in");
+
+      // 1. Create Tavus persona (skip if one already exists)
+      let personaId = data.tavusPersonaId || "";
+      if (!personaId && data.tavusReplicaId) {
+        try {
+          const personaPayload = {
+            persona_name: data.name || "Untitled",
+            replica_id: data.tavusReplicaId,
+            system_prompt: buildSystemPrompt(data),
+          };
+          if (data.kbDocumentIds && data.kbDocumentIds.length > 0) {
+            personaPayload.context = data.kbDocumentIds.join(",");
+          }
+          if (data.tavusLayers?.llmModel) {
+            personaPayload.layers = { llm: { model: data.tavusLayers.llmModel } };
+          }
+          const pResp = await fetch("/api/tavus/personas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(personaPayload),
+          });
+          const pResult = await pResp.json();
+          if (pResult.persona_id) {
+            personaId = pResult.persona_id;
+            data.tavusPersonaId = personaId;
+          } else {
+            console.warn("Tavus persona creation response:", pResult);
+          }
+        } catch (pErr) {
+          console.warn("Tavus persona creation failed:", pErr);
+        }
+      }
+
+      // 2. Save experience to Supabase
       const payload = {
         user_id: session.user.id,
         name: data.name || "Untitled",
