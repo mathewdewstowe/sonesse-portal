@@ -292,10 +292,25 @@ function buildSystemPrompt(data) {
   const uc = data.useCase ? data.useCase.charAt(0).toUpperCase() + data.useCase.slice(1) : "Interview";
   const tone = data.tone || "Professional";
   const name = data.name || "AI Assistant";
-  let prompt = `You are a ${tone.toLowerCase()} AI ${uc.toLowerCase()} assistant called ${name}.`;
-  if (data.goals) prompt += `\n\nGoals:\n${data.goals}`;
-  if (data.guardrails) prompt += `\n\nGuardrails:\n${data.guardrails}`;
+  const botType = data.botType === "voice" ? "voice-only" : "video avatar";
+  let prompt = `You are a ${tone.toLowerCase()} AI ${uc.toLowerCase()} ${botType} assistant called "${name}".`;
+  prompt += `\nYou are conducting a one-on-one ${uc.toLowerCase()} session with a single participant.`;
+  if (data.goals) prompt += `\n\nYour goals:\n${data.goals}`;
+  if (data.guardrails) prompt += `\n\nGuardrails — you must follow these strictly:\n${data.guardrails}`;
+  if (data.kbJobDesc?.name) prompt += `\n\nA job description document ("${data.kbJobDesc.name}") has been provided in the knowledge base. Use it to tailor your questions and assess candidates against the role requirements.`;
+  if (data.kbResume?.name) prompt += `\n\nA candidate resume ("${data.kbResume.name}") has been provided in the knowledge base. Reference it to personalise the conversation and ask relevant follow-up questions.`;
+  prompt += `\n\nTone: Maintain a ${tone.toLowerCase()} tone throughout the conversation.`;
   return prompt;
+}
+
+function buildTavusLayers(data) {
+  const layers = {};
+  const tl = data.tavusLayers || {};
+  if (tl.llmModel) layers.llm = { model: tl.llmModel };
+  if (tl.turnDetection) layers.turn_detection = { model: tl.turnDetection };
+  if (tl.perceptionModel && tl.perceptionModel !== "off") layers.perception = { model: tl.perceptionModel };
+  if (tl.sttEngine) layers.stt = { engine: tl.sttEngine };
+  return Object.keys(layers).length > 0 ? layers : null;
 }
 
 const USE_CASE_DEFAULTS = {
@@ -2971,6 +2986,7 @@ function StepPreview({ data, onSaved }) {
           )}
         </div>
       )}
+
     </div>
   );
 }
@@ -2987,6 +3003,7 @@ function StepDeploy({ data, onSaved, user }) {
   const [botEmail, setBotEmail]     = useState("");
   const [deployError, setDeployError] = useState("");
   const [copied, setCopied]         = useState(false);
+  const [confirmModal, setConfirmModal] = useState(null);
   const vendor = AVATAR_VENDORS.find((v) => v.id === data.avatar);
 
   const handleSave = async () => {
@@ -3008,9 +3025,8 @@ function StepDeploy({ data, onSaved, user }) {
           if (data.kbDocumentIds && data.kbDocumentIds.length > 0) {
             personaPayload.context = data.kbDocumentIds.join(",");
           }
-          if (data.tavusLayers?.llmModel) {
-            personaPayload.layers = { llm: { model: data.tavusLayers.llmModel } };
-          }
+          const tavusLayers = buildTavusLayers(data);
+          if (tavusLayers) personaPayload.layers = tavusLayers;
           const pResp = await fetch("/api/tavus/personas", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -3110,7 +3126,19 @@ function StepDeploy({ data, onSaved, user }) {
 
       {/* ── Step 1: Save ── */}
       {!saved && (
-        <button onClick={handleSave} disabled={saving} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", padding: "14px 20px", fontSize: 16, opacity: saving ? 0.7 : 1 }}>
+        <button onClick={() => {
+          const personaPayload = {
+            persona_name: data.name || "Untitled",
+            replica_id: data.tavusReplicaId || "(not selected)",
+            system_prompt: buildSystemPrompt(data),
+          };
+          if (data.kbDocumentIds && data.kbDocumentIds.length > 0) personaPayload.context = data.kbDocumentIds.join(",");
+          const tavusLayers = buildTavusLayers(data);
+          if (tavusLayers) personaPayload.layers = tavusLayers;
+          if (data.kbJobDesc?.name) personaPayload._jd = data.kbJobDesc.name;
+          if (data.kbResume?.name) personaPayload._resume = data.kbResume.name;
+          setConfirmModal(personaPayload);
+        }} disabled={saving} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", padding: "14px 20px", fontSize: 16, opacity: saving ? 0.7 : 1 }}>
           {saving ? <span>Saving…</span> : <span style={{ display: "flex", alignItems: "center", gap: 8 }}>{Icons.rocket} Save experience</span>}
         </button>
       )}
@@ -3180,6 +3208,57 @@ function StepDeploy({ data, onSaved, user }) {
           ) : (
             <p style={{ fontSize: 13, color: theme.textMuted, margin: 0 }}>Teams meeting created. Check your umified.com calendar for the join link.</p>
           )}
+        </div>
+      )}
+
+      {/* Persona confirmation modal */}
+      {confirmModal && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#fff", borderRadius: 16, width: "90%", maxWidth: 680, maxHeight: "85vh", overflow: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+            <div style={{ padding: "20px 24px", borderBottom: `1px solid ${theme.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 16, color: theme.heading }}>Review Tavus Persona</div>
+                <div style={{ fontSize: 12, color: theme.textMuted, marginTop: 2 }}>Confirm the API payload before creating the persona and saving</div>
+              </div>
+              <button onClick={() => setConfirmModal(null)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: theme.textMuted, padding: 4 }}>✕</button>
+            </div>
+            <div style={{ padding: "20px 24px" }}>
+              <div style={{ display: "grid", gap: 12, marginBottom: 20 }}>
+                {[
+                  { label: "Persona Name", value: confirmModal.persona_name },
+                  { label: "Replica ID", value: confirmModal.replica_id },
+                  ...(confirmModal._jd ? [{ label: "Job Description", value: confirmModal._jd }] : []),
+                  ...(confirmModal._resume ? [{ label: "Candidate Resume", value: confirmModal._resume }] : []),
+                  ...(confirmModal.context ? [{ label: "KB Document IDs", value: confirmModal.context }] : []),
+                ].map(item => (
+                  <div key={item.label} style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: theme.textDim, minWidth: 130, textTransform: "uppercase", letterSpacing: "0.04em" }}>{item.label}</span>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: theme.heading, wordBreak: "break-all" }}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+              {confirmModal.layers && (
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: theme.heading, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.04em" }}>Layers</div>
+                  <pre style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 16px", fontSize: 12, color: theme.text, overflow: "auto", margin: 0, fontFamily: "'SF Mono', 'Fira Code', monospace" }}>{JSON.stringify(confirmModal.layers, null, 2)}</pre>
+                </div>
+              )}
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: theme.heading, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.04em" }}>System Prompt</div>
+                <pre style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 16px", fontSize: 12, color: theme.text, overflow: "auto", margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6, maxHeight: 300, fontFamily: "'SF Mono', 'Fira Code', monospace" }}>{confirmModal.system_prompt}</pre>
+              </div>
+              <details style={{ marginBottom: 20 }}>
+                <summary style={{ fontSize: 12, fontWeight: 600, color: theme.primary, cursor: "pointer", marginBottom: 8 }}>View full API payload</summary>
+                <pre style={{ background: theme.surface, border: `1px solid ${theme.border}`, borderRadius: 8, padding: "12px 16px", fontSize: 11, color: theme.text, overflow: "auto", margin: 0, maxHeight: 250, fontFamily: "'SF Mono', 'Fira Code', monospace" }}>{JSON.stringify((() => { const p = { ...confirmModal }; delete p._jd; delete p._resume; return p; })(), null, 2)}</pre>
+              </details>
+            </div>
+            <div style={{ padding: "16px 24px", borderTop: `1px solid ${theme.border}`, display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button onClick={() => setConfirmModal(null)} style={{ ...styles.btnSecondary, padding: "10px 20px" }}>Cancel</button>
+              <button onClick={() => { setConfirmModal(null); handleSave(); }} style={{ ...styles.btnPrimary, padding: "10px 24px" }}>
+                Create Persona &amp; Save
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
