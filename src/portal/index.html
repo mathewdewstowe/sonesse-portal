@@ -3834,7 +3834,13 @@ function SessionsPage({ user, onLogout, onHome }) {
 // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function Wizard({ user, onLogout, onHome, onSaved, initialData }) {
   const [step, setStep] = useState(0);
-  const [data, setData] = useState(initialData || { useCase: "recruitment" });
+  const [data, setData] = useState(initialData || {
+    useCase: "recruitment",
+    name: USE_CASE_DEFAULTS.recruitment,
+    goals: USE_CASE_PERSONA_DEFAULTS.recruitment.goals,
+    guardrails: USE_CASE_PERSONA_DEFAULTS.recruitment.guardrails,
+    tone: USE_CASE_PERSONA_DEFAULTS.recruitment.tone,
+  });
 
   const canProceed = () => {
     switch (step) {
