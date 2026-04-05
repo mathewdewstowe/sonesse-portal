@@ -322,6 +322,19 @@ const USE_CASE_DEFAULTS = {
   meetingbot: "AI Meeting Assistant",
   sdr: "AI SDR Outreach Bot",
 };
+const USE_CASE_PERSONA_DEFAULTS = {
+  recruitment: {
+    goals: "Screen candidates for technical fit, assess communication skills, evaluate culture alignment. Ask structured questions based on the job description. Probe for relevant experience and problem-solving ability.",
+    guardrails: "Do not ask about salary expectations, age, personal circumstances, marital status or protected characteristics. Do not make hiring decisions or share opinions on the candidate's suitability. Do not reveal evaluation criteria.",
+    tone: "Professional",
+  },
+  sales: { goals: "Qualify inbound leads by understanding their needs, budget, timeline and decision-making process. Book a follow-up meeting with the sales team.", guardrails: "Do not make pricing commitments or share confidential roadmap details. Do not disparage competitors.", tone: "Friendly" },
+  tutoring: { goals: "Guide the learner through the topic step-by-step. Check understanding with questions before moving on. Adapt difficulty to the learner's level.", guardrails: "Do not give direct answers to assessments. Do not deviate from the curriculum topic.", tone: "Empathetic" },
+  coaching: { goals: "Help the coachee reflect on their goals, identify blockers, and commit to specific next steps.", guardrails: "Do not provide therapy or medical advice. Do not make promises about outcomes.", tone: "Direct" },
+  onboarding: { goals: "Walk new users through setup, answer FAQs, and ensure they complete key onboarding steps.", guardrails: "Do not access or modify account settings on behalf of the user.", tone: "Friendly" },
+  meetingbot: { goals: "Join the meeting, take structured notes, capture action items, and summarise key decisions.", guardrails: "Do not participate in the conversation unless directly addressed. Do not record without consent.", tone: "Professional" },
+  sdr: { goals: "Engage prospects, qualify interest, handle initial objections, and book discovery calls.", guardrails: "Do not make pricing commitments or share confidential information. Do not be pushy or aggressive.", tone: "Friendly" },
+};
 
 // Use portrait-oriented images with faces properly framed
 const AVATAR_VENDORS = [
@@ -1278,7 +1291,7 @@ function StepUseCase({ data, onChange }) {
   // Auto-select the only available option
   useEffect(() => {
     const available = useCases.filter(u => !u.disabled);
-    if (available.length === 1 && !data.useCase) onChange({ ...data, useCase: available[0].id, name: USE_CASE_DEFAULTS[available[0].id] || "" });
+    if (available.length === 1 && !data.useCase) { const defaults = USE_CASE_PERSONA_DEFAULTS[available[0].id] || {}; onChange({ ...data, useCase: available[0].id, name: USE_CASE_DEFAULTS[available[0].id] || "", goals: defaults.goals || "", guardrails: defaults.guardrails || "", tone: defaults.tone || "" }); }
   }, []);
 
   return (
@@ -1287,7 +1300,7 @@ function StepUseCase({ data, onChange }) {
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Select the domain for your experience.</p>
       <div className="portal-grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
         {useCases.map((uc) => (
-          <button key={uc.id} disabled={uc.disabled} onClick={() => !uc.disabled && onChange({ ...data, useCase: uc.id, name: USE_CASE_DEFAULTS[uc.id] || "" })} style={{ ...selCard(data.useCase === uc.id, { padding: "16px 20px" }), ...(uc.disabled ? { opacity: 0.45, cursor: "not-allowed" } : {}) }}>
+          <button key={uc.id} disabled={uc.disabled} onClick={() => { if (uc.disabled) return; const defaults = USE_CASE_PERSONA_DEFAULTS[uc.id] || {}; onChange({ ...data, useCase: uc.id, name: USE_CASE_DEFAULTS[uc.id] || "", goals: defaults.goals || "", guardrails: defaults.guardrails || "", tone: defaults.tone || "" }); }} style={{ ...selCard(data.useCase === uc.id, { padding: "16px 20px" }), ...(uc.disabled ? { opacity: 0.45, cursor: "not-allowed" } : {}) }}>
             <div style={{ fontWeight: 600, fontSize: 14, color: data.useCase === uc.id ? theme.primary : theme.heading, marginBottom: 2 }}>{uc.label}</div>
             <div style={{ fontSize: 12, color: theme.textMuted }}>{uc.desc}</div>
           </button>
@@ -3343,7 +3356,47 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
   const { conversations: sessionsData } = useConversations();
 
   const enableNew = new URLSearchParams(window.location.search).has('enable');
+  const [deployingId, setDeployingId] = useState(null);
   const ucColors = { recruitment: "#6d28d9", sales: "#0891b2", tutoring: "#16a34a", coaching: "#d97706", lms: "#db2777", onboarding: "#4f46e5", meetingbot: "#0f766e", sdr: "#b45309" };
+
+  const launchWeb = async (exp) => {
+    setDeployingId(exp.id + "-web");
+    try {
+      const cfg = exp.config || {};
+      const resp = await fetch("/api/tavus/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          replica_id: cfg.tavusReplicaId || "r5f0577fc829",
+          persona_id: cfg.tavusPersonaId || "pdac61133ac5",
+          conversation_name: exp.name || "Sonesse Experience",
+          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+        }),
+      });
+      const result = await resp.json();
+      const url = result.conversation_url || result.data?.conversation_url;
+      if (url) window.open(url, "_blank");
+      else alert(result.error || "Failed to create web session");
+    } catch (e) { alert(e.message); }
+    finally { setDeployingId(null); }
+  };
+
+  const launchTeams = async (exp) => {
+    setDeployingId(exp.id + "-teams");
+    try {
+      const cfg = exp.config || {};
+      const session = (await sb.auth.getSession()).data.session;
+      const resp = await fetch("/api/teams/create-meeting", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Persona-Id": cfg.tavusPersonaId || "", "X-Replica-Id": cfg.tavusReplicaId || "" },
+        body: JSON.stringify({ experienceId: exp.id, experienceName: exp.name || "Sonesse Experience", userEmail: session?.user?.email || "" }),
+      });
+      const result = await resp.json();
+      if (result.ok && result.joinWebUrl) window.open(result.joinWebUrl, "_blank");
+      else alert(result.error || "Failed to create Teams meeting");
+    } catch (e) { alert(e.message); }
+    finally { setDeployingId(null); }
+  };
 
   const loadExperiences = async () => {
     setLoading(true);
@@ -3494,7 +3547,12 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
                     <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: exp.status === "live" ? theme.successBg : theme.surface, color: exp.status === "live" ? theme.success : theme.textDim, border: `1px solid ${exp.status === "live" ? theme.successBorder : theme.border}` }}>
                       {exp.status === "live" ? "● Live" : "Draft"}
                     </span>
-                    <button style={{ ...styles.btnSecondary, padding: "6px 14px", fontSize: 12 }}>Preview</button>
+                    <button onClick={() => launchWeb(exp)} disabled={!!deployingId} style={{ ...styles.btnSecondary, padding: "6px 14px", fontSize: 12, opacity: deployingId === exp.id + "-web" ? 0.6 : 1 }}>
+                      {deployingId === exp.id + "-web" ? "Launching…" : "Web"}
+                    </button>
+                    <button onClick={() => launchTeams(exp)} disabled={!!deployingId} style={{ ...styles.btnSecondary, padding: "6px 14px", fontSize: 12, background: "#0078d4", color: "#fff", borderColor: "#0078d4", opacity: deployingId === exp.id + "-teams" ? 0.6 : 1 }}>
+                      {deployingId === exp.id + "-teams" ? "Creating…" : "Teams"}
+                    </button>
                     {/* Three-dot menu */}
                     <div style={{ position: "relative" }}>
                       <button onClick={() => setMenuOpen(menuOpen === exp.id ? null : exp.id)} style={{ background: "none", border: "none", cursor: "pointer", padding: "6px 8px", borderRadius: 6, color: theme.textMuted, fontSize: 18, lineHeight: 1 }}>⋯</button>
