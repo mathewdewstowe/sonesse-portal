@@ -339,6 +339,8 @@ const USE_CASE_PERSONA_DEFAULTS = {
 // Use portrait-oriented images with faces properly framed
 const AVATAR_VENDORS = [
   { id: "tavus", name: "Tavus", type: "video", desc: "Real-time conversational video avatars with lip sync", color: "#1e40af", logo: "T", previewImg: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=300&fit=crop&crop=faces,center" },
+  { id: "heygen", name: "HeyGen", type: "video", desc: "AI-powered interactive video avatars for enterprise", color: "#6d28d9", logo: "H", previewImg: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=300&fit=crop&crop=faces,center", disabled: true },
+  { id: "anam", name: "Anam", type: "video", desc: "Photorealistic real-time avatars with emotional expression", color: "#0891b2", logo: "A", previewImg: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=faces,center", disabled: true },
   { id: "elevenlabs", name: "ElevenLabs", type: "voice", desc: "Ultra-realistic voice synthesis and cloning", color: "#d97706", logo: "XI", previewImg: null },
   { id: "deepgram", name: "Deepgram", type: "voice", desc: "Fast, accurate voice agents for enterprise scale", color: "#16a34a", logo: "D", previewImg: null },
 ];
@@ -1386,12 +1388,13 @@ function StepAvatar({ data, onChange }) {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
         {filtered.map((vendor) => (
-          <button key={vendor.id} onClick={() => onChange({ ...data, avatar: vendor.id })} style={{
-            ...styles.card, cursor: "pointer", textAlign: "left", padding: 0, overflow: "hidden",
+          <button key={vendor.id} disabled={vendor.disabled} onClick={() => !vendor.disabled && onChange({ ...data, avatar: vendor.id })} style={{
+            ...styles.card, cursor: vendor.disabled ? "not-allowed" : "pointer", textAlign: "left", padding: 0, overflow: "hidden",
             borderColor: data.avatar === vendor.id ? theme.selectedBorder : theme.border,
             background: data.avatar === vendor.id ? theme.selectedBg : theme.surface,
             boxShadow: data.avatar === vendor.id ? `0 0 0 1px ${theme.selectedBorder}` : "none",
-            transition: "all 0.15s",
+            opacity: vendor.disabled ? 0.45 : 1,
+            transition: "all 0.15s", position: "relative",
           }}>
             {/* Avatar face preview — fixed 130px height, face centred */}
             {vendor.previewImg ? (
@@ -1405,6 +1408,7 @@ function StepAvatar({ data, onChange }) {
                 {/* gradient fade bottom */}
                 <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 36, background: "linear-gradient(to top, rgba(248,249,251,0.95), transparent)" }} />
                 <div style={{ position: "absolute", top: 8, right: 8, padding: "2px 8px", borderRadius: 10, background: "rgba(0,0,0,0.55)", color: "#fff", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>{vendor.type}</div>
+                {vendor.disabled && <div style={{ position: "absolute", top: 8, left: 8, padding: "2px 8px", borderRadius: 10, background: "#e5e7eb", color: "#6b7280", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Coming soon</div>}
               </div>
             ) : (
               <div style={{ width: "100%", height: 100, background: `linear-gradient(135deg, ${vendor.color}18, ${vendor.color}08)`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, position: "relative" }}>
@@ -3955,9 +3959,6 @@ function Wizard({ user, onLogout, onHome, onSaved, initialData }) {
             ) : <div />}
             {step < totalSteps - 1 && (
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <button onClick={() => setStep(step + 1)} style={{ ...styles.btnGhost, color: theme.textDim, fontSize: 13, fontWeight: 500 }}>
-                  Skip
-                </button>
                 <button onClick={() => canProceed() && setStep(step + 1)} disabled={!canProceed()} style={{ ...styles.btnPrimary, opacity: canProceed() ? 1 : 0.4 }}>
                   <span>Continue</span> {Icons.arrowRight}
                 </button>
