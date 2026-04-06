@@ -1039,7 +1039,7 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           replica_id: rId, persona_id: personaId, conversation_name: name,
-          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+          properties: { max_call_duration: 300, enable_recording: true, apply_greenscreen: false },
         }),
       })
         .then(r => r.json())
@@ -1599,7 +1599,7 @@ function StepChooseTavusAvatar({ data, onChange }) {
           replica_id: replica.replica_id,
           conversation_name: `Preview — ${replica.replica_name}`,
           conversational_context: "You are a friendly AI assistant. This is a brief 60-second preview. Greet the user warmly and briefly describe how you can help with recruitment screening interviews.",
-          properties: { max_call_duration: 120, enable_recording: false, apply_greenscreen: false },
+          properties: { max_call_duration: 120, enable_recording: true, apply_greenscreen: false },
         }),
       });
       const res = await resp.json();
@@ -2852,7 +2852,7 @@ function StepPreview({ data, onSaved }) {
           replica_id: replicaId,
           persona_id: personaId,
           conversation_name: data.name || "Sonesse Experience",
-          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+          properties: { max_call_duration: 300, enable_recording: true, apply_greenscreen: false },
         }),
       });
       const result = await resp.json();
@@ -3123,7 +3123,7 @@ function StepDeploy({ data, onSaved, user }) {
           replica_id: replicaId,
           persona_id: personaId,
           conversation_name: data.name || "Sonesse Experience",
-          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+          properties: { max_call_duration: 300, enable_recording: true, apply_greenscreen: false },
         }),
       });
       const result = await resp.json();
@@ -3375,7 +3375,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
           replica_id: cfg.tavusReplicaId || "r5f0577fc829",
           persona_id: cfg.tavusPersonaId || "pdac61133ac5",
           conversation_name: exp.name || "Sonesse Experience",
-          properties: { max_call_duration: 300, enable_recording: false, apply_greenscreen: false },
+          properties: { max_call_duration: 300, enable_recording: true, apply_greenscreen: false },
         }),
       });
       const result = await resp.json();
