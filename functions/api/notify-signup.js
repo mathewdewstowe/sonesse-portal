@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }) {
   let body = {};
   try { body = await request.json(); } catch {}
 
-  const { email = "unknown", name = "" } = body;
+  const { email = "unknown", name = "", company = "" } = body;
   const now = new Date().toUTCString();
 
   const html = `
@@ -44,6 +44,7 @@ export async function onRequestPost({ request, env }) {
         <table style="font-size:14px;width:100%;border-collapse:collapse;">
           <tr><td style="color:#6b7280;padding:4px 0;width:100px;">Email</td><td style="font-weight:600;color:#111827;">${email}</td></tr>
           ${name ? `<tr><td style="color:#6b7280;padding:4px 0;">Name</td><td style="font-weight:600;color:#111827;">${name}</td></tr>` : ""}
+          ${company ? `<tr><td style="color:#6b7280;padding:4px 0;">Company</td><td style="font-weight:600;color:#111827;">${company}</td></tr>` : ""}
           <tr><td style="color:#6b7280;padding:4px 0;">Time</td><td style="font-weight:600;color:#111827;">${now}</td></tr>
         </table>
       </div>

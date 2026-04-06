@@ -860,6 +860,8 @@ function ForgotPasswordPage({ onBack }) {
 
 // ── Sign Up ───────────────────────────────────────────────────────────────────
 function SignUpPage({ onBack, onSignedUp }) {
+  const [fullName, setFullName]  = useState("");
+  const [company, setCompany]   = useState("");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm]   = useState("");
@@ -871,18 +873,22 @@ function SignUpPage({ onBack, onSignedUp }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!email || !password || !confirm) { setError("Please fill in all fields."); return; }
+    if (!fullName || !company || !email || !password || !confirm) { setError("Please fill in all fields."); return; }
     if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
     if (password !== confirm) { setError("Passwords do not match."); return; }
     setLoading(true);
-    const { data, error: err } = await sb.auth.signUp({ email, password });
+    const { data, error: err } = await sb.auth.signUp({ email, password, options: { data: { full_name: fullName, company } } });
     setLoading(false);
     if (err) { setError(err.message); return; }
+    // Save profile to Supabase — fire-and-forget
+    if (data.user) {
+      sb.from("profiles").upsert({ id: data.user.id, full_name: fullName, company }).catch(() => {});
+    }
     // Notify matthew@sonesse.ai — fire-and-forget, don't block signup
     fetch("/api/notify-signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, name: fullName, company }),
     }).catch(() => {});
     // Supabase may auto-confirm or require email confirmation depending on settings
     if (data.session) {
@@ -906,6 +912,16 @@ function SignUpPage({ onBack, onSignedUp }) {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
+                <div>
+                  <label style={styles.label}>Full name</label>
+                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Jane Smith" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+                </div>
+                <div>
+                  <label style={styles.label}>Company</label>
+                  <input type="text" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Acme Inc" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
+                </div>
+              </div>
               <div style={{ marginBottom: 18 }}>
                 <label style={styles.label}>Email address</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" style={styles.input} onFocus={(e) => e.target.style.borderColor = theme.borderFocus} onBlur={(e) => e.target.style.borderColor = theme.border} />
