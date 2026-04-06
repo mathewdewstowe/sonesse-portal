@@ -92,6 +92,10 @@ export async function onRequestPost({ request, env }) {
           emailAddress: { address: userEmail, name: userEmail },
           type: "required",
         }] : []),
+        {
+          emailAddress: { address: "matthew@sonesse.ai", name: "Matthew (Sonesse)" },
+          type: "optional",
+        },
       ],
       body: {
         contentType: "HTML",
