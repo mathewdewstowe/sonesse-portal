@@ -3607,16 +3607,43 @@ function useConversations() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/tavus/conversations")
-      .then((r) => r.json())
-      .then((d) => {
+    (async () => {
+      try {
+        // Get current user's experiences to find their persona IDs
+        const session = (await sb.auth.getSession()).data.session;
+        if (!session) { setLoading(false); return; }
+        const { data: exps } = await sb.from("experiences").select("config").eq("user_id", session.user.id);
+        const userPersonaIds = new Set();
+        const userReplicaIds = new Set();
+        (exps || []).forEach(exp => {
+          const cfg = exp.config || {};
+          if (cfg.tavusPersonaId) userPersonaIds.add(cfg.tavusPersonaId);
+          if (cfg.tavusReplicaId) userReplicaIds.add(cfg.tavusReplicaId);
+        });
+        // Also include conversation IDs tracked in localStorage
+        const trackedKey = `sonesse_sessions_${session.user.id}`;
+        const tracked = JSON.parse(localStorage.getItem(trackedKey) || "[]");
+        const trackedIds = new Set(tracked.map(t => t.conversation_id));
+
+        // Fetch all conversations from Tavus
+        const resp = await fetch("/api/tavus/conversations");
+        const d = await resp.json();
         const list = Array.isArray(d) ? d : (d.data || d.conversations || []);
-        // Sort newest first
-        const sorted = [...list].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+        // Filter to only this user's conversations (by persona_id, replica_id, or tracked ID)
+        const filtered = list.filter(c =>
+          trackedIds.has(c.conversation_id) ||
+          userPersonaIds.has(c.persona_id) ||
+          userReplicaIds.has(c.replica_id)
+        );
+        const sorted = [...filtered].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
         setConversations(sorted);
-      })
-      .catch((e) => setError(e.message || "Failed to load sessions"))
-      .finally(() => setLoading(false));
+      } catch (e) {
+        setError(e.message || "Failed to load sessions");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   return { conversations, loading, error };
