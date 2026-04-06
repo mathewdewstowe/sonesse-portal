@@ -3144,7 +3144,7 @@ function StepDeploy({ data, onSaved, user }) {
 
   return (
     <div>
-      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Save &amp; Deploy</h2>
+      <h2 style={{ color: theme.heading, margin: "0 0 6px", fontSize: 22, fontWeight: 700 }}>Create &amp; Deploy</h2>
       <p style={{ color: theme.textMuted, margin: "0 0 28px", fontSize: 14 }}>Review your configuration, save your experience, then deploy to Microsoft Teams.</p>
 
       <div style={{ display: "grid", gap: 10, marginBottom: 32 }}>
@@ -3181,7 +3181,7 @@ function StepDeploy({ data, onSaved, user }) {
           if (data.kbResume?.name) personaPayload._resume = data.kbResume.name;
           setConfirmModal(personaPayload);
         }} disabled={saving} style={{ ...styles.btnPrimary, width: "100%", justifyContent: "center", padding: "14px 20px", fontSize: 16, opacity: saving ? 0.7 : 1 }}>
-          {saving ? <span>Saving…</span> : <span style={{ display: "flex", alignItems: "center", gap: 8 }}>{Icons.rocket} Save experience</span>}
+          {saving ? <span>Creating…</span> : <span style={{ display: "flex", alignItems: "center", gap: 8 }}>{Icons.rocket} Create your Experience</span>}
         </button>
       )}
 
@@ -3892,7 +3892,7 @@ function Wizard({ user, onLogout, onHome, onSaved, initialData }) {
           {step === 9  && <LockedStep><StepTriggerWorkflow data={data} onChange={setData} /></LockedStep>}
           {step === 10 && <LockedStep><StepDataSources data={data} onChange={setData} /></LockedStep>}
           {step === 11 && <LockedStep><StepPostMeeting data={data} onChange={setData} /></LockedStep>}
-          {step === 12 && <StepPreview data={data} />}
+          {step === 12 && <LockedStep><StepPreview data={data} /></LockedStep>}
           {step === 13 && <StepDeploy data={data} onSaved={onSaved} user={user} />}
 
           {/* Navigation */}
