@@ -1809,8 +1809,8 @@ function StepAvatarSettings({ data, onChange }) {
 
       <div style={{ display: "flex", borderRadius: 8, border: `1px solid ${theme.border}`, overflow: "hidden", marginBottom: 20, width: "fit-content" }}>
         {["default", "advanced"].map(m => (
-          <button key={m} onClick={() => { setMode(m); onChange({ ...data, avatarSettingsMode: m }); }}
-            style={{ padding: "7px 18px", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer", background: mode === m ? theme.primary : "transparent", color: mode === m ? "#fff" : theme.textMuted, transition: "all 0.15s" }}>
+          <button key={m} disabled={m === "advanced"} onClick={() => { if (m === "advanced") return; setMode(m); onChange({ ...data, avatarSettingsMode: m }); }}
+            style={{ padding: "7px 18px", fontSize: 13, fontWeight: 600, border: "none", cursor: m === "advanced" ? "not-allowed" : "pointer", background: mode === m ? theme.primary : "transparent", color: mode === m ? "#fff" : theme.textMuted, opacity: m === "advanced" ? 0.45 : 1, transition: "all 0.15s" }}>
             {m === "default" ? "Defaults" : "Advanced"}
           </button>
         ))}
@@ -2788,7 +2788,7 @@ function StepPreview({ data, onSaved }) {
         system_prompt: buildSystemPrompt(data),
       };
       if (data.kbDocumentIds && data.kbDocumentIds.length > 0) {
-        personaPayload.context = data.kbDocumentIds.join(",");
+        personaPayload.document_ids = data.kbDocumentIds;
       }
       if (data.tavusLayers?.llmModel) {
         personaPayload.layers = { llm: { model: data.tavusLayers.llmModel } };
@@ -3036,7 +3036,7 @@ function StepDeploy({ data, onSaved, user }) {
             system_prompt: buildSystemPrompt(data),
           };
           if (data.kbDocumentIds && data.kbDocumentIds.length > 0) {
-            personaPayload.context = data.kbDocumentIds.join(",");
+            personaPayload.document_ids = data.kbDocumentIds;
           }
           const tavusLayers = buildTavusLayers(data);
           if (tavusLayers) personaPayload.layers = tavusLayers;
@@ -3174,7 +3174,7 @@ function StepDeploy({ data, onSaved, user }) {
             replica_id: data.tavusReplicaId || "(not selected)",
             system_prompt: buildSystemPrompt(data),
           };
-          if (data.kbDocumentIds && data.kbDocumentIds.length > 0) personaPayload.context = data.kbDocumentIds.join(",");
+          if (data.kbDocumentIds && data.kbDocumentIds.length > 0) personaPayload.document_ids = data.kbDocumentIds;
           const tavusLayers = buildTavusLayers(data);
           if (tavusLayers) personaPayload.layers = tavusLayers;
           if (data.kbJobDesc?.name) personaPayload._jd = data.kbJobDesc.name;

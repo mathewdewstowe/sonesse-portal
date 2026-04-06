@@ -36,7 +36,7 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
-  const { persona_name, replica_id, system_prompt, context, layers } = body;
+  const { persona_name, replica_id, system_prompt, context, layers, document_ids } = body;
   if (!persona_name || !replica_id) {
     return new Response(JSON.stringify({ error: "persona_name and replica_id are required" }), {
       status: 400,
@@ -50,6 +50,7 @@ export async function onRequestPost({ request, env }) {
     system_prompt: system_prompt || "You are a helpful AI assistant.",
     ...(context ? { context } : {}),
     ...(layers ? { layers } : {}),
+    ...(document_ids && document_ids.length > 0 ? { document_ids } : {}),
   };
 
   try {
