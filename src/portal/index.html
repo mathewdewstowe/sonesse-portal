@@ -1047,7 +1047,7 @@ function PreBuiltAvatarCard({ name, desc, personaId, replicaId, tags, onUse, thu
           const url = res.conversation_url || res.data?.conversation_url;
           const cid = res.conversation_id || res.data?.conversation_id;
           if (!url) throw new Error(res.error || res.message || "No URL returned");
-          if (cid) trackConversation(cid, name);
+          if (cid) trackConversation(cid, name, { personaId, replicaId: rId, platform: "web", conversationUrl: url });
           setWebUrl(url); setWeb("done"); window.open(url, "_blank");
         })
         .catch(e => { setWebErr(e.message); setWeb("error"); });
@@ -2859,7 +2859,7 @@ function StepPreview({ data, onSaved }) {
       const url = result.conversation_url || result.data?.conversation_url;
       const cid = result.conversation_id || result.data?.conversation_id;
       if (!url) throw new Error(result.error || "No conversation URL returned");
-      if (cid) trackConversation(cid, data.name || "Sonesse Experience");
+      if (cid) trackConversation(cid, data.name || "Sonesse Experience", { personaId: data.tavusPersonaId, replicaId: data.tavusReplicaId, experienceId: data._dbId, platform: "web", conversationUrl: url });
       setMeetingUrl(url);
       setLaunched("web");
       window.open(url, "_blank");
@@ -3098,6 +3098,7 @@ function StepDeploy({ data, onSaved, user }) {
       });
       const result = await resp.json();
       if (!result.ok) throw new Error(result.error || "Failed to create Teams meeting");
+      trackConversation(result.eventId || experienceId, data.name || "Sonesse Experience", { personaId: data.tavusPersonaId, replicaId: data.tavusReplicaId, experienceId, platform: "teams", conversationUrl: result.joinWebUrl });
       setMeetingUrl(result.joinWebUrl || "");
       setBotEmail(result.botEmail || "");
       setDeployed("teams");
@@ -3127,7 +3128,9 @@ function StepDeploy({ data, onSaved, user }) {
       });
       const result = await resp.json();
       const url = result.conversation_url || result.data?.conversation_url;
+      const cid = result.conversation_id || result.data?.conversation_id;
       if (!url) throw new Error(result.error || "No conversation URL returned");
+      if (cid) trackConversation(cid, data.name || "Sonesse Experience", { personaId, replicaId, experienceId, platform: "web", conversationUrl: url });
       setMeetingUrl(url);
       setDeployed("web");
       window.open(url, "_blank");
@@ -3377,8 +3380,11 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
       });
       const result = await resp.json();
       const url = result.conversation_url || result.data?.conversation_url;
-      if (url) window.open(url, "_blank");
-      else alert(result.error || "Failed to create web session");
+      const cid = result.conversation_id || result.data?.conversation_id;
+      if (url) {
+        if (cid) trackConversation(cid, exp.name || "Sonesse Experience", { personaId: cfg.tavusPersonaId, replicaId: cfg.tavusReplicaId, experienceId: exp.id, platform: "web", conversationUrl: url });
+        window.open(url, "_blank");
+      } else alert(result.error || "Failed to create web session");
     } catch (e) { alert(e.message); }
     finally { setDeployingId(null); }
   };
@@ -3394,8 +3400,10 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
         body: JSON.stringify({ experienceId: exp.id, experienceName: exp.name || "Sonesse Experience", userEmail: session?.user?.email || "" }),
       });
       const result = await resp.json();
-      if (result.ok && result.joinWebUrl) window.open(result.joinWebUrl, "_blank");
-      else alert(result.error || "Failed to create Teams meeting");
+      if (result.ok && result.joinWebUrl) {
+        trackConversation(result.eventId || exp.id, exp.name || "Sonesse Experience", { personaId: cfg.tavusPersonaId, replicaId: cfg.tavusReplicaId, experienceId: exp.id, platform: "teams", conversationUrl: result.joinWebUrl });
+        window.open(result.joinWebUrl, "_blank");
+      } else alert(result.error || "Failed to create Teams meeting");
     } catch (e) { alert(e.message); }
     finally { setDeployingId(null); }
   };
@@ -3588,16 +3596,20 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
 // SESSIONS TABLE (shared component)
 // Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 // Track a conversation against the current user in localStorage
-async function trackConversation(conversationId, name) {
+async function trackConversation(conversationId, name, extra = {}) {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if (!session?.user?.id) return;
-    const key = `sonesse_sessions_${session.user.id}`;
-    const existing = JSON.parse(localStorage.getItem(key) || "[]");
-    if (!existing.find(s => s.conversation_id === conversationId)) {
-      existing.unshift({ conversation_id: conversationId, name, created_at: new Date().toISOString() });
-      localStorage.setItem(key, JSON.stringify(existing.slice(0, 500)));
-    }
+    await sb.from("sessions").insert({
+      user_id: session.user.id,
+      conversation_id: conversationId,
+      conversation_name: name,
+      persona_id: extra.personaId || null,
+      replica_id: extra.replicaId || null,
+      experience_id: extra.experienceId || null,
+      platform: extra.platform || "web",
+      conversation_url: extra.conversationUrl || null,
+    });
   } catch (_) {}
 }
 
@@ -3609,36 +3621,48 @@ function useConversations() {
   useEffect(() => {
     (async () => {
       try {
-        // Get current user's experiences to find their persona IDs
         const session = (await sb.auth.getSession()).data.session;
         if (!session) { setLoading(false); return; }
-        const { data: exps } = await sb.from("experiences").select("config").eq("user_id", session.user.id);
-        const userPersonaIds = new Set();
-        const userReplicaIds = new Set();
-        (exps || []).forEach(exp => {
-          const cfg = exp.config || {};
-          if (cfg.tavusPersonaId) userPersonaIds.add(cfg.tavusPersonaId);
-          if (cfg.tavusReplicaId) userReplicaIds.add(cfg.tavusReplicaId);
-        });
-        // Also include conversation IDs tracked in localStorage
-        const trackedKey = `sonesse_sessions_${session.user.id}`;
-        const tracked = JSON.parse(localStorage.getItem(trackedKey) || "[]");
-        const trackedIds = new Set(tracked.map(t => t.conversation_id));
 
-        // Fetch all conversations from Tavus
+        // 1. Fetch user's sessions from Supabase (source of truth)
+        const { data: userSessions } = await sb.from("sessions")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .order("created_at", { ascending: false });
+
+        if (!userSessions || userSessions.length === 0) {
+          setConversations([]);
+          setLoading(false);
+          return;
+        }
+
+        // 2. Fetch all Tavus conversations to enrich with status/transcript/recording
         const resp = await fetch("/api/tavus/conversations");
         const d = await resp.json();
-        const list = Array.isArray(d) ? d : (d.data || d.conversations || []);
+        const tavusList = Array.isArray(d) ? d : (d.data || d.conversations || []);
+        const tavusMap = {};
+        tavusList.forEach(c => { tavusMap[c.conversation_id] = c; });
 
-        // Filter to only this user's conversations
-        // Priority: tracked conversation IDs (explicit), then persona IDs from their experiences only
-        // Exclude shared/default persona IDs that multiple users might share
-        const filtered = list.filter(c =>
-          trackedIds.has(c.conversation_id) ||
-          (userPersonaIds.size > 0 && userPersonaIds.has(c.persona_id))
-        );
-        const sorted = [...filtered].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-        setConversations(sorted);
+        // 3. Merge: Supabase session + Tavus conversation details
+        const merged = userSessions.map(s => {
+          const tavus = tavusMap[s.conversation_id] || {};
+          return {
+            ...tavus,
+            conversation_id: s.conversation_id,
+            conversation_name: s.conversation_name || tavus.conversation_name || "Untitled",
+            persona_id: s.persona_id || tavus.persona_id,
+            replica_id: s.replica_id || tavus.replica_id,
+            platform: s.platform,
+            conversation_url: s.conversation_url || tavus.conversation_url,
+            created_at: s.created_at || tavus.created_at,
+            ended_at: tavus.ended_at || s.ended_at,
+            status: tavus.status || s.status,
+            transcript: tavus.transcript,
+            recording_url: tavus.recording_url,
+          };
+        });
+
+        setConversations(merged);
       } catch (e) {
         setError(e.message || "Failed to load sessions");
       } finally {
