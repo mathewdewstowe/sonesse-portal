@@ -68,7 +68,7 @@ export async function onRequestPost({ request, env }) {
     );
   }
 
-  const botEmail = customBotEmail || `${experienceId}@my-meeting-bot.com`;
+  const botEmail = customBotEmail || "tavus.demo@my-meeting-bot.com";
 
   // Default: start now, end in 15 minutes
   const start = startTime ? new Date(startTime) : new Date();
