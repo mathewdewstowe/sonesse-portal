@@ -3493,7 +3493,7 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
           {/* Header row */}
           <div className="portal-home-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 32 }}>
             <div>
-              <h1 className="portal-page-title" style={{ color: theme.heading, fontSize: 24, fontWeight: 700, margin: "0 0 4px" }}>Welcome back{user ? `, ${user.split("@")[0]}` : ""}</h1>
+              <h1 className="portal-page-title" style={{ color: theme.heading, fontSize: 24, fontWeight: 700, margin: "0 0 4px" }}>Welcome back</h1>
               <p style={{ color: theme.textMuted, fontSize: 14, margin: 0 }}>Manage your AI experiences and review session activity.</p>
             </div>
             <button onClick={onNewExperience} style={{ ...styles.btnPrimary, padding: "10px 18px", gap: 8 }}>
