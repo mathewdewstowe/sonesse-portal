@@ -2016,11 +2016,13 @@ function StepKnowledgeBase({ data, onChange }) {
         const path = `${session.user.id}/kb/${key}-${Date.now()}.pdf`;
         const { error } = await sb.storage.from("logos").upload(path, file, { upsert: true });
         if (!error) {
-          publicUrl = sb.storage.from("logos").getPublicUrl(path).data.publicUrl;
+          // Use signed URL (1 hour) so Tavus can fetch the file
+          const { data: signedData } = await sb.storage.from("logos").createSignedUrl(path, 3600);
+          publicUrl = signedData?.signedUrl || sb.storage.from("logos").getPublicUrl(path).data.publicUrl;
         }
       }
 
-      // Send to Tavus Knowledge Base if we have a public URL
+      // Send to Tavus Knowledge Base if we have a URL
       let documentId = null;
       if (publicUrl) {
         try {
