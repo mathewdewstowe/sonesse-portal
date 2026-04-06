@@ -3554,9 +3554,6 @@ function PortalHome({ user, onLogout, onNewExperience, onEditExperience, onSessi
                       <div style={{ fontWeight: 700, fontSize: 14, color: theme.heading, marginBottom: 2 }}>{exp.name}</div>
                       <div style={{ fontSize: 12, color: theme.textMuted }}>{(exp.vendor || "—").charAt(0).toUpperCase() + (exp.vendor || "—").slice(1)} → {(exp.use_case || "").charAt(0).toUpperCase() + (exp.use_case || "").slice(1)}</div>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 20, background: exp.status === "live" ? theme.successBg : theme.surface, color: exp.status === "live" ? theme.success : theme.textDim, border: `1px solid ${exp.status === "live" ? theme.successBorder : theme.border}` }}>
-                      {exp.status === "live" ? "● Live" : "Draft"}
-                    </span>
                     <button onClick={() => launchWeb(exp)} disabled={!!deployingId} style={{ ...styles.btnSecondary, padding: "6px 14px", fontSize: 12, opacity: deployingId === exp.id + "-web" ? 0.6 : 1 }}>
                       {deployingId === exp.id + "-web" ? "Launching…" : "Web"}
                     </button>
