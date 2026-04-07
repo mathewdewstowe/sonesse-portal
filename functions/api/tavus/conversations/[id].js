@@ -14,7 +14,7 @@ export async function onRequestDelete({ params, env }) {
   if (!id) return new Response(JSON.stringify({ error: "Missing conversation id" }), { status: 400, headers: { "Content-Type": "application/json", ...CORS } });
   try {
     const resp = await fetch(`https://tavusapi.com/v2/conversations/${id}`, { method: "DELETE", headers: { "x-api-key": apiKey } });
-    return new Response(JSON.stringify({ ok: resp.ok, status: resp.status }), { status: resp.status, headers: { "Content-Type": "application/json", ...CORS } });
+    return new Response(JSON.stringify({ ok: resp.ok, status: resp.status }), { status: 200, headers: { "Content-Type": "application/json", ...CORS } });
   } catch (err) {
     return new Response(JSON.stringify({ error: "Failed to delete", detail: err.message }), { status: 502, headers: { "Content-Type": "application/json", ...CORS } });
   }
