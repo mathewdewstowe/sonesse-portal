@@ -3,9 +3,22 @@
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
+
+export async function onRequestDelete({ params, env }) {
+  const apiKey = env.TAVUS_API_KEY;
+  if (!apiKey) return new Response(JSON.stringify({ error: "TAVUS_API_KEY not configured" }), { status: 500, headers: { "Content-Type": "application/json", ...CORS } });
+  const { id } = params;
+  if (!id) return new Response(JSON.stringify({ error: "Missing conversation id" }), { status: 400, headers: { "Content-Type": "application/json", ...CORS } });
+  try {
+    const resp = await fetch(`https://tavusapi.com/v2/conversations/${id}`, { method: "DELETE", headers: { "x-api-key": apiKey } });
+    return new Response(JSON.stringify({ ok: resp.ok, status: resp.status }), { status: resp.status, headers: { "Content-Type": "application/json", ...CORS } });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: "Failed to delete", detail: err.message }), { status: 502, headers: { "Content-Type": "application/json", ...CORS } });
+  }
+}
 
 export async function onRequestGet({ params, env }) {
   const apiKey = env.TAVUS_API_KEY;
