@@ -44,7 +44,8 @@ export async function onRequestPost({ request, env }) {
     conversational_context: conversational_context || "You are a helpful AI assistant.",
     properties: {
       max_call_duration: 300,
-      enable_recording: false,
+      enable_recording: true,
+      enable_closed_captions: true,
       apply_greenscreen: false,
       ...(properties || {}),
     },
